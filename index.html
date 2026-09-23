@@ -259,7 +259,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         </div>
         <div id="folOpts" class="folOpts" hidden>
           <div class="frow">
-            <div class="flab">They follow on</div>
+            <div class="flab">Following on</div>
             <div class="seg2" role="group" aria-label="Which side they follow on">
               <button type="button" data-folside="right">Right</button>
               <button type="button" data-folside="left">Left</button>
@@ -294,6 +294,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel" id="updPanel">
         <div class="ph"><h2>App version</h2></div>
+        <p class="note">Your settings stay on this phone — headers, counts, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
         <div class="upd"><span class="ver" id="verNow"></span><span class="st" id="verSt">Checking…</span></div>
         <button class="updbtn" id="updBtn" type="button" hidden>Update now</button>
         <button class="chkbtn" id="chkBtn" type="button">Check for updates</button>
@@ -348,7 +349,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
       <section class="panel">
         <div class="ph"><h2>How to use it</h2></div>
         <p class="note"><b>My header</b> stays set until you change it. <b>1. Other combines</b> is everyone in the crew besides you who'll cut this land: the ones out with you now, or the ones you want to leave room for.</p>
-        <p class="note"><b>2. Following me / Not following.</b> <b>Following me</b> shows two compact switches: <b>They follow on Right/Left</b> (usually Right), and <b>Strike out Skip/Outside</b>. <b>Skip</b> jumps over the pack (followers out + whole crew back). <b>Outside</b> keeps crop on the outside — leave room for the followers only (e.g. four 40′ headers → <b>+5</b>), which also handles mixed header sizes. <b>Not following</b> means you're going out alone and only leaving room for the <b>other</b> combines in the headland (not yourself). Three others same size → <b>+4</b>. Two → <b>+3</b>. Nobody else → <b>+1</b>.</p>
+        <p class="note"><b>2. Following me / Not following.</b> <b>Following me</b> shows two compact switches: <b>Following on Right/Left</b> (usually Right), and <b>Strike out Skip/Outside</b>. <b>Skip</b> jumps over the pack (followers out + whole crew back). <b>Outside</b> keeps crop on the outside — leave room for the followers only (e.g. four 40′ headers → <b>+5</b>), which also handles mixed header sizes. <b>Not following</b> means you're going out alone and only leaving room for the <b>other</b> combines in the headland (not yourself). Three others same size → <b>+4</b>. Two → <b>+3</b>. Nobody else → <b>+1</b>.</p>
         <p class="note"><b>3. Turning at the end:</b> pick the way you'll turn, as you're driving the pass you're on now. Heading north and turning east to strike out and come back south? That's <b>Right</b>.</p>
         <p class="note"><b>4. Count from the line you last struck out on,</b> not the line you just came back on. That pass is always the edge of what's left to cut. At the start of a field, count from your line along the edge. Last strike-out on 16 and it says <b>+10</b>? Go to 26. (If your line numbers count down that way, go to 6. Just move 10 lines over.)</p>
         <p class="note"><b>5. Quick check</b> with every header the same size as yours: <b>Following me</b> = 2 × the number of combines, you included. <b>Not following</b> = the number of <b>other</b> combines + 1. With mixed sizes, go by the app.</p>
@@ -363,14 +364,38 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 <script>
 (function(){
 const KEY='strikeout.v1';
+const KEY_BAK=KEY+'.bak';
 const DEF={heads:[{id:'h30',w:30,label:''},{id:'h35',w:35,label:''},{id:'h40',w:40,label:''},{id:'h45',w:45,label:''}],
   lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false};
-let S;
-try{S=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){S=null;}
-if(!S||!Array.isArray(S.heads)||!S.heads.length)S=JSON.parse(JSON.stringify(DEF));
+function readStore(){
+  for(const k of [KEY,KEY_BAK]){
+    try{
+      const raw=localStorage.getItem(k);
+      if(!raw)continue;
+      const o=JSON.parse(raw);
+      if(o&&Array.isArray(o.heads)&&o.heads.length)return o;
+    }catch(e){}
+  }
+  return null;
+}
+let S=readStore();
+if(!S)S=JSON.parse(JSON.stringify(DEF));
 for(const k in DEF)if(S[k]===undefined)S[k]=JSON.parse(JSON.stringify(DEF[k]));
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(){
+  // Every change is written immediately so headers, counts, Following on, Skip/Outside, theme, etc.
+  // survive app close, offline use, and Update now (updates only refresh files, never wipe this).
+  try{
+    const raw=JSON.stringify(S);
+    localStorage.setItem(KEY,raw);
+    localStorage.setItem(KEY_BAK,raw);
+  }catch(e){}
+}
+save(); // persist merged defaults (new keys) without resetting user values
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}
+function flushSave(){try{save();}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSave();});
+window.addEventListener('pagehide',flushSave);
+window.addEventListener('beforeunload',flushSave);
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -573,7 +598,7 @@ if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.8';
+const APP_VERSION='1.0.9';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
@@ -593,6 +618,7 @@ async function checkUpdate(){
 }
 async function updateNow(){
   const b=$('updBtn');b.textContent='Updating…';b.disabled=true;
+  flushSave(); // keep settings; only refresh cached app files
   try{
     if('caches' in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}
     if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.update().catch(()=>{})));}
