@@ -87,7 +87,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .brand{font-family:var(--display);font-weight:900;font-size:1.8rem;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin:0;line-height:1}
 .brand svg{width:46px;height:31px;flex:none}
 .bar .sp{flex:1}
-.iconbtn{height:50px;min-width:50px;padding:0 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;cursor:pointer}
+.iconbtn{height:50px;min-width:50px;padding:0 14px;border:0;background:transparent;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;cursor:pointer}
 .iconbtn svg{width:26px;height:26px;flex:none}
 .iconbtn:active{transform:scale(.97)}
 #setBtn{position:relative}
@@ -629,7 +629,7 @@ if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.16';
+const APP_VERSION='1.0.17';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
