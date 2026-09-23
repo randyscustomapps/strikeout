@@ -266,6 +266,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   <!-- SETTINGS -->
   <main id="settings" class="set" hidden>
     <div class="ctrls">
+      <button class="done" id="doneTopBtn" type="button">Back to field</button>
+
       <section class="panel" id="updPanel">
         <div class="ph"><h2>App version</h2></div>
         <div class="upd"><span class="ver" id="verNow"></span><span class="st" id="verSt">Checking…</span></div>
@@ -276,16 +278,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
       <section class="panel">
         <div class="ph"><h2>My header</h2><small>your GPS line width</small></div>
         <div class="chips" id="leadChips"></div>
-      </section>
-
-      <section class="panel">
-        <div class="ph"><h2>How to use it</h2></div>
-        <p class="note"><b>My header</b> above stays set until you change it. <b>1. Other combines</b> is everyone in the crew besides you who'll cut this land: the ones out with you now, or the ones you want to leave room for.</p>
-        <p class="note"><b>2. Following me / Not following.</b> <b>Following me</b> means they're cutting behind you on this pass, so the app leaves room for their passes going out <i>plus</i> the whole crew coming back. <b>Not following</b> means you're going out alone and only leaving room for the whole crew (you included) to come back. Going out alone with 2 others set to Not following means +4. Everything at 0 means +2.</p>
-        <p class="note"><b>3. Turning at the end:</b> pick the way you'll turn, as you're driving the pass you're on now. Heading north and turning east to strike out and come back south? That's <b>Right</b>.</p>
-        <p class="note"><b>4. Count from the line you last struck out on,</b> not the line you just came back on. That pass is always the edge of what's left to cut. At the start of a field, count from your line along the edge. Last strike-out on 16 and it says <b>+10</b>? Go to 26. (If your line numbers count down that way, go to 6. Just move 10 lines over.)</p>
-        <p class="note"><b>5. Quick check</b> with every header the same size as yours: <b>Following me</b> = 2 × the number of combines, you included. <b>Not following</b> = the number of combines + 1. With mixed sizes, go by the app.</p>
-        <p class="note"><b>6. The nudge is left or right <i>after</i> the turn,</b> once you're lined up on the new line (heading south in that example), so it matches the arrows on your GPS. <i>Farther out</i> means away from the land you've cut, and <i>back in</i> means toward it. Add it to whatever nudge is already dialled in.</p>
       </section>
 
       <section class="panel">
@@ -327,6 +319,16 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel">
         <button class="danger" id="resetBtn" type="button">Reset everything to defaults</button>
+      </section>
+
+      <section class="panel">
+        <div class="ph"><h2>How to use it</h2></div>
+        <p class="note"><b>My header</b> stays set until you change it. <b>1. Other combines</b> is everyone in the crew besides you who'll cut this land: the ones out with you now, or the ones you want to leave room for.</p>
+        <p class="note"><b>2. Following me / Not following.</b> <b>Following me</b> means they're cutting behind you on this pass, so the app leaves room for their passes going out <i>plus</i> the whole crew coming back. <b>Not following</b> means you're going out alone and only leaving room for the whole crew (you included) to come back. Going out alone with 2 others set to Not following means +4. Everything at 0 means +2.</p>
+        <p class="note"><b>3. Turning at the end:</b> pick the way you'll turn, as you're driving the pass you're on now. Heading north and turning east to strike out and come back south? That's <b>Right</b>.</p>
+        <p class="note"><b>4. Count from the line you last struck out on,</b> not the line you just came back on. That pass is always the edge of what's left to cut. At the start of a field, count from your line along the edge. Last strike-out on 16 and it says <b>+10</b>? Go to 26. (If your line numbers count down that way, go to 6. Just move 10 lines over.)</p>
+        <p class="note"><b>5. Quick check</b> with every header the same size as yours: <b>Following me</b> = 2 × the number of combines, you included. <b>Not following</b> = the number of combines + 1. With mixed sizes, go by the app.</p>
+        <p class="note"><b>6. The nudge is left or right <i>after</i> the turn,</b> once you're lined up on the new line (heading south in that example), so it matches the arrows on your GPS. <i>Farther out</i> means away from the land you've cut, and <i>back in</i> means toward it. Add it to whatever nudge is already dialled in.</p>
       </section>
 
       <button class="done" id="doneBtn" type="button">Back to field</button>
@@ -526,13 +528,14 @@ function show(which){
 }
 $('setBtn').addEventListener('click',()=>show('settings'));
 $('doneBtn').addEventListener('click',()=>show('field'));
+$('doneTopBtn').addEventListener('click',()=>show('field'));
 
 applyTheme();renderField();
 if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.3';
+const APP_VERSION='1.0.4';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
