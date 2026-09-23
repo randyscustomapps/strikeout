@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#F2DFA7">
 <meta name="description" content="Strikeout: how many GPS lines to skip, and how far to nudge, when the lead combine strikes out for the crew.">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -70,7 +70,7 @@
 }
 [hidden]{display:none!important}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
+html,body{height:100%;touch-action:manipulation;overscroll-behavior:none}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:17px;line-height:1.35;padding-inline:12px;user-select:none;-webkit-user-select:none}
 button{font-family:var(--ui);color:inherit;touch-action:manipulation}
 button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outline-offset:2px}
@@ -179,6 +179,45 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .danger.arm{background:var(--danger);color:#fff}
 .done{height:64px;border-radius:16px;border:0;background:var(--on);color:var(--on-ink);font-family:var(--display);font-weight:900;font-size:1.8rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .math{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9rem;background:var(--surface2);border-radius:10px;padding:10px 12px;color:var(--ink);user-select:text;-webkit-user-select:text;white-space:pre-wrap}
+
+/* field compact: fit main screen on phone without scrolling; settings may still scroll */
+.app{padding-block:6px 10px;gap:6px}
+.brand{font-size:1.55rem}
+.brand svg{width:40px;height:27px}
+.iconbtn{height:44px;min-width:44px;padding:0 12px;border-radius:12px}
+.result{padding:8px 12px 8px;gap:4px;border-radius:14px}
+.r-num{font-size:3.8rem}
+.r-lbl{font-size:1.15rem}
+.r-nval{font-size:1.9rem}
+.r-nval svg{width:26px;height:26px}
+.r-ndir{font-size:1rem}
+.r-ref{font-size:.8rem}
+.layout,.ctrls{gap:6px}
+.panel{padding:6px;gap:5px;border-radius:14px}
+.ph h2{font-size:1.05rem}
+.ph small{font-size:.82rem}
+.tog.turn{min-height:56px}
+.tog.turn b{font-size:1.7rem}
+.tog.turn svg{width:26px;height:26px}
+.tog.yn{min-height:44px}
+.tog.yn b{font-size:1.05rem}
+.step{width:48px;height:44px;font-size:1.7rem;border-radius:9px}
+.cnt{min-width:36px;font-size:2rem}
+.ctr{padding:3px;border-radius:10px}
+.ctr .w{font-size:1.45rem}
+.ctr .nm{padding-left:6px}
+.ovl .big{font-size:1.9rem}
+.ovl{gap:8px}
+@media (max-width:560px){
+  .counters{grid-template-columns:1fr 1fr;gap:5px}
+}
+@media (max-height:740px){
+  .r-num{font-size:3.3rem}
+  .tog.turn{min-height:50px}
+  .tog.turn b{font-size:1.5rem}
+  .app{padding-block:4px 6px;gap:5px}
+  .layout,.ctrls{gap:5px}
+}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 </style>
@@ -511,7 +550,7 @@ if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.0';
+const APP_VERSION='1.0.1';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
