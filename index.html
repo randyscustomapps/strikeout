@@ -113,6 +113,29 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .r-ndir{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.08em;text-transform:uppercase}
 .r-nsub{font-size:.8rem;color:var(--res-muted);letter-spacing:.02em}
 .r-ref{font-size:.85rem;color:var(--res-muted)}
+.r-gps{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 10px;margin-top:2px;padding-top:8px;border-top:1px solid rgba(224,169,28,.28)}
+.r-now{display:flex;flex-direction:column;align-items:flex-start;gap:3px;flex:1 1 auto;min-width:0}
+.r-now label{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.05em;text-transform:uppercase;color:var(--res-muted);white-space:nowrap;line-height:1}
+.r-stepper{display:flex;align-items:center;gap:4px}
+.r-stepper button{width:48px;height:48px;border-radius:12px;border:2px solid var(--res-ink);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;cursor:pointer;padding:0}
+.r-stepper button:active{transform:scale(.96);background:var(--res-ink);color:var(--res-bg)}
+.r-stepper input{width:4.6ch;height:48px;border-radius:12px;border:2px solid var(--res-ink);background:#FFF4D2;color:#2A1D0A;font-family:var(--display);font-weight:900;font-size:2rem;line-height:1;text-align:center;font-variant-numeric:tabular-nums;padding:0 2px;min-width:0;user-select:text;-webkit-user-select:text}
+.r-stepper input::placeholder{color:#8A7040;opacity:1}
+.r-dir{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.r-dir button{height:44px;border-radius:10px;border:2px solid rgba(224,169,28,.55);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;padding:0 8px;white-space:nowrap}
+.r-dir button[aria-pressed="true"]{background:var(--res-ink);color:var(--res-bg);border-color:var(--res-ink)}
+.r-dir button:active{transform:scale(.98)}
+.r-auto{flex:1 1 100%;display:flex;gap:6px;align-items:stretch}
+.r-axis{flex:1 1 auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;min-width:0}
+.r-axis button,.r-autobtn{height:40px;border-radius:10px;border:2px solid rgba(224,169,28,.55);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:1.02rem;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;padding:0 6px;white-space:nowrap}
+.r-axis button[aria-pressed="true"],.r-autobtn[aria-pressed="true"]{background:var(--res-ink);color:var(--res-bg);border-color:var(--res-ink)}
+.r-axis button:active,.r-autobtn:active{transform:scale(.98)}
+.r-autobtn{flex:0 0 auto;padding:0 10px}
+.r-autonote{flex:1 1 100%;margin:0;font-size:.78rem;line-height:1.25;color:var(--res-muted)}
+.r-go{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-left:auto}
+.r-go .r-lbl{font-size:1.05rem;line-height:1}
+.r-tgt{font-family:var(--display);font-weight:900;font-size:3.1rem;line-height:.82;font-variant-numeric:tabular-nums}
+.r-tgt.empty{color:var(--res-muted)}
 
 /* controls */
 .layout{display:flex;flex-direction:column;gap:8px}
@@ -190,6 +213,13 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .result{padding:10px 14px 8px;gap:4px}
   .r-num{font-size:4.2rem}
   .r-nval{font-size:2rem}
+  .r-gps{gap:6px 8px;padding-top:6px}
+  .r-now label,.r-go .r-lbl{font-size:.95rem}
+  .r-stepper button{width:46px;height:46px}
+  .r-stepper input{width:4.2ch;height:46px;font-size:1.85rem}
+  .r-dir button{height:42px;font-size:1.02rem}
+  .r-axis button,.r-autobtn{height:38px;font-size:.95rem}
+  .r-tgt{font-size:2.6rem}
   .r-nval svg{width:28px;height:28px}
   .layout,.ctrls{gap:6px}
   .panel{padding:7px;gap:6px}
@@ -251,7 +281,35 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
   <!-- FIELD MODE -->
   <main id="field" class="layout">
-    <section class="result" aria-live="polite" id="result"></section>
+    <section class="result" id="result" aria-label="Strikeout result">
+      <div id="resultMain" aria-live="polite"></div>
+      <div class="r-gps">
+        <div class="r-now">
+          <label for="lineNowIn">Current row</label>
+          <div class="r-stepper">
+            <button type="button" data-line="dec" aria-label="Lower current row">−</button>
+            <input id="lineNowIn" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="5" placeholder="—">
+            <button type="button" data-line="inc" aria-label="Raise current row">+</button>
+          </div>
+        </div>
+        <div class="r-go" aria-live="polite" aria-atomic="true">
+          <span class="r-lbl">Go to</span>
+          <span class="r-tgt empty" id="lineGoNum">—</span>
+        </div>
+        <div class="r-dir" role="group" aria-label="Line numbers count up or down">
+          <button type="button" data-linedir="up" id="lineUpBtn" aria-pressed="true">Count up</button>
+          <button type="button" data-linedir="down" id="lineDnBtn" aria-pressed="false">Count down</button>
+        </div>
+        <div class="r-auto">
+          <div class="r-axis" role="group" aria-label="Field axis">
+            <button type="button" data-axis="ns" id="axisNs" aria-pressed="true">North–South</button>
+            <button type="button" data-axis="ew" id="axisEw" aria-pressed="false">East–West</button>
+          </div>
+          <button type="button" class="r-autobtn" id="autoBtn" aria-pressed="false">Auto off</button>
+        </div>
+        <p class="r-autonote" id="autoNote" hidden></p>
+      </div>
+    </section>
 
     <div class="ctrls">
       <section class="panel">
@@ -305,7 +363,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel" id="updPanel">
         <div class="ph"><h2>App version</h2></div>
-        <p class="note">Your settings stay on this phone — headers, counts, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
+        <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
         <div class="upd"><span class="ver" id="verNow"></span><span class="st" id="verSt">Checking…</span></div>
         <button class="updbtn" id="updBtn" type="button" hidden>Update now</button>
         <button class="chkbtn" id="chkBtn" type="button">Check for updates</button>
@@ -347,6 +405,16 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
       </section>
 
       <section class="panel">
+        <div class="ph"><h2>Auto advance confirms after</h2><small>new direction</small></div>
+        <div class="seg3" id="confirmSeg">
+          <button type="button" data-confirm="50">50 ft</button>
+          <button type="button" data-confirm="100">100 ft</button>
+          <button type="button" data-confirm="150">150 ft</button>
+        </div>
+        <p class="note">Current row moves only after the phone has traveled this far the new way. A short backup, such as for plugged crop, does not count. Default is 100 ft.</p>
+      </section>
+
+      <section class="panel">
         <div class="ph"><h2>How it works it out</h2></div>
         <p class="note">Your GPS lines are spaced at <b>your header width</b>. Everyone's cut counts as <b>header width minus overlap</b>.</p>
         <div class="math" id="mathBox"></div>
@@ -363,7 +431,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Leave room for the others only, not yourself.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
-        <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down.</p>
+        <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
+        <p class="note"><b>Auto</b> is off until you turn it on and allow location. Pick <b>North–South</b> or <b>East–West</b>. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto stays off and the typed row still works.</p>
         <p class="note"><b>Quick check</b> when every header matches yours. <b>Following + Skip:</b> 2 × others + 1 (two others → <b>+5</b>, four others → <b>+9</b>). <b>Outside</b> or <b>Not following:</b> others + 1 (three others → <b>+4</b>, four others → <b>+5</b>). Mixed sizes: use the card. A leftover strip is not always fixed by more lines.</p>
         <p class="note"><b>Nudge</b> is left or right <i>after</i> the turn, on the new heading, so it matches the GPS arrows. Farther out is away from cut land; back in is toward it. Add it to any nudge already set.</p>
       </section>
@@ -387,7 +456,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 const KEY='strikeout.v1';
 const KEY_BAK=KEY+'.bak';
 const DEF={heads:[{id:'h35',w:35,label:''},{id:'h40',w:40,label:''}],
-  lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false};
+  lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false,
+  lineNow:null,lineDir:'up',fieldAxis:'ns',autoAdv:false,confirmFt:100};
 function readStore(){
   for(const k of [KEY,KEY_BAK]){
     try{
@@ -402,6 +472,19 @@ function readStore(){
 let S=readStore();
 if(!S)S=JSON.parse(JSON.stringify(DEF));
 for(const k in DEF)if(S[k]===undefined)S[k]=JSON.parse(JSON.stringify(DEF[k]));
+if(S.lineDir!=='down')S.lineDir='up';
+if(S.fieldAxis!=='ew')S.fieldAxis='ns';
+S.autoAdv=S.autoAdv===true;
+(function(){
+  const ft=Math.round(Number(S.confirmFt));
+  S.confirmFt=(ft===50||ft===100||ft===150)?ft:100;
+})();
+(function(){
+  let n=S.lineNow;
+  if(typeof n==='string'&&/^\d{1,5}$/.test(n))n=parseInt(n,10);
+  if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>99999)n=null;
+  S.lineNow=n;
+})();
 function save(){
   // Every change is written immediately so headers, counts, Following on, Skip/Outside, theme, etc.
   // survive app close, offline use, and Update now (updates only refresh files, never wipe this).
@@ -480,12 +563,249 @@ function renderResult(){
   const nudgeHtml=P.nudge===0
     ?`<div class="r-nval">No nudge</div><div class="r-ndir">Right on a line</div>`
     :`<div class="r-nval">${dw==='left'?arrowL:''}${fmtFtIn(P.nudge)}${dw==='right'?arrowR:''}</div><div class="r-ndir">Nudge ${dw}</div><div class="r-nsub">after the turn · ${P.dir==='out'?'farther out':'back in'}</div>`;
-  $('result').innerHTML=`
+  $('resultMain').innerHTML=`
     <div class="r-main">
       <div class="r-skip"><span class="r-num">+${P.move}</span><span class="r-lbl">line${P.move===1?'':'s'}</span></div>
       <div class="r-nudge">${nudgeHtml}</div>
     </div>
     <div class="r-ref">from the line you're on now</div>`;
+  syncLineInput();
+  paintTarget(P.move);
+}
+function lineNowNum(){
+  const n=S.lineNow;
+  return (typeof n==='number'&&Number.isInteger(n)&&n>=0&&n<=99999)?n:null;
+}
+function targetRow(move){
+  const now=lineNowNum();
+  if(now===null||!Number.isFinite(move))return null;
+  return S.lineDir==='down'?now-move:now+move;
+}
+function syncLineInput(force){
+  const el=$('lineNowIn');
+  if(!el)return;
+  if(!force&&document.activeElement===el)return;
+  const n=lineNowNum();
+  el.value=n===null?'':String(n);
+}
+function paintTarget(move){
+  if(move===undefined)move=calc().P.move;
+  const t=targetRow(move);
+  const num=$('lineGoNum');
+  if(num){
+    const empty=t===null;
+    num.textContent=empty?'—':String(t);
+    num.classList.toggle('empty',empty);
+  }
+  const up=$('lineUpBtn'),dn=$('lineDnBtn');
+  if(up)up.setAttribute('aria-pressed',S.lineDir!=='down');
+  if(dn)dn.setAttribute('aria-pressed',S.lineDir==='down');
+}
+
+// Auto advance: GPS travel along the field axis. A reverse counts only after
+// confirmFt of movement the new way. Stopped or short backups add no distance.
+function normDeg(d){d%=360;if(d<0)d+=360;return d;}
+function angDiff(a,b){const d=Math.abs(normDeg(a)-normDeg(b))%360;return d>180?360-d:d;}
+function axisSide(h,axis){
+  if(!Number.isFinite(h))return null;
+  if(axis==='ew'){
+    if(angDiff(h,90)<=50)return 'e';
+    if(angDiff(h,270)<=50)return 'w';
+    return null;
+  }
+  if(angDiff(h,0)<=50)return 'n';
+  if(angDiff(h,180)<=50)return 's';
+  return null;
+}
+function metersBetween(a,b){
+  const R=6371000,p1=a.lat*Math.PI/180,p2=b.lat*Math.PI/180;
+  const dφ=(b.lat-a.lat)*Math.PI/180,dλ=(b.lng-a.lng)*Math.PI/180;
+  const s=Math.sin(dφ/2)*Math.sin(dφ/2)+Math.cos(p1)*Math.cos(p2)*Math.sin(dλ/2)*Math.sin(dλ/2);
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(s)));
+}
+function bearingDeg(a,b){
+  const φ1=a.lat*Math.PI/180,φ2=b.lat*Math.PI/180,Δλ=(b.lng-a.lng)*Math.PI/180;
+  const y=Math.sin(Δλ)*Math.cos(φ2);
+  const x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
+  return normDeg(Math.atan2(y,x)*180/Math.PI);
+}
+function confirmMeters(){return (S.confirmFt||100)*0.3048;}
+function sideWord(side){return {n:'north',s:'south',e:'east',w:'west'}[side]||'';}
+let geoId=null,oriOn=false,watching=false,autoGen=0,autoMsg='',geoWeak=false;
+let passSide=null,pendingSide=null,pendingM=0,lockSide=null,lockM=0,lastFix=null;
+function resetTrack(){
+  passSide=null;pendingSide=null;pendingM=0;lockSide=null;lockM=0;lastFix=null;
+}
+function stopSensors(){
+  watching=false;
+  if(geoId!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(geoId);}catch(e){}}
+  geoId=null;
+  if(oriOn){
+    window.removeEventListener('deviceorientationabsolute',onOri);
+    window.removeEventListener('deviceorientation',onOri);
+    oriOn=false;
+  }
+  resetTrack();
+  geoWeak=false;
+}
+function headingFromOri(e){
+  if(!e)return null;
+  if(typeof e.webkitCompassHeading==='number'&&!Number.isNaN(e.webkitCompassHeading))return normDeg(e.webkitCompassHeading);
+  if(e.absolute&&typeof e.alpha==='number'&&!Number.isNaN(e.alpha))return normDeg(360-e.alpha);
+  return null;
+}
+let lastCompass=null;
+function onOri(e){const h=headingFromOri(e);if(h!=null)lastCompass=h;}
+function autoStatusText(){
+  if(!S.autoAdv)return autoMsg||'';
+  if(autoMsg)return autoMsg;
+  if(!watching)return 'Tap Auto to allow location.';
+  if(geoWeak)return 'GPS weak. Auto waits for a clearer fix.';
+  if(!passSide){
+    const ft=Math.min(S.confirmFt,Math.round(lockM/0.3048));
+    if(lockSide)return 'Learning '+sideWord(lockSide)+' · '+ft+' / '+S.confirmFt+' ft';
+    const hinted=lastCompass==null?null:axisSide(lastCompass,S.fieldAxis==='ew'?'ew':'ns');
+    if(hinted)return 'Auto on. Phone points '+sideWord(hinted)+'. Drive to confirm.';
+    return 'Auto on. Drive the pass to learn direction.';
+  }
+  if(pendingSide){
+    const ft=Math.min(S.confirmFt,Math.round(pendingM/0.3048));
+    return 'New way '+sideWord(pendingSide)+' · '+ft+' / '+S.confirmFt+' ft';
+  }
+  return 'Auto on · headed '+sideWord(passSide);
+}
+function renderAutoUi(){
+  const ns=$('axisNs'),ew=$('axisEw'),btn=$('autoBtn'),note=$('autoNote');
+  if(ns)ns.setAttribute('aria-pressed',S.fieldAxis!=='ew');
+  if(ew)ew.setAttribute('aria-pressed',S.fieldAxis==='ew');
+  if(btn){btn.setAttribute('aria-pressed',!!S.autoAdv);btn.textContent=S.autoAdv?'Auto on':'Auto off';}
+  if(note){const t=autoStatusText();note.hidden=!t;note.textContent=t||'';}
+}
+function commitBump(side){
+  const editing=document.activeElement&&document.activeElement.id==='lineNowIn';
+  passSide=side;pendingSide=null;pendingM=0;lockSide=null;lockM=0;
+  if(editing){renderAutoUi();return;}
+  const now=lineNowNum();
+  const move=calc().P.move;
+  if(now===null||!(move>0)){renderAutoUi();return;}
+  const next=S.lineDir==='down'?now-move:now+move;
+  S.lineNow=Math.max(0,Math.min(99999,next));
+  save();
+  syncLineInput(true);
+  paintTarget();
+  if(navigator.vibrate)try{navigator.vibrate(20);}catch(e){}
+  renderAutoUi();
+}
+function onFix(pos){
+  if(!S.autoAdv||!watching)return;
+  const c=pos&&pos.coords;
+  if(!c||!Number.isFinite(c.latitude)||!Number.isFinite(c.longitude))return;
+  const acc=Number.isFinite(c.accuracy)?c.accuracy:999;
+  if(acc>100){geoWeak=true;renderAutoUi();return;}
+  geoWeak=false;
+  const fix={lat:c.latitude,lng:c.longitude,heading:c.heading,speed:c.speed};
+  if(!lastFix){lastFix=fix;renderAutoUi();return;}
+  const d=metersBetween(lastFix,fix);
+  const speedKnown=Number.isFinite(fix.speed);
+  if(speedKnown&&fix.speed<0.45){lastFix=fix;renderAutoUi();return;}
+  const minD=speedKnown?4:8;
+  if(d<minD)return;
+  if(d>250){lastFix=fix;renderAutoUi();return;}
+  const heading=bearingDeg(lastFix,fix);
+  lastFix=fix;
+  const side=axisSide(heading,S.fieldAxis==='ew'?'ew':'ns');
+  if(!side){renderAutoUi();return;}
+  if(!passSide){
+    if(side===lockSide)lockM+=d;
+    else{lockSide=side;lockM=d;}
+    if(lockM>=confirmMeters()){passSide=lockSide;lockSide=null;lockM=0;}
+    renderAutoUi();
+    return;
+  }
+  if(side===passSide){
+    if(pendingSide){pendingSide=null;pendingM=0;}
+    renderAutoUi();
+    return;
+  }
+  if(pendingSide!==side){pendingSide=side;pendingM=0;}
+  pendingM+=d;
+  if(pendingM>=confirmMeters())commitBump(side);
+  else renderAutoUi();
+}
+function onGeoErr(err){
+  if(!S.autoAdv)return;
+  if(err&&err.code===1){
+    autoGen++;
+    S.autoAdv=false;
+    autoMsg='Location denied. Auto stays off. Current row still works.';
+    stopSensors();
+    save();
+    renderAutoUi();
+    return;
+  }
+  geoWeak=true;
+  renderAutoUi();
+}
+function beginWatch(listenOri){
+  stopSensors();
+  watching=true;
+  if(listenOri){
+    window.addEventListener('deviceorientationabsolute',onOri);
+    window.addEventListener('deviceorientation',onOri);
+    oriOn=true;
+  }
+  try{
+    const id=navigator.geolocation.watchPosition(onFix,onGeoErr,{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
+    if(!S.autoAdv||!watching){try{navigator.geolocation.clearWatch(id);}catch(err){}}
+    else geoId=id;
+  }catch(e){
+    S.autoAdv=false;
+    autoMsg='Location is unavailable. Auto stays off.';
+    stopSensors();
+    save();
+  }
+  renderAutoUi();
+}
+async function startAuto(){
+  const gen=++autoGen;
+  autoMsg='';
+  let listenOri=true;
+  try{
+    const DOE=window.DeviceOrientationEvent;
+    if(DOE&&typeof DOE.requestPermission==='function'){
+      const r=await DOE.requestPermission();
+      listenOri=r==='granted';
+    }
+  }catch(e){listenOri=false;}
+  if(gen!==autoGen)return;
+  if(!navigator.geolocation){
+    S.autoAdv=false;
+    autoMsg='No location on this phone. Auto stays off.';
+    save();renderAutoUi();
+    return;
+  }
+  S.autoAdv=true;
+  save();
+  beginWatch(listenOri);
+}
+async function resumeAuto(){
+  if(!S.autoAdv||!navigator.geolocation)return;
+  let state='unknown';
+  try{
+    if(navigator.permissions&&navigator.permissions.query){
+      const p=await navigator.permissions.query({name:'geolocation'});
+      state=p.state;
+    }
+  }catch(e){}
+  if(!S.autoAdv)return;
+  if(state==='denied'){
+    S.autoAdv=false;
+    autoMsg='Location denied. Auto stays off. Current row still works.';
+    save();renderAutoUi();
+    return;
+  }
+  if(state==='granted')beginWatch(false);
+  else{autoMsg='Tap Auto to allow location.';renderAutoUi();}
 }
 
 function renderField(){
@@ -513,6 +833,7 @@ function renderField(){
   document.querySelectorAll('[data-folskip]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.folskip==='1')===!!S.folSkip));
   document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===S.cut));
   renderResult();
+  renderAutoUi();
 }
 
 // field interactions
@@ -525,12 +846,45 @@ document.getElementById('field').addEventListener('click',e=>{
   else if(b.dataset.folside){S.folSide=b.dataset.folside;}
   else if(b.dataset.folskip!==undefined){S.folSkip=b.dataset.folskip==='1';}
   else if(b.dataset.cut){S.cut=b.dataset.cut;}
+  else if(b.dataset.line==='dec'||b.dataset.line==='inc'){
+    const n=lineNowNum();
+    if(b.dataset.line==='dec')S.lineNow=n===null?0:Math.max(0,n-1);
+    else S.lineNow=n===null?1:Math.min(99999,n+1);
+    resetTrack();
+  }
+  else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
+  else if(b.dataset.axis){
+    const ax=b.dataset.axis==='ew'?'ew':'ns';
+    if(ax!==S.fieldAxis){S.fieldAxis=ax;resetTrack();}
+  }
+  else if(b.id==='autoBtn'){
+    if(S.autoAdv){autoGen++;S.autoAdv=false;autoMsg='';stopSensors();}
+    else{if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){} void startAuto(); return;}
+  }
   else if(b.id==='ovlMinus'){S.overlapIn=Math.max(0,Math.round((S.overlapIn-S.stepIn)*2)/2);}
   else if(b.id==='ovlPlus'){S.overlapIn=Math.min(48,Math.round((S.overlapIn+S.stepIn)*2)/2);}
   else return;
   if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
   save();renderField();
 });
+$('lineNowIn').addEventListener('input',()=>{
+  const el=$('lineNowIn');
+  const cleaned=el.value.replace(/\D/g,'').slice(0,5);
+  if(cleaned!==el.value){
+    const at=el.selectionStart||0;
+    const cut=el.value.length-cleaned.length;
+    el.value=cleaned;
+    const pos=Math.max(0,at-cut);
+    try{el.setSelectionRange(pos,pos);}catch(err){}
+  }
+  S.lineNow=cleaned===''?null:parseInt(cleaned,10);
+  resetTrack();
+  save();
+  paintTarget();
+  renderAutoUi();
+});
+$('lineNowIn').addEventListener('focusout',()=>syncLineInput(true));
+$('lineNowIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.target.blur();}});
 
 // theme
 function isNight(){
@@ -574,6 +928,7 @@ function renderSettings(){
       <button class="del" type="button" data-del="${h.id}" aria-label="Remove this header" ${S.heads.length<2?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>`).join('');
   document.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.step===S.stepIn));
+  document.querySelectorAll('[data-confirm]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.confirm===S.confirmFt));
   $('wakeBtn').setAttribute('aria-pressed',!!S.wake);
   const c=calc();
   $('mathBox').textContent=(S.mode==='double'
@@ -605,12 +960,21 @@ $('addHead').addEventListener('click',()=>{
 });
 $('leadChips').addEventListener('click',e=>{const b=e.target.closest('[data-lead]');if(!b)return;S.lead=b.dataset.lead;save();renderSettings();});
 $('stepSeg').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(!b)return;S.stepIn=+b.dataset.step;save();renderSettings();});
+$('confirmSeg').addEventListener('click',e=>{
+  const b=e.target.closest('[data-confirm]');if(!b)return;
+  const ft=+b.dataset.confirm;
+  if(ft!==50&&ft!==100&&ft!==150)return;
+  S.confirmFt=ft;save();renderSettings();
+  if(pendingSide&&pendingM>=confirmMeters())commitBump(pendingSide);
+  else if(!passSide&&lockSide&&lockM>=confirmMeters()){passSide=lockSide;lockSide=null;lockM=0;renderAutoUi();}
+  else renderAutoUi();
+});
 $('themeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-theme-pick]');if(!b)return;S.theme=b.dataset.themePick;save();applyTheme();});
 let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';renderSettings();
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';renderSettings();
 });
 
 function show(which){
@@ -626,10 +990,11 @@ $('doneTopBtn').addEventListener('click',()=>show('field'));
 
 applyTheme();renderField();
 if(S.wake)wake();
+void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.18';
+const APP_VERSION='1.0.19';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
