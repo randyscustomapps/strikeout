@@ -386,7 +386,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 (function(){
 const KEY='strikeout.v1';
 const KEY_BAK=KEY+'.bak';
-const DEF={heads:[{id:'h30',w:30,label:''},{id:'h35',w:35,label:''},{id:'h40',w:40,label:''},{id:'h45',w:45,label:''}],
+const DEF={heads:[{id:'h35',w:35,label:''},{id:'h40',w:40,label:''}],
   lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false};
 function readStore(){
   for(const k of [KEY,KEY_BAK]){
@@ -629,7 +629,7 @@ if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.17';
+const APP_VERSION='1.0.18';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
