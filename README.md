@@ -20,6 +20,7 @@ Edit `index.html`, raise `APP_VERSION` in it, and set the same number in `versio
 ## The math
 - GPS line spacing = the lead's header width (no overlap set in the GPS).
 - Each head's cut = header width − overlap per head.
-- Following me out = Yes: room = followers' passes going out + whole crew coming back.
-- Following me out = No: room = whole crew coming back (you included).
-- Lines to move = room ÷ line spacing + 1 (your own pass). The remainder is the nudge, and the app picks whichever way needs the smaller nudge.
+- Add the +lines to the GPS line you're driving now, including the first pass.
+- Following me + Skip: room = followers out + whole crew back. The line count is room ÷ your line (the other way is one more line, nudged back).
+- Following me + Outside: room = followers only. Not following: room = the other combines only. Lines = room ÷ your line + 1 (your own pass), still from the line you're on.
+- The remainder is the nudge, and the app picks whichever way needs the smaller nudge.

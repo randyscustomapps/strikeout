@@ -351,8 +351,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>My header</b> stays set until you change it. <b>1. Other combines</b> is everyone in the crew besides you who'll cut this land: the ones out with you now, or the ones you want to leave room for.</p>
         <p class="note"><b>2. Following me / Not following.</b> <b>Following me</b> shows two compact switches: <b>Following on Right/Left</b> (usually Right), and <b>Strike out Skip/Outside</b>. <b>Skip</b> jumps over the pack (followers out + whole crew back). <b>Outside</b> keeps crop on the outside — leave room for the followers only (e.g. four 40′ headers → <b>+5</b>), which also handles mixed header sizes. <b>Not following</b> means you're going out alone and only leaving room for the <b>other</b> combines in the headland (not yourself). Three others same size → <b>+4</b>. Two → <b>+3</b>. Nobody else → <b>+1</b>.</p>
         <p class="note"><b>3. Turning at the end:</b> pick the way you'll turn, as you're driving the pass you're on now. Heading north and turning east to strike out and come back south? That's <b>Right</b>.</p>
-        <p class="note"><b>4. Count from the line you last struck out on,</b> not the line you just came back on. That pass is always the edge of what's left to cut. At the start of a field, count from your line along the edge. Last strike-out on 16 and it says <b>+10</b>? Go to 26. (If your line numbers count down that way, go to 6. Just move 10 lines over.)</p>
-        <p class="note"><b>5. Quick check</b> with every header the same size as yours: <b>Following me + Skip</b> = 2 × the number of combines, you included. <b>Outside</b> = others + 1 (e.g. four → +5). <b>Not following</b> = others + 1. With mixed sizes, go by the card — and if a strikeout leaves a strip, don’t assume more lines is always the fix.</p>
+        <p class="note"><b>4. Add the +lines to the GPS line you're driving now.</b> That includes the first pass, when the GPS has no earlier strike-out line. Driving 78 and it says <b>+5</b>? Go to 83. (If your line numbers count down that way, go to 73. Just move that many lines over.)</p>
+        <p class="note"><b>5. Quick check</b> with every header the same size as yours: <b>Following me + Skip</b> = 2 × the others + 1 (e.g. four → <b>+9</b>). <b>Outside</b> = others + 1 (e.g. four → +5). <b>Not following</b> = others + 1. With mixed sizes, go by the card — and if a strikeout leaves a strip, don’t assume more lines is always the fix.</p>
         <p class="note"><b>6. The nudge is left or right <i>after</i> the turn,</b> once you're lined up on the new line (heading south in that example), so it matches the arrows on your GPS. <i>Farther out</i> means away from the land you've cut, and <i>back in</i> means toward it. Add it to whatever nudge is already dialled in.</p>
       </section>
 
@@ -427,11 +427,17 @@ function calc(){
     else gap=folSum;
   }else gap=folSum;
   const N=Math.floor(gap/L+1e-9);const rem=gap-N*L;
-  const A={skip:N,move:N+1,nudge:rem,dir:'out'},B={skip:N+1,move:N+2,nudge:L-rem,dir:'back'};
+  // +lines is added to the GPS line you're driving now, including the first pass.
+  // Following + Skip with followers: move is N (other way N+1). The gap is the
+  // passes you leave; do not add another line on top. Outside, Not following,
+  // and alone (no followers) keep N+1 / N+2 so alone still shows +1.
+  const fromNow=S.mode==='double'&&S.folSkip!==false&&folN>0;
+  const A=fromNow?{skip:N,move:N,nudge:rem,dir:'out'}:{skip:N,move:N+1,nudge:rem,dir:'out'};
+  const B=fromNow?{skip:N+1,move:N+1,nudge:L-rem,dir:'back'}:{skip:N+1,move:N+2,nudge:L-rem,dir:'back'};
   let P=A,Alt=B;
   if(rem>L-rem){P=B;Alt=A;}
   if(Math.round(P.nudge*2)/2===0){P.nudge=0;}
-  return {ld,L,o,folSum,folN,crew,gap,P,Alt,heads:folN+1};
+  return {ld,L,o,folSum,folN,crew,gap,P,Alt,heads:folN+1,fromNow};
 }
 function dirWord(d){ // S.cut = the way you turn at the end, seen from the pass you're on. Answer is left/right AFTER the turn.
   // When followers are on your left (rare), mirror the nudge side so the pack can come up on that side.
@@ -458,7 +464,7 @@ function renderResult(){
       <div class="r-skip"><span class="r-num">+${P.move}</span><span class="r-lbl">line${P.move===1?'':'s'}</span></div>
       <div class="r-nudge">${nudgeHtml}</div>
     </div>
-    <div class="r-ref">from the line you last struck out on</div>`;
+    <div class="r-ref">from the line you're on now</div>`;
 }
 
 function renderField(){
@@ -554,7 +560,8 @@ function renderSettings(){
       ?`gap = Skip: followers out + whole crew back\n    = ${fmtFtIn(c.folSum)} + ${fmtFtIn(c.crew)} = ${fmtFtIn(c.gap)}`
       :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(c.gap)}`)
     :`gap = other combines only (not you) = ${fmtFtIn(c.gap)}`)+
-    `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\nmove = lines left standing + 1 (your own pass)`+
+    `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
+    (c.fromNow?`move = that line count, from the pass you're on now`:`move = lines left standing + 1 (your own pass), from the line you're on now`)+
     `\n\nshown: +${c.P.move} lines${c.P.nudge?', nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}\nother way: +${c.Alt.move} lines${c.Alt.nudge?', nudge '+fmtFtIn(c.Alt.nudge)+' '+dirWord(c.Alt.dir):''}`;
   applyTheme();
 }
@@ -601,7 +608,7 @@ if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.12';
+const APP_VERSION='1.0.13';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
