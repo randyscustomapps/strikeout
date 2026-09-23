@@ -15,7 +15,10 @@ Tells the lead combine how many GPS lines to skip, and how far to nudge, so the 
 Open it once with signal. After that it works with no cell service.
 
 ## Updating
-Edit `index.html`, raise `APP_VERSION` in it, and set the same number in `version.json`. Phones show a red dot and an Update Now button in Settings. See INSTRUCTIONS.md.
+Edit `index.html`, raise `APP_VERSION` in it, and set the same number in `version.json`. In `sw.js`, set `VERSION` to a new cache name that includes that version (for example `strikeout-cache-1.0.15`). Do not cache `version.json`. Phones show a red dot and an Update Now button in Settings. See INSTRUCTIONS.md.
+
+## Fonts
+Barlow (500, 600, 700) and Big Shoulders Display (700, 800, 900) are self-hosted in `fonts/` under the SIL Open Font License. See `fonts/OFL-Barlow.txt` and `fonts/OFL-BigShouldersDisplay.txt`.
 
 ## The math
 - GPS line spacing = the lead's header width (no overlap set in the GPS).
