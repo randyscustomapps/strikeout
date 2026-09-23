@@ -202,7 +202,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 }
 
 /* compact follow options under Following me — one row, not full-width */
-.folOpts{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:stretch;gap:8px;margin-top:2px;padding:6px 8px;border-radius:12px;border:2px solid var(--line);background:var(--surface2)}
+.folOpts{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:stretch;gap:8px;margin-top:2px}
 .folOpts .frow{display:flex;flex-direction:column;gap:3px;flex:0 1 auto;min-width:0}
 .folOpts .flab{font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:0 1px;white-space:nowrap}
 .seg2{display:inline-grid;grid-template-columns:auto auto;gap:2px;padding:2px;border-radius:9px;background:var(--surface);border:2px solid var(--line);width:max-content;max-width:100%}
@@ -608,7 +608,7 @@ if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.13';
+const APP_VERSION='1.0.14';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
