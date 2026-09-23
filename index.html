@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<script>window.STRIKEOUT_PWA=true;</script>
+<script>window.STRIKEOUT_PWA=true;window.__soBIP=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__soBIP=e;try{window.dispatchEvent(new Event('so-bip'));}catch(err){}});</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <title>Strikeout</title>
 <style>
@@ -212,6 +212,16 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .seg2 button:active{transform:scale(.98)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
+
+/* one-time install hint — overlay, does not reflow the field */
+.install{position:fixed;z-index:30;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(480px,calc(100% - 24px));background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+.install h2{margin:0;font-family:var(--display);font-weight:800;font-size:1.45rem;letter-spacing:.06em;text-transform:uppercase}
+.install p{margin:0;font-size:1.05rem;font-weight:600;line-height:1.3}
+.install-acts{display:flex;gap:8px}
+.install-acts button{flex:1;min-height:60px;border-radius:14px;cursor:pointer;font-weight:800}
+.install-go{border:0;background:var(--on);color:var(--on-ink);font-family:var(--display);font-size:1.5rem;letter-spacing:.05em;text-transform:uppercase}
+.install-ok{border:2px solid var(--line);background:var(--surface2);font-size:1.15rem}
+.install-go:active,.install-ok:active{transform:scale(.98)}
 </style>
 
 </head>
@@ -361,6 +371,15 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
       <button class="done" id="doneBtn" type="button">Back to field</button>
     </div>
   </main>
+</div>
+
+<div id="installHint" class="install" hidden role="region" aria-label="Install Strikeout">
+  <h2 id="installTitle">Install app</h2>
+  <p id="installCopy"></p>
+  <div class="install-acts">
+    <button class="install-go" id="installGo" type="button">Install app</button>
+    <button class="install-ok" id="installOk" type="button">Not now</button>
+  </div>
 </div>
 
 <script>
@@ -646,6 +665,64 @@ if(HOSTED){
   setInterval(checkUpdate,20*60*1000);
   if(location.search)history.replaceState(null,'',location.pathname);
 }else{$('verSt').textContent='Updates work in the installed app';}
+
+// One-time install / Add to Home Screen. Separate from settings (strikeout.v1).
+const INSTALL_KEY='strikeout.installHint.v1';
+function appInstalled(){
+  try{
+    if(navigator.standalone===true)return true;
+    if(window.matchMedia('(display-mode: standalone)').matches)return true;
+    if(window.matchMedia('(display-mode: fullscreen)').matches)return true;
+  }catch(e){}
+  return false;
+}
+function installHintSeen(){
+  try{return localStorage.getItem(INSTALL_KEY)==='1';}catch(e){return true;}
+}
+function rememberInstallHint(){
+  try{localStorage.setItem(INSTALL_KEY,'1');}catch(e){}
+}
+function hideInstallHint(){const el=$('installHint');if(el)el.hidden=true;}
+let deferredPrompt=window.__soBIP||null;
+let installHintDue=false;
+function openInstallHint(kind){
+  if(!HOSTED||appInstalled()||installHintSeen())return;
+  const el=$('installHint');if(!el||!el.hidden)return;
+  const go=$('installGo');
+  if(kind==='ios'){
+    $('installTitle').textContent='Add to Home Screen';
+    $('installCopy').textContent='Tap Share, then Add to Home Screen.';
+    go.hidden=true;
+    $('installOk').textContent='OK';
+  }else{
+    $('installTitle').textContent='Install app';
+    $('installCopy').textContent='Put Strikeout on this phone. It opens like an app, even with no signal.';
+    go.hidden=false;
+    go.textContent='Install app';
+    $('installOk').textContent='Not now';
+  }
+  el.hidden=false;
+}
+function maybeInstallHint(){
+  if(!HOSTED||appInstalled()||installHintSeen())return;
+  if(deferredPrompt){openInstallHint('android');return;}
+  const ua=navigator.userAgent||'';
+  const ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(ios)openInstallHint('ios');
+}
+$('installOk').addEventListener('click',()=>{rememberInstallHint();hideInstallHint();});
+$('installGo').addEventListener('click',async()=>{
+  const ev=deferredPrompt;deferredPrompt=null;window.__soBIP=null;
+  rememberInstallHint();hideInstallHint();
+  if(!ev)return;
+  try{await ev.prompt();await ev.userChoice;}catch(e){}
+});
+window.addEventListener('appinstalled',()=>{deferredPrompt=null;window.__soBIP=null;rememberInstallHint();hideInstallHint();});
+window.addEventListener('so-bip',()=>{
+  deferredPrompt=window.__soBIP||deferredPrompt;
+  if(installHintDue)openInstallHint('android');
+});
+if(HOSTED)setTimeout(()=>{installHintDue=true;maybeInstallHint();},900);
 })();
 </script>
 
