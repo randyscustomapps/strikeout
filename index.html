@@ -113,6 +113,22 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .r-ndir{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.08em;text-transform:uppercase}
 .r-nsub{font-size:.8rem;color:var(--res-muted);letter-spacing:.02em}
 .r-ref{font-size:.85rem;color:var(--res-muted)}
+.r-gps{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 10px;margin-top:2px;padding-top:8px;border-top:1px solid rgba(224,169,28,.28)}
+.r-now{display:flex;flex-direction:column;align-items:flex-start;gap:3px;flex:1 1 auto;min-width:0}
+.r-now label{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.05em;text-transform:uppercase;color:var(--res-muted);white-space:nowrap;line-height:1}
+.r-stepper{display:flex;align-items:center;gap:4px}
+.r-stepper button{width:48px;height:48px;border-radius:12px;border:2px solid var(--res-ink);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;cursor:pointer;padding:0}
+.r-stepper button:active{transform:scale(.96);background:var(--res-ink);color:var(--res-bg)}
+.r-stepper input{width:4.6ch;height:48px;border-radius:12px;border:2px solid var(--res-ink);background:#FFF4D2;color:#2A1D0A;font-family:var(--display);font-weight:900;font-size:2rem;line-height:1;text-align:center;font-variant-numeric:tabular-nums;padding:0 2px;min-width:0;user-select:text;-webkit-user-select:text}
+.r-stepper input::placeholder{color:#8A7040;opacity:1}
+.r-dir{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.r-dir button{height:44px;border-radius:10px;border:2px solid rgba(224,169,28,.55);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;padding:0 8px;white-space:nowrap}
+.r-dir button[aria-pressed="true"]{background:var(--res-ink);color:var(--res-bg);border-color:var(--res-ink)}
+.r-dir button:active{transform:scale(.98)}
+.r-go{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-left:auto}
+.r-go .r-lbl{font-size:1.05rem;line-height:1}
+.r-tgt{font-family:var(--display);font-weight:900;font-size:3.1rem;line-height:.82;font-variant-numeric:tabular-nums}
+.r-tgt.empty{color:var(--res-muted)}
 
 /* controls */
 .layout{display:flex;flex-direction:column;gap:8px}
@@ -190,6 +206,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .result{padding:10px 14px 8px;gap:4px}
   .r-num{font-size:4.2rem}
   .r-nval{font-size:2rem}
+  .r-gps{gap:6px 8px;padding-top:6px}
+  .r-now label,.r-go .r-lbl{font-size:.95rem}
+  .r-stepper button{width:46px;height:46px}
+  .r-stepper input{width:4.2ch;height:46px;font-size:1.85rem}
+  .r-dir button{height:42px;font-size:1.02rem}
+  .r-tgt{font-size:2.6rem}
   .r-nval svg{width:28px;height:28px}
   .layout,.ctrls{gap:6px}
   .panel{padding:7px;gap:6px}
@@ -251,7 +273,27 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
   <!-- FIELD MODE -->
   <main id="field" class="layout">
-    <section class="result" aria-live="polite" id="result"></section>
+    <section class="result" id="result" aria-label="Strikeout result">
+      <div id="resultMain" aria-live="polite"></div>
+      <div class="r-gps">
+        <div class="r-now">
+          <label for="lineNowIn">Current row</label>
+          <div class="r-stepper">
+            <button type="button" data-line="dec" aria-label="Lower current row">−</button>
+            <input id="lineNowIn" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="5" placeholder="—">
+            <button type="button" data-line="inc" aria-label="Raise current row">+</button>
+          </div>
+        </div>
+        <div class="r-go" aria-live="polite" aria-atomic="true">
+          <span class="r-lbl">Go to</span>
+          <span class="r-tgt empty" id="lineGoNum">—</span>
+        </div>
+        <div class="r-dir" role="group" aria-label="Line numbers count up or down">
+          <button type="button" data-linedir="up" id="lineUpBtn" aria-pressed="true">Numbers up</button>
+          <button type="button" data-linedir="down" id="lineDnBtn" aria-pressed="false">Numbers down</button>
+        </div>
+      </div>
+    </section>
 
     <div class="ctrls">
       <section class="panel">
@@ -305,7 +347,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel" id="updPanel">
         <div class="ph"><h2>App version</h2></div>
-        <p class="note">Your settings stay on this phone — headers, counts, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
+        <p class="note">Your settings stay on this phone — headers, counts, current row, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
         <div class="upd"><span class="ver" id="verNow"></span><span class="st" id="verSt">Checking…</span></div>
         <button class="updbtn" id="updBtn" type="button" hidden>Update now</button>
         <button class="chkbtn" id="chkBtn" type="button">Check for updates</button>
@@ -363,7 +405,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Leave room for the others only, not yourself.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
-        <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down.</p>
+        <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b> on the card — <b>Go to</b> adds that move, or subtracts it if <b>Numbers down</b> is on.</p>
         <p class="note"><b>Quick check</b> when every header matches yours. <b>Following + Skip:</b> 2 × others + 1 (two others → <b>+5</b>, four others → <b>+9</b>). <b>Outside</b> or <b>Not following:</b> others + 1 (three others → <b>+4</b>, four others → <b>+5</b>). Mixed sizes: use the card. A leftover strip is not always fixed by more lines.</p>
         <p class="note"><b>Nudge</b> is left or right <i>after</i> the turn, on the new heading, so it matches the GPS arrows. Farther out is away from cut land; back in is toward it. Add it to any nudge already set.</p>
       </section>
@@ -387,7 +429,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 const KEY='strikeout.v1';
 const KEY_BAK=KEY+'.bak';
 const DEF={heads:[{id:'h35',w:35,label:''},{id:'h40',w:40,label:''}],
-  lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false};
+  lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false,
+  lineNow:null,lineDir:'up'};
 function readStore(){
   for(const k of [KEY,KEY_BAK]){
     try{
@@ -402,6 +445,13 @@ function readStore(){
 let S=readStore();
 if(!S)S=JSON.parse(JSON.stringify(DEF));
 for(const k in DEF)if(S[k]===undefined)S[k]=JSON.parse(JSON.stringify(DEF[k]));
+if(S.lineDir!=='down')S.lineDir='up';
+(function(){
+  let n=S.lineNow;
+  if(typeof n==='string'&&/^\d{1,5}$/.test(n))n=parseInt(n,10);
+  if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>99999)n=null;
+  S.lineNow=n;
+})();
 function save(){
   // Every change is written immediately so headers, counts, Following on, Skip/Outside, theme, etc.
   // survive app close, offline use, and Update now (updates only refresh files, never wipe this).
@@ -480,12 +530,43 @@ function renderResult(){
   const nudgeHtml=P.nudge===0
     ?`<div class="r-nval">No nudge</div><div class="r-ndir">Right on a line</div>`
     :`<div class="r-nval">${dw==='left'?arrowL:''}${fmtFtIn(P.nudge)}${dw==='right'?arrowR:''}</div><div class="r-ndir">Nudge ${dw}</div><div class="r-nsub">after the turn · ${P.dir==='out'?'farther out':'back in'}</div>`;
-  $('result').innerHTML=`
+  $('resultMain').innerHTML=`
     <div class="r-main">
       <div class="r-skip"><span class="r-num">+${P.move}</span><span class="r-lbl">line${P.move===1?'':'s'}</span></div>
       <div class="r-nudge">${nudgeHtml}</div>
     </div>
     <div class="r-ref">from the line you're on now</div>`;
+  syncLineInput();
+  paintTarget(P.move);
+}
+function lineNowNum(){
+  const n=S.lineNow;
+  return (typeof n==='number'&&Number.isInteger(n)&&n>=0&&n<=99999)?n:null;
+}
+function targetRow(move){
+  const now=lineNowNum();
+  if(now===null||!Number.isFinite(move))return null;
+  return S.lineDir==='down'?now-move:now+move;
+}
+function syncLineInput(force){
+  const el=$('lineNowIn');
+  if(!el)return;
+  if(!force&&document.activeElement===el)return;
+  const n=lineNowNum();
+  el.value=n===null?'':String(n);
+}
+function paintTarget(move){
+  if(move===undefined)move=calc().P.move;
+  const t=targetRow(move);
+  const num=$('lineGoNum');
+  if(num){
+    const empty=t===null;
+    num.textContent=empty?'—':String(t);
+    num.classList.toggle('empty',empty);
+  }
+  const up=$('lineUpBtn'),dn=$('lineDnBtn');
+  if(up)up.setAttribute('aria-pressed',S.lineDir!=='down');
+  if(dn)dn.setAttribute('aria-pressed',S.lineDir==='down');
 }
 
 function renderField(){
@@ -525,12 +606,34 @@ document.getElementById('field').addEventListener('click',e=>{
   else if(b.dataset.folside){S.folSide=b.dataset.folside;}
   else if(b.dataset.folskip!==undefined){S.folSkip=b.dataset.folskip==='1';}
   else if(b.dataset.cut){S.cut=b.dataset.cut;}
+  else if(b.dataset.line==='dec'||b.dataset.line==='inc'){
+    const n=lineNowNum();
+    if(b.dataset.line==='dec')S.lineNow=n===null?0:Math.max(0,n-1);
+    else S.lineNow=n===null?1:Math.min(99999,n+1);
+  }
+  else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
   else if(b.id==='ovlMinus'){S.overlapIn=Math.max(0,Math.round((S.overlapIn-S.stepIn)*2)/2);}
   else if(b.id==='ovlPlus'){S.overlapIn=Math.min(48,Math.round((S.overlapIn+S.stepIn)*2)/2);}
   else return;
   if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
   save();renderField();
 });
+$('lineNowIn').addEventListener('input',()=>{
+  const el=$('lineNowIn');
+  const cleaned=el.value.replace(/\D/g,'').slice(0,5);
+  if(cleaned!==el.value){
+    const at=el.selectionStart||0;
+    const cut=el.value.length-cleaned.length;
+    el.value=cleaned;
+    const pos=Math.max(0,at-cut);
+    try{el.setSelectionRange(pos,pos);}catch(err){}
+  }
+  S.lineNow=cleaned===''?null:parseInt(cleaned,10);
+  save();
+  paintTarget();
+});
+$('lineNowIn').addEventListener('focusout',()=>syncLineInput(true));
+$('lineNowIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.target.blur();}});
 
 // theme
 function isNight(){
@@ -629,7 +732,7 @@ if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.18';
+const APP_VERSION='1.0.19';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
