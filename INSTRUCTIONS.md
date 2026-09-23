@@ -9,6 +9,7 @@ no framework and no server code. **Do not rewrite, reformat or "improve" the fil
 | `index.html` | The whole app (HTML, CSS and JS in one file) |
 | `manifest.webmanifest` | Makes it installable ("Add to Home Screen") |
 | `sw.js` | Service worker, so it works offline |
+| `fonts/` | Self-hosted Barlow and Big Shoulders Display (SIL Open Font License) |
 | `version.json` | Current version number. The app checks this to show "Update available" |
 | `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` | Home-screen icons |
 | `README.md` | Short readme |
@@ -35,7 +36,8 @@ When changing anything in `index.html`:
 1. Make the change in `index.html`.
 2. In `index.html`, find `const APP_VERSION='1.0.0';` and raise the number, e.g. `'1.0.1'`.
 3. In `version.json`, set `"version"` to **the same number**, e.g. `"1.0.1"`.
-4. Commit both files to `main`. GitHub Pages redeploys in about a minute.
+4. In `sw.js`, set `VERSION` to a new cache name that includes that same version, e.g. `'strikeout-cache-1.0.1'`. Do not add `version.json` to the cache list.
+5. Commit to `main`. GitHub Pages redeploys in about a minute.
 
 What users see: next time the app is opened or brought back to the screen, a **pulsing red dot** shows on the
 settings (gear) button. In Settings, under **App version**, there's a red **UPDATE NOW** button. Tapping it
@@ -46,7 +48,7 @@ Most of the time a normal restart with signal already loads the new version, bec
 first. The Update Now button is the sure-fire way.
 
 ## Rules for an AI editing this
-- Keep everything in the single `index.html`. Don't split it into separate files or add a build tool.
+- Keep the app in the single `index.html`. Font files belong in `fonts/`. Don't add a build tool.
 - Don't change the saved-settings key `strikeout.v1` in `index.html`, or everyone's saved settings will reset.
-- Always bump `APP_VERSION` and `version.json` together (Task 3).
+- Always bump `APP_VERSION`, `version.json`, and the `VERSION` cache name in `sw.js` together (Task 3).
 - Don't cache `version.json` in `sw.js`. It must always come from the network.
