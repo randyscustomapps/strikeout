@@ -180,46 +180,72 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .done{height:64px;border-radius:16px;border:0;background:var(--on);color:var(--on-ink);font-family:var(--display);font-weight:900;font-size:1.8rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .math{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9rem;background:var(--surface2);border-radius:10px;padding:10px 12px;color:var(--ink);user-select:text;-webkit-user-select:text;white-space:pre-wrap}
 
-/* field compact: fit main screen on phone without scrolling; settings may still scroll */
-.app{padding-block:6px 10px;gap:6px}
-.brand{font-size:1.55rem}
-.brand svg{width:40px;height:27px}
-.iconbtn{height:44px;min-width:44px;padding:0 12px;border-radius:12px}
-.result{padding:8px 12px 8px;gap:4px;border-radius:14px}
-.r-num{font-size:3.8rem}
-.r-lbl{font-size:1.15rem}
-.r-nval{font-size:1.9rem}
-.r-nval svg{width:26px;height:26px}
-.r-ndir{font-size:1rem}
-.r-ref{font-size:.8rem}
-.layout,.ctrls{gap:6px}
-.panel{padding:6px;gap:5px;border-radius:14px}
-.ph h2{font-size:1.05rem}
-.ph small{font-size:.82rem}
-.tog.turn{min-height:56px}
-.tog.turn b{font-size:1.7rem}
-.tog.turn svg{width:26px;height:26px}
-.tog.yn{min-height:44px}
-.tog.yn b{font-size:1.05rem}
-.step{width:48px;height:44px;font-size:1.7rem;border-radius:9px}
-.cnt{min-width:36px;font-size:2rem}
-.ctr{padding:3px;border-radius:10px}
-.ctr .w{font-size:1.45rem}
-.ctr .nm{padding-left:6px}
-.ovl .big{font-size:1.9rem}
-.ovl{gap:8px}
-@media (max-width:560px){
-  .counters{grid-template-columns:1fr 1fr;gap:5px}
+/* field fits the device: scales to viewport height; settings may still scroll */
+html:has(body.mode-field){padding-top:0;padding-bottom:0}
+html,body{height:100%;height:100dvh}
+body.mode-field{overflow:hidden}
+body.mode-settings{overflow:auto;-webkit-overflow-scrolling:touch}
+body.mode-field .app{
+  height:100dvh;max-height:100dvh;overflow:hidden;
+  padding-block:max(4px,env(safe-area-inset-top,0px)) max(6px,env(safe-area-inset-bottom,0px));
+  gap:clamp(4px,1vh,8px);box-sizing:border-box;
 }
-@media (max-height:740px){
-  .r-num{font-size:3.3rem}
-  .tog.turn{min-height:50px}
-  .tog.turn b{font-size:1.5rem}
-  .app{padding-block:4px 6px;gap:5px}
-  .layout,.ctrls{gap:5px}
+body.mode-settings .app{height:auto;min-height:100dvh;max-height:none;overflow:visible;padding-block:8px 24px;gap:8px}
+body.mode-field .bar{flex:0 0 auto}
+body.mode-field #field.layout{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  gap:clamp(4px,1.1vh,8px);
+}
+body.mode-field #field .result{
+  flex:0 1 auto;padding:clamp(6px,.9vh,12px) 14px;gap:clamp(2px,.5vh,6px);
+  border-radius:14px;
+}
+body.mode-field .r-num{font-size:clamp(2.5rem,10.5vh,5rem)}
+body.mode-field .r-lbl{font-size:clamp(1rem,2.6vh,1.4rem)}
+body.mode-field .r-nval{font-size:clamp(1.45rem,4.2vh,2.3rem)}
+body.mode-field .r-nval svg{width:clamp(20px,4vh,32px);height:clamp(20px,4vh,32px)}
+body.mode-field .r-ndir{font-size:clamp(.9rem,2.2vh,1.15rem)}
+body.mode-field .r-ref{font-size:clamp(.72rem,1.8vh,.85rem)}
+body.mode-field #field .ctrls{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  gap:clamp(4px,1.1vh,8px);
+}
+body.mode-field #field .panel{
+  flex:1 1 0;min-height:0;overflow:hidden;
+  padding:clamp(4px,.8vh,8px);gap:clamp(3px,.7vh,7px);border-radius:14px;
+  justify-content:center;
+}
+body.mode-field .ph h2{font-size:clamp(.95rem,2.3vh,1.2rem)}
+body.mode-field .ph small{font-size:clamp(.72rem,1.8vh,.9rem)}
+body.mode-field #field .two{flex:1 1 auto;min-height:0;align-items:stretch}
+body.mode-field .tog.turn{min-height:0;height:100%;flex:1}
+body.mode-field .tog.turn b{font-size:clamp(1.35rem,4vh,2.1rem)}
+body.mode-field .tog.turn svg{width:clamp(22px,3.8vh,30px);height:clamp(22px,3.8vh,30px)}
+body.mode-field .tog.yn{min-height:0;height:auto;padding:clamp(4px,.8vh,8px)}
+body.mode-field .tog.yn b{font-size:clamp(.95rem,2.3vh,1.2rem)}
+body.mode-field #field .counters{
+  flex:1 1 auto;min-height:0;align-content:stretch;
+  grid-template-columns:1fr 1fr;gap:clamp(4px,.8vh,6px);
+}
+body.mode-field .ctr{min-height:0;height:100%;padding:clamp(2px,.5vh,4px)}
+body.mode-field .ctr .w{font-size:clamp(1.2rem,3.4vh,1.8rem)}
+body.mode-field .step{
+  width:clamp(40px,6.5vh,56px);height:clamp(40px,6.5vh,56px);
+  font-size:clamp(1.4rem,3.5vh,2rem);
+}
+body.mode-field .cnt{font-size:clamp(1.5rem,4vh,2.4rem);min-width:clamp(28px,5vh,44px)}
+body.mode-field #field .ovl{flex:1 1 auto;min-height:0}
+body.mode-field .ovl .big{font-size:clamp(1.5rem,4.2vh,2.3rem)}
+body.mode-field .brand{font-size:clamp(1.35rem,3.2vh,1.8rem)}
+body.mode-field .brand svg{width:clamp(34px,5vh,46px);height:clamp(23px,3.4vh,31px)}
+body.mode-field .iconbtn{height:clamp(40px,6vh,50px);min-width:clamp(40px,6vh,50px)}
+/* landscape tablet: keep side-by-side, still fill height */
+@media (min-width:760px) and (orientation:landscape){
+  body.mode-field #field.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:stretch}
+  body.mode-field #field .result{height:100%;align-self:stretch}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
-@media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
+@media (max-width:380px){body:not(.mode-field) .r-num{font-size:5rem}body:not(.mode-field) .r-nval{font-size:2.3rem}}
 </style>
 
 </head>
@@ -539,18 +565,21 @@ function show(which){
   const set=which==='settings';
   $('field').hidden=set;$('settings').hidden=!set;
   $('setBtn').hidden=set;
+  document.body.classList.toggle('mode-settings',set);
+  document.body.classList.toggle('mode-field',!set);
   if(set)renderSettings();else{S.heads.sort((a,b)=>a.w-b.w);save();renderField();}
   window.scrollTo(0,0);wake();
 }
 $('setBtn').addEventListener('click',()=>show('settings'));
 $('doneBtn').addEventListener('click',()=>show('field'));
 
+document.body.classList.add('mode-field');
 applyTheme();renderField();
 if(S.wake)wake();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.1';
+const APP_VERSION='1.0.2';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
