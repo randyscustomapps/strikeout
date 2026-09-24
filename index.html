@@ -347,14 +347,14 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         </div>
         <div class="leave" id="leaveBox">
           <div class="leave-top">
-            <span class="leave-lab" id="leaveLab">Leave room for</span>
+            <span class="leave-lab" id="leaveLab">Didn’t follow</span>
             <div class="leave-step">
-              <button class="step" id="leaveMinus" type="button" aria-label="Fewer to leave room for">−</button>
+              <button class="step" id="leaveMinus" type="button" aria-label="Fewer who didn’t follow">−</button>
               <span class="cnt" id="leaveVal">0</span>
-              <button class="step" id="leavePlus" type="button" aria-label="One more to leave room for">+</button>
+              <button class="step" id="leavePlus" type="button" aria-label="One more who didn’t follow">+</button>
             </div>
           </div>
-          <div class="leave-chips" id="leaveChips" hidden role="group" aria-label="Header width to leave room for"></div>
+          <div class="leave-chips" id="leaveChips" hidden role="group" aria-label="Didn’t follow header width"></div>
         </div>
         <div class="counters" id="counters"></div>
       </section>
@@ -377,7 +377,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel" id="updPanel">
         <div class="ph"><h2>App version</h2></div>
-        <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, leave room, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
+        <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, Didn’t follow, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
         <div class="upd"><span class="ver" id="verNow"></span><span class="st" id="verSt">Checking…</span></div>
         <button class="updbtn" id="updBtn" type="button" hidden>Update now</button>
         <button class="chkbtn" id="chkBtn" type="button">Check for updates</button>
@@ -450,10 +450,10 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel">
         <div class="ph"><h2>How to use it</h2></div>
-        <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones you leave room for.</p>
+        <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
-        <p class="note"><b>Not following</b> — you go out alone. Leave room for the others only, not yourself.</p>
-        <p class="note"><b>Leave room</b> — people who didn’t follow. Pick how many and their header size. Their cut is added once, like Outside, not as a full Skip jump.</p>
+        <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
+        <p class="note"><b>Didn’t follow</b> — people who didn’t follow. Pick how many and their header size. Their cut is added once, like Outside, not as a full Skip pack jump.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
         <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
@@ -1038,7 +1038,7 @@ function renderSettings(){
       ?`gap = Skip: followers out + whole crew back\n    = ${fmtFtIn(c.folSum)} + ${fmtFtIn(c.crew)} = ${fmtFtIn(gapShown)}`
       :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(gapShown)}`)
     :`gap = other combines only (not you) = ${fmtFtIn(gapShown)}`)+
-    (c.leaveN>0?`\nleave room once: ${c.leaveN} × ${ftTxt(c.leaveW)} cut = ${fmtFtIn(c.leaveCut)}\n    gap = ${fmtFtIn(c.gap)}`:'')+
+    (c.leaveN>0?`\ndidn't follow once: ${c.leaveN} × ${ftTxt(c.leaveW)} cut = ${fmtFtIn(c.leaveCut)}\n    gap = ${fmtFtIn(c.gap)}`:'')+
     `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
     (c.fromNow?`move = that line count, from the pass you're on now`:`move = lines left standing + 1 (your own pass), from the line you're on now`)+
     `\n\nshown: +${c.P.move} lines${c.P.nudge?', nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}\nother way: +${c.Alt.move} lines${c.Alt.nudge?', nudge '+fmtFtIn(c.Alt.nudge)+' '+dirWord(c.Alt.dir):''}`;
