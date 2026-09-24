@@ -119,8 +119,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .r-stepper{display:flex;align-items:center;gap:4px}
 .r-stepper button{width:48px;height:48px;border-radius:12px;border:2px solid var(--res-ink);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;cursor:pointer;padding:0}
 .r-stepper button:active{transform:scale(.96);background:var(--res-ink);color:var(--res-bg)}
-.r-stepper input{width:4.6ch;height:48px;border-radius:12px;border:2px solid var(--res-ink);background:#FFF4D2;color:#2A1D0A;font-family:var(--display);font-weight:900;font-size:2rem;line-height:1;text-align:center;font-variant-numeric:tabular-nums;padding:0 2px;min-width:0;user-select:text;-webkit-user-select:text}
-.r-stepper input::placeholder{color:#8A7040;opacity:1}
+.r-stepper input{width:4.6ch;height:48px;border-radius:12px;border:2px solid var(--res-ink);background:transparent;color:var(--res-ink);caret-color:var(--res-ink);font-family:var(--display);font-weight:900;font-size:2rem;line-height:1;text-align:center;font-variant-numeric:tabular-nums;padding:0 2px;min-width:0;user-select:text;-webkit-user-select:text;-webkit-appearance:none;appearance:none}
+.r-stepper input::placeholder{color:var(--res-muted);opacity:1}
 .r-dir{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .r-dir button{height:44px;border-radius:10px;border:2px solid rgba(224,169,28,.55);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;padding:0 8px;white-space:nowrap}
 .r-dir button[aria-pressed="true"]{background:var(--res-ink);color:var(--res-bg);border-color:var(--res-ink)}
@@ -1099,7 +1099,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.22';
+const APP_VERSION='1.0.23';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
