@@ -452,7 +452,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones you leave room for.</p>
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Leave room for the others only, not yourself.</p>
-        <p class="note"><b>Leave room</b> — people who didn’t follow. Pick how many and their header size. Spacing treats them as still in the jump.</p>
+        <p class="note"><b>Leave room</b> — people who didn’t follow. Pick how many and their header size. Their cut is added once, like Outside, not as a full Skip jump.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
         <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works.</p>
@@ -567,22 +567,23 @@ function calc(){
   const eff=w=>Math.max(0,w*12-o);
   let folSum=0,folN=0;
   S.heads.forEach(h=>{const n=S.counts[h.id]||0;folN+=n;folSum+=n*eff(h.w);});
-  const liveN=folN;
-  let leaveN=0,leaveW=0;
-  if((S.leaveN|0)>0){
-    const h=S.heads.find(x=>x.id===S.leaveHead)||pickLeaveHead();
-    if(h){leaveN=S.leaveN|0;leaveW=h.w;folN+=leaveN;folSum+=leaveN*eff(h.w);}
-  }
   const crew=eff(ld.w)+folSum;
   // Following me + Skip: others out + whole crew back.
   // Following me + Outside: only the followers' widths (crop stays outside; e.g. 4×40 → +5).
   // Not following: other combines only (not you).
   // Alone (nobody counted): never "skip" an empty pack — same as +1 / Outside.
+  // Live counts only above. Leave-room ghosts are not Skip-pack followers.
   let gap;
   if(S.mode==='double'){
     if(S.folSkip!==false)gap=(folN===0)?0:(folSum+crew);
     else gap=folSum;
   }else gap=folSum;
+  const liveGap=gap;
+  let leaveN=0,leaveW=0,leaveCut=0;
+  if((S.leaveN|0)>0){
+    const h=S.heads.find(x=>x.id===S.leaveHead)||pickLeaveHead();
+    if(h){leaveN=S.leaveN|0;leaveW=h.w;leaveCut=leaveN*eff(h.w);gap+=leaveCut;}
+  }
   const N=Math.floor(gap/L+1e-9);const rem=gap-N*L;
   // +lines is added to the GPS line you're driving now, including the first pass.
   // Following + Skip with followers: move is N (other way N+1). The gap is the
@@ -594,7 +595,7 @@ function calc(){
   let P=A,Alt=B;
   if(rem>L-rem){P=B;Alt=A;}
   if(Math.round(P.nudge*2)/2===0){P.nudge=0;}
-  return {ld,L,o,folSum,folN:liveN,crew,gap,P,Alt,heads:liveN+1,fromNow,leaveN,leaveW};
+  return {ld,L,o,folSum,folN,crew,gap,liveGap,P,Alt,heads:folN+1,fromNow,leaveN,leaveW,leaveCut};
 }
 function dirWord(d){ // S.cut = the way you turn at the end, seen from the pass you're on. Answer is left/right AFTER the turn.
   // When followers are on your left (rare), mirror the nudge side so the pack can come up on that side.
@@ -1008,12 +1009,13 @@ function renderSettings(){
   $('wakeBtn').setAttribute('aria-pressed',!!S.wake);
   renderAutoUi();
   const c=calc();
+  const gapShown=c.leaveN>0?c.liveGap:c.gap;
   $('mathBox').textContent=(S.mode==='double'
     ?(S.folSkip!==false
-      ?`gap = Skip: followers out + whole crew back\n    = ${fmtFtIn(c.folSum)} + ${fmtFtIn(c.crew)} = ${fmtFtIn(c.gap)}`
-      :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(c.gap)}`)
-    :`gap = other combines only (not you) = ${fmtFtIn(c.gap)}`)+
-    (c.leaveN>0?`\nleave room: ${c.leaveN} × ${ftTxt(c.leaveW)} counted in that gap`:'')+
+      ?`gap = Skip: followers out + whole crew back\n    = ${fmtFtIn(c.folSum)} + ${fmtFtIn(c.crew)} = ${fmtFtIn(gapShown)}`
+      :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(gapShown)}`)
+    :`gap = other combines only (not you) = ${fmtFtIn(gapShown)}`)+
+    (c.leaveN>0?`\nleave room once: ${c.leaveN} × ${ftTxt(c.leaveW)} cut = ${fmtFtIn(c.leaveCut)}\n    gap = ${fmtFtIn(c.gap)}`:'')+
     `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
     (c.fromNow?`move = that line count, from the pass you're on now`:`move = lines left standing + 1 (your own pass), from the line you're on now`)+
     `\n\nshown: +${c.P.move} lines${c.P.nudge?', nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}\nother way: +${c.Alt.move} lines${c.Alt.nudge?', nudge '+fmtFtIn(c.Alt.nudge)+' '+dirWord(c.Alt.dir):''}`;
