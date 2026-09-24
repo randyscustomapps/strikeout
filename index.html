@@ -102,7 +102,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .chkbtn{height:52px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1rem;cursor:pointer}
 
 /* result */
-.result{background:var(--res-bg);color:var(--res-ink);border-radius:18px;padding:12px 16px 10px;display:flex;flex-direction:column;gap:6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.result{background:var(--res-bg);color:var(--res-ink);border-radius:18px;padding:12px 16px 10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .r-main{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
 .r-skip{display:flex;align-items:baseline;gap:6px}
 .r-lbl{font-family:var(--display);font-weight:800;font-size:1.4rem;letter-spacing:.06em;text-transform:uppercase;color:var(--res-muted)}
@@ -125,13 +125,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .r-dir button{height:44px;border-radius:10px;border:2px solid rgba(224,169,28,.55);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;padding:0 8px;white-space:nowrap}
 .r-dir button[aria-pressed="true"]{background:var(--res-ink);color:var(--res-bg);border-color:var(--res-ink)}
 .r-dir button:active{transform:scale(.98)}
-.r-auto{flex:1 1 100%;display:flex;gap:6px;align-items:stretch}
-.r-axis{flex:1 1 auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;min-width:0}
-.r-axis button,.r-autobtn{height:40px;border-radius:10px;border:2px solid rgba(224,169,28,.55);background:transparent;color:var(--res-ink);font-family:var(--display);font-weight:800;font-size:1.02rem;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;padding:0 6px;white-space:nowrap}
-.r-axis button[aria-pressed="true"],.r-autobtn[aria-pressed="true"]{background:var(--res-ink);color:var(--res-bg);border-color:var(--res-ink)}
-.r-axis button:active,.r-autobtn:active{transform:scale(.98)}
-.r-autobtn{flex:0 0 auto;padding:0 10px}
-.r-autonote{flex:1 1 100%;margin:0;font-size:.78rem;line-height:1.25;color:var(--res-muted)}
+.r-autonote{flex:1 1 100%;margin:0;font-size:.82rem;line-height:1.25;color:var(--res-muted)}
 .r-go{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-left:auto}
 .r-go .r-lbl{font-size:1.05rem;line-height:1}
 .r-tgt{font-family:var(--display);font-weight:900;font-size:3.1rem;line-height:.82;font-variant-numeric:tabular-nums}
@@ -181,7 +175,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 /* landscape / tablet: result left, controls right */
 @media (min-width:760px) and (orientation:landscape){
   .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:start}
-  .result{top:calc(env(safe-area-inset-top,0px) + 8px)}
 }
 
 /* settings — section groups sit on the page; field combine rows keep .panel cards */
@@ -197,6 +190,9 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .seg3 button{height:60px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1.05rem;cursor:pointer}
 .seg3 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
+.seg2set{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg2set button{height:60px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1.02rem;cursor:pointer;padding:0 6px}
+.seg2set button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .note{color:var(--muted);font-size:.95rem;margin:0;max-width:62ch;user-select:text;-webkit-user-select:text}
 .note b{color:var(--ink)}
 .danger{height:56px;border-radius:12px;border:2px solid var(--danger);color:var(--danger);background:transparent;font-weight:700;font-size:1rem;cursor:pointer}
@@ -218,7 +214,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .r-stepper button{width:46px;height:46px}
   .r-stepper input{width:4.2ch;height:46px;font-size:1.85rem}
   .r-dir button{height:42px;font-size:1.02rem}
-  .r-axis button,.r-autobtn{height:38px;font-size:.95rem}
+  .r-autonote{font-size:.78rem}
   .r-tgt{font-size:2.6rem}
   .r-nval svg{width:28px;height:28px}
   .layout,.ctrls{gap:6px}
@@ -230,6 +226,10 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .cnt{font-size:2.15rem;min-width:40px}
   .ctr .w{font-size:1.65rem}
   .ovl .big{font-size:2.05rem}
+  .leave-lab{font-size:1.02rem}
+  .leave-step .step{width:40px;height:36px;font-size:1.45rem}
+  .leave-step .cnt{font-size:1.6rem}
+  .leave-chips button{height:34px;font-size:1.05rem}
 }
 
 /* compact follow options under Following me — one row, not full-width */
@@ -240,6 +240,16 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .seg2 button{height:30px;min-width:3.2rem;padding:0 .55rem;border:0;border-radius:6px;background:transparent;font-family:var(--ui);font-weight:700;font-size:.82rem;color:var(--muted);cursor:pointer;line-height:1;white-space:nowrap}
 .seg2 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink)}
 .seg2 button:active{transform:scale(.98)}
+.leave{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.leave-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.leave-lab{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
+.leave-step{display:flex;align-items:center;gap:4px;flex:none}
+.leave-step .step{width:44px;height:40px;font-size:1.6rem}
+.leave-step .cnt{font-size:1.8rem;min-width:28px}
+.leave-chips{display:flex;flex-wrap:wrap;gap:6px}
+.leave-chips button{height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);background:var(--surface2);font-family:var(--display);font-weight:800;font-size:1.2rem;cursor:pointer}
+.leave-chips button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
+.leave-chips button:active{transform:scale(.98)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
@@ -300,13 +310,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
           <button type="button" data-linedir="up" id="lineUpBtn" aria-pressed="true">Count up</button>
           <button type="button" data-linedir="down" id="lineDnBtn" aria-pressed="false">Count down</button>
         </div>
-        <div class="r-auto">
-          <div class="r-axis" role="group" aria-label="Field axis">
-            <button type="button" data-axis="ns" id="axisNs" aria-pressed="true">North–South</button>
-            <button type="button" data-axis="ew" id="axisEw" aria-pressed="false">East–West</button>
-          </div>
-          <button type="button" class="r-autobtn" id="autoBtn" aria-pressed="false">Auto off</button>
-        </div>
         <p class="r-autonote" id="autoNote" hidden></p>
       </div>
     </section>
@@ -342,6 +345,17 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
             </div>
           </div>
         </div>
+        <div class="leave" id="leaveBox">
+          <div class="leave-top">
+            <span class="leave-lab" id="leaveLab">Leave room for</span>
+            <div class="leave-step">
+              <button class="step" id="leaveMinus" type="button" aria-label="Fewer to leave room for">−</button>
+              <span class="cnt" id="leaveVal">0</span>
+              <button class="step" id="leavePlus" type="button" aria-label="One more to leave room for">+</button>
+            </div>
+          </div>
+          <div class="leave-chips" id="leaveChips" hidden role="group" aria-label="Header width to leave room for"></div>
+        </div>
         <div class="counters" id="counters"></div>
       </section>
 
@@ -363,10 +377,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel" id="updPanel">
         <div class="ph"><h2>App version</h2></div>
-        <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
+        <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, leave room, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
         <div class="upd"><span class="ver" id="verNow"></span><span class="st" id="verSt">Checking…</span></div>
         <button class="updbtn" id="updBtn" type="button" hidden>Update now</button>
         <button class="chkbtn" id="chkBtn" type="button">Check for updates</button>
+        <button class="chkbtn" id="installAgain" type="button">Show install tip again</button>
       </section>
 
       <section class="panel">
@@ -405,6 +420,13 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
       </section>
 
       <section class="panel">
+        <div class="ph"><h2>Auto</h2></div>
+        <button class="tog" type="button" id="autoBtn" aria-pressed="false"><b id="autoBtnLbl">Auto off</b><span id="autoSetNote">Off. Type Current row on the field card.</span></button>
+        <div class="ph"><h2>Field axis</h2><small>passes run</small></div>
+        <div class="seg2set" id="axisSeg" role="group" aria-label="Field axis">
+          <button type="button" data-axis="ns" id="axisNs" aria-pressed="true">North–South</button>
+          <button type="button" data-axis="ew" id="axisEw" aria-pressed="false">East–West</button>
+        </div>
         <div class="ph"><h2>Auto advance confirms after</h2><small>new direction</small></div>
         <div class="seg3" id="confirmSeg">
           <button type="button" data-confirm="50">50 ft</button>
@@ -430,9 +452,10 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones you leave room for.</p>
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Leave room for the others only, not yourself.</p>
+        <p class="note"><b>Leave room</b> — people who didn’t follow. Pick how many and their header size. Their cut is added once, like Outside, not as a full Skip jump.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
-        <p class="note"><b>Auto</b> is off until you turn it on and allow location. Pick <b>North–South</b> or <b>East–West</b>. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto stays off and the typed row still works.</p>
+        <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works.</p>
         <p class="note"><b>Quick check</b> when every header matches yours. <b>Following + Skip:</b> 2 × others + 1 (two others → <b>+5</b>, four others → <b>+9</b>). <b>Outside</b> or <b>Not following:</b> others + 1 (three others → <b>+4</b>, four others → <b>+5</b>). Mixed sizes: use the card. A leftover strip is not always fixed by more lines.</p>
         <p class="note"><b>Nudge</b> is left or right <i>after</i> the turn, on the new heading, so it matches the GPS arrows. Farther out is away from cut land; back in is toward it. Add it to any nudge already set.</p>
       </section>
@@ -457,7 +480,7 @@ const KEY='strikeout.v1';
 const KEY_BAK=KEY+'.bak';
 const DEF={heads:[{id:'h35',w:35,label:''},{id:'h40',w:40,label:''}],
   lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false,
-  lineNow:null,lineDir:'up',fieldAxis:'ns',autoAdv:false,confirmFt:100};
+  lineNow:null,lineDir:'up',fieldAxis:'ns',autoAdv:true,confirmFt:100,leaveN:0,leaveHead:null};
 function readStore(){
   for(const k of [KEY,KEY_BAK]){
     try{
@@ -484,6 +507,18 @@ S.autoAdv=S.autoAdv===true;
   if(typeof n==='string'&&/^\d{1,5}$/.test(n))n=parseInt(n,10);
   if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>99999)n=null;
   S.lineNow=n;
+})();
+(function(){
+  let n=Math.round(Number(S.leaveN));
+  if(!Number.isFinite(n)||n<0)n=0;
+  if(n>99)n=99;
+  S.leaveN=n;
+  if(typeof S.leaveHead!=='string'||!S.heads.some(h=>h.id===S.leaveHead))S.leaveHead=null;
+  if(S.leaveN>0&&!S.leaveHead){
+    const h=pickLeaveHead();
+    S.leaveHead=h?h.id:null;
+    if(!S.leaveHead)S.leaveN=0;
+  }
 })();
 function save(){
   // Every change is written immediately so headers, counts, Following on, Skip/Outside, theme, etc.
@@ -514,6 +549,18 @@ function fmtFtIn(inches){
 function fmtIn(i){return (i%1===0?i.toFixed(0):i.toFixed(1))+'"';}
 function ftTxt(w){return (w%1===0?w.toFixed(0):w.toFixed(1))+"'";}
 function lead(){return S.heads.find(h=>h.id===S.lead)||S.heads[0];}
+function pickLeaveHead(){
+  let best=null,bestN=0;
+  S.heads.forEach(h=>{const n=S.counts[h.id]||0;if(n>bestN){bestN=n;best=h;}});
+  if(best)return best;
+  const ld=lead();
+  return S.heads.find(h=>!ld||h.id!==ld.id)||S.heads[0]||null;
+}
+function ensureLeaveHead(){
+  if(S.heads.some(h=>h.id===S.leaveHead))return;
+  const h=pickLeaveHead();
+  S.leaveHead=h?h.id:null;
+}
 
 function calc(){
   const ld=lead();const L=ld.w*12;const o=S.overlapIn;
@@ -525,11 +572,18 @@ function calc(){
   // Following me + Outside: only the followers' widths (crop stays outside; e.g. 4×40 → +5).
   // Not following: other combines only (not you).
   // Alone (nobody counted): never "skip" an empty pack — same as +1 / Outside.
+  // Live counts only above. Leave-room ghosts are not Skip-pack followers.
   let gap;
   if(S.mode==='double'){
     if(S.folSkip!==false)gap=(folN===0)?0:(folSum+crew);
     else gap=folSum;
   }else gap=folSum;
+  const liveGap=gap;
+  let leaveN=0,leaveW=0,leaveCut=0;
+  if((S.leaveN|0)>0){
+    const h=S.heads.find(x=>x.id===S.leaveHead)||pickLeaveHead();
+    if(h){leaveN=S.leaveN|0;leaveW=h.w;leaveCut=leaveN*eff(h.w);gap+=leaveCut;}
+  }
   const N=Math.floor(gap/L+1e-9);const rem=gap-N*L;
   // +lines is added to the GPS line you're driving now, including the first pass.
   // Following + Skip with followers: move is N (other way N+1). The gap is the
@@ -541,7 +595,7 @@ function calc(){
   let P=A,Alt=B;
   if(rem>L-rem){P=B;Alt=A;}
   if(Math.round(P.nudge*2)/2===0){P.nudge=0;}
-  return {ld,L,o,folSum,folN,crew,gap,P,Alt,heads:folN+1,fromNow};
+  return {ld,L,o,folSum,folN,crew,gap,liveGap,P,Alt,heads:folN+1,fromNow,leaveN,leaveW,leaveCut};
 }
 function dirWord(d){ // S.cut = the way you turn at the end, seen from the pass you're on. Answer is left/right AFTER the turn.
   // When followers are on your left (rare), mirror the nudge side so the pack can come up on that side.
@@ -659,27 +713,35 @@ function onOri(e){const h=headingFromOri(e);if(h!=null)lastCompass=h;}
 function autoStatusText(){
   if(!S.autoAdv)return autoMsg||'';
   if(autoMsg)return autoMsg;
-  if(!watching)return 'Tap Auto to allow location.';
-  if(geoWeak)return 'GPS weak. Auto waits for a clearer fix.';
+  if(!watching)return 'Auto on · allow location in Settings';
+  if(geoWeak)return 'Auto on · GPS weak';
   if(!passSide){
     const ft=Math.min(S.confirmFt,Math.round(lockM/0.3048));
-    if(lockSide)return 'Learning '+sideWord(lockSide)+' · '+ft+' / '+S.confirmFt+' ft';
+    if(lockSide)return 'Auto on · headed '+sideWord(lockSide)+' · '+ft+' / '+S.confirmFt+' ft';
     const hinted=lastCompass==null?null:axisSide(lastCompass,S.fieldAxis==='ew'?'ew':'ns');
-    if(hinted)return 'Auto on. Phone points '+sideWord(hinted)+'. Drive to confirm.';
-    return 'Auto on. Drive the pass to learn direction.';
+    if(hinted)return 'Auto on · headed '+sideWord(hinted);
+    return 'Auto on · drive to learn direction';
   }
   if(pendingSide){
     const ft=Math.min(S.confirmFt,Math.round(pendingM/0.3048));
-    return 'New way '+sideWord(pendingSide)+' · '+ft+' / '+S.confirmFt+' ft';
+    return 'Auto on · headed '+sideWord(pendingSide)+' · '+ft+' / '+S.confirmFt+' ft';
   }
   return 'Auto on · headed '+sideWord(passSide);
 }
 function renderAutoUi(){
-  const ns=$('axisNs'),ew=$('axisEw'),btn=$('autoBtn'),note=$('autoNote');
+  const ns=$('axisNs'),ew=$('axisEw'),btn=$('autoBtn'),note=$('autoNote'),setNote=$('autoSetNote'),lbl=$('autoBtnLbl');
   if(ns)ns.setAttribute('aria-pressed',S.fieldAxis!=='ew');
   if(ew)ew.setAttribute('aria-pressed',S.fieldAxis==='ew');
-  if(btn){btn.setAttribute('aria-pressed',!!S.autoAdv);btn.textContent=S.autoAdv?'Auto on':'Auto off';}
-  if(note){const t=autoStatusText();note.hidden=!t;note.textContent=t||'';}
+  if(btn)btn.setAttribute('aria-pressed',!!S.autoAdv);
+  if(lbl)lbl.textContent=S.autoAdv?'Auto on':'Auto off';
+  const onLine=S.autoAdv?autoStatusText():'';
+  const fieldLine=onLine||((!S.autoAdv&&autoMsg)?autoMsg:'');
+  if(note){note.hidden=!fieldLine;note.textContent=fieldLine||'';}
+  if(setNote){
+    if(!S.autoAdv)setNote.textContent=autoMsg||'Off. Type Current row on the field card.';
+    else if(!watching)setNote.textContent='On. Tap off, then on, to allow location.';
+    else setNote.textContent=onLine||'On. Current row advances after a real turnaround.';
+  }
 }
 function commitBump(side){
   const editing=document.activeElement&&document.activeElement.id==='lineNowIn';
@@ -805,7 +867,7 @@ async function resumeAuto(){
     return;
   }
   if(state==='granted')beginWatch(false);
-  else{autoMsg='Tap Auto to allow location.';renderAutoUi();}
+  else{autoMsg='Auto on · allow location in Settings';renderAutoUi();}
 }
 
 function renderField(){
@@ -832,6 +894,15 @@ function renderField(){
   document.querySelectorAll('[data-folside]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.folside===(S.folSide||'right')));
   document.querySelectorAll('[data-folskip]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.folskip==='1')===!!S.folSkip));
   document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===S.cut));
+  const ln=S.leaveN||0;
+  $('leaveVal').textContent=String(ln);
+  $('leaveMinus').disabled=ln<=0;
+  const lchips=$('leaveChips');
+  if(ln>0){
+    ensureLeaveHead();
+    lchips.hidden=false;
+    lchips.innerHTML=S.heads.map(h=>`<button type="button" data-leave="${h.id}" aria-pressed="${h.id===S.leaveHead}">${ftTxt(h.w)}</button>`).join('');
+  }else{lchips.hidden=true;lchips.innerHTML='';}
   renderResult();
   renderAutoUi();
 }
@@ -853,14 +924,9 @@ document.getElementById('field').addEventListener('click',e=>{
     resetTrack();
   }
   else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
-  else if(b.dataset.axis){
-    const ax=b.dataset.axis==='ew'?'ew':'ns';
-    if(ax!==S.fieldAxis){S.fieldAxis=ax;resetTrack();}
-  }
-  else if(b.id==='autoBtn'){
-    if(S.autoAdv){autoGen++;S.autoAdv=false;autoMsg='';stopSensors();}
-    else{if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){} void startAuto(); return;}
-  }
+  else if(b.id==='leaveMinus'){S.leaveN=Math.max(0,(S.leaveN||0)-1);}
+  else if(b.id==='leavePlus'){S.leaveN=Math.min(99,(S.leaveN||0)+1);ensureLeaveHead();}
+  else if(b.dataset.leave){if(S.heads.some(h=>h.id===b.dataset.leave))S.leaveHead=b.dataset.leave;else return;}
   else if(b.id==='ovlMinus'){S.overlapIn=Math.max(0,Math.round((S.overlapIn-S.stepIn)*2)/2);}
   else if(b.id==='ovlPlus'){S.overlapIn=Math.min(48,Math.round((S.overlapIn+S.stepIn)*2)/2);}
   else return;
@@ -916,6 +982,17 @@ async function wake(){
 }
 document.addEventListener('visibilitychange',wake);
 $('wakeBtn').addEventListener('click',()=>{S.wake=!S.wake;save();$('wakeBtn').setAttribute('aria-pressed',S.wake);if(!S.wake)$('wakeNote').textContent='Stops the phone going to sleep in field mode';wake();});
+$('autoBtn').addEventListener('click',()=>{
+  if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
+  if(S.autoAdv){autoGen++;S.autoAdv=false;autoMsg='';stopSensors();save();renderAutoUi();}
+  else void startAuto();
+});
+$('axisSeg').addEventListener('click',e=>{
+  const b=e.target.closest('[data-axis]');if(!b)return;
+  const ax=b.dataset.axis==='ew'?'ew':'ns';
+  if(ax!==S.fieldAxis){S.fieldAxis=ax;resetTrack();}
+  save();renderAutoUi();
+});
 $('dimBtn').addEventListener('click',()=>{S.dim=!S.dim;save();applyTheme();});
 
 // settings
@@ -930,12 +1007,15 @@ function renderSettings(){
   document.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.step===S.stepIn));
   document.querySelectorAll('[data-confirm]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.confirm===S.confirmFt));
   $('wakeBtn').setAttribute('aria-pressed',!!S.wake);
+  renderAutoUi();
   const c=calc();
+  const gapShown=c.leaveN>0?c.liveGap:c.gap;
   $('mathBox').textContent=(S.mode==='double'
     ?(S.folSkip!==false
-      ?`gap = Skip: followers out + whole crew back\n    = ${fmtFtIn(c.folSum)} + ${fmtFtIn(c.crew)} = ${fmtFtIn(c.gap)}`
-      :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(c.gap)}`)
-    :`gap = other combines only (not you) = ${fmtFtIn(c.gap)}`)+
+      ?`gap = Skip: followers out + whole crew back\n    = ${fmtFtIn(c.folSum)} + ${fmtFtIn(c.crew)} = ${fmtFtIn(gapShown)}`
+      :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(gapShown)}`)
+    :`gap = other combines only (not you) = ${fmtFtIn(gapShown)}`)+
+    (c.leaveN>0?`\nleave room once: ${c.leaveN} × ${ftTxt(c.leaveW)} cut = ${fmtFtIn(c.leaveCut)}\n    gap = ${fmtFtIn(c.gap)}`:'')+
     `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
     (c.fromNow?`move = that line count, from the pass you're on now`:`move = lines left standing + 1 (your own pass), from the line you're on now`)+
     `\n\nshown: +${c.P.move} lines${c.P.nudge?', nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}\nother way: +${c.Alt.move} lines${c.Alt.nudge?', nudge '+fmtFtIn(c.Alt.nudge)+' '+dirWord(c.Alt.dir):''}`;
@@ -951,7 +1031,9 @@ $('headRows').addEventListener('input',e=>{
 $('headRows').addEventListener('click',e=>{
   const b=e.target.closest('[data-del]');if(!b||S.heads.length<2)return;
   const id=b.dataset.del;S.heads=S.heads.filter(h=>h.id!==id);delete S.counts[id];
-  if(S.lead===id)S.lead=S.heads[0].id;save();renderSettings();
+  if(S.lead===id)S.lead=S.heads[0].id;
+  if(S.leaveHead===id){S.leaveHead=null;if(S.leaveN>0){const h=pickLeaveHead();S.leaveHead=h?h.id:null;if(!S.leaveHead)S.leaveN=0;}}
+  save();renderSettings();
 });
 $('addHead').addEventListener('click',()=>{
   const last=S.heads[S.heads.length-1];const id='h'+Date.now().toString(36);
@@ -994,7 +1076,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.19';
+const APP_VERSION='1.0.20';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
@@ -1050,42 +1132,69 @@ function rememberInstallHint(){
 function hideInstallHint(){const el=$('installHint');if(el)el.hidden=true;}
 let deferredPrompt=window.__soBIP||null;
 let installHintDue=false;
-function openInstallHint(kind){
-  if(!HOSTED||appInstalled()||installHintSeen())return;
-  const el=$('installHint');if(!el||!el.hidden)return;
-  const go=$('installGo');
+function isIos(){
+  const ua=navigator.userAgent||'';
+  return /iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+}
+function paintInstallBanner(kind){
+  const go=$('installGo'),ok=$('installOk');
   if(kind==='ios'){
     $('installTitle').textContent='Add to Home Screen';
     $('installCopy').textContent='Tap Share, then Add to Home Screen.';
     go.hidden=true;
-    $('installOk').textContent='OK';
-  }else{
-    $('installTitle').textContent='Install app';
+    ok.hidden=false;
+    ok.textContent='OK';
+    return;
+  }
+  $('installTitle').textContent='Install app';
+  if(deferredPrompt){
     $('installCopy').textContent='Put Strikeout on this phone. It opens like an app, even with no signal.';
     go.hidden=false;
     go.textContent='Install app';
-    $('installOk').textContent='Not now';
+    ok.hidden=false;
+    ok.textContent='Not now';
+  }else{
+    $('installCopy').textContent='Chrome menu (⋮) → Install app or Add to Home screen.';
+    go.hidden=false;
+    go.textContent='Got it';
+    ok.hidden=true;
   }
+}
+function openInstallHint(kind){
+  if(!HOSTED||appInstalled()||installHintSeen())return;
+  const el=$('installHint');if(!el)return;
+  paintInstallBanner(kind);
   el.hidden=false;
 }
 function maybeInstallHint(){
   if(!HOSTED||appInstalled()||installHintSeen())return;
-  if(deferredPrompt){openInstallHint('android');return;}
-  const ua=navigator.userAgent||'';
-  const ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  if(ios)openInstallHint('ios');
+  if(isIos()){openInstallHint('ios');return;}
+  openInstallHint('android');
+}
+function forgetInstallHint(){
+  try{localStorage.removeItem(INSTALL_KEY);}catch(e){}
 }
 $('installOk').addEventListener('click',()=>{rememberInstallHint();hideInstallHint();});
 $('installGo').addEventListener('click',async()=>{
-  const ev=deferredPrompt;deferredPrompt=null;window.__soBIP=null;
+  const ev=deferredPrompt;
+  if(!ev){rememberInstallHint();hideInstallHint();return;}
+  deferredPrompt=null;window.__soBIP=null;
   rememberInstallHint();hideInstallHint();
-  if(!ev)return;
   try{await ev.prompt();await ev.userChoice;}catch(e){}
+});
+$('installAgain').addEventListener('click',()=>{
+  forgetInstallHint();
+  const el=$('installHint');if(el)el.hidden=true;
+  installHintDue=true;
+  maybeInstallHint();
 });
 window.addEventListener('appinstalled',()=>{deferredPrompt=null;window.__soBIP=null;rememberInstallHint();hideInstallHint();});
 window.addEventListener('so-bip',()=>{
   deferredPrompt=window.__soBIP||deferredPrompt;
-  if(installHintDue)openInstallHint('android');
+  if(!installHintDue||isIos()||!deferredPrompt)return;
+  const el=$('installHint');
+  if(el&&!el.hidden){paintInstallBanner('android');return;}
+  openInstallHint('android');
 });
 if(HOSTED)setTimeout(()=>{installHintDue=true;maybeInstallHint();},900);
 })();
