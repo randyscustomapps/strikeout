@@ -1099,7 +1099,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.21';
+const APP_VERSION='1.0.22';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
@@ -1183,8 +1183,10 @@ function paintInstallBanner(kind){
     ok.hidden=true;
   }
 }
-function openInstallHint(kind){
-  if(!HOSTED||appInstalled()||installHintSeen())return;
+function openInstallHint(kind, force){
+  // Cold start still skips when already installed or dismissed. The Settings
+  // button passes force so the tip can be shown again for someone else.
+  if(!force&&(!HOSTED||appInstalled()||installHintSeen()))return;
   const el=$('installHint');if(!el)return;
   paintInstallBanner(kind);
   el.hidden=false;
@@ -1207,9 +1209,9 @@ $('installGo').addEventListener('click',async()=>{
 });
 $('installAgain').addEventListener('click',()=>{
   forgetInstallHint();
-  const el=$('installHint');if(el)el.hidden=true;
   installHintDue=true;
-  maybeInstallHint();
+  show('field');
+  openInstallHint(isIos()?'ios':'android', true);
 });
 window.addEventListener('appinstalled',()=>{deferredPrompt=null;window.__soBIP=null;rememberInstallHint();hideInstallHint();});
 window.addEventListener('so-bip',()=>{
