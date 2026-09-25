@@ -227,9 +227,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .ctr .w{font-size:1.65rem}
   .ovl .big{font-size:2.05rem}
   .leave-lab{font-size:1.02rem}
-  .leave-step .step{width:40px;height:36px;font-size:1.45rem}
-  .leave-step .cnt{font-size:1.6rem}
-  .leave-chips button{height:34px;font-size:1.05rem}
 }
 
 /* compact follow options under Following me — one row, not full-width */
@@ -241,15 +238,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .seg2 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink)}
 .seg2 button:active{transform:scale(.98)}
 .leave{display:flex;flex-direction:column;gap:6px;margin-top:2px}
-.leave-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .leave-lab{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
-.leave-step{display:flex;align-items:center;gap:4px;flex:none}
-.leave-step .step{width:44px;height:40px;font-size:1.6rem}
-.leave-step .cnt{font-size:1.8rem;min-width:28px}
-.leave-chips{display:flex;flex-wrap:wrap;gap:6px}
-.leave-chips button{height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);background:var(--surface2);font-family:var(--display);font-weight:800;font-size:1.2rem;cursor:pointer}
-.leave-chips button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
-.leave-chips button:active{transform:scale(.98)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
@@ -345,18 +334,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
             </div>
           </div>
         </div>
-        <div class="leave" id="leaveBox">
-          <div class="leave-top">
-            <span class="leave-lab" id="leaveLab">Didn’t follow</span>
-            <div class="leave-step">
-              <button class="step" id="leaveMinus" type="button" aria-label="Fewer who didn’t follow">−</button>
-              <span class="cnt" id="leaveVal">0</span>
-              <button class="step" id="leavePlus" type="button" aria-label="One more who didn’t follow">+</button>
-            </div>
-          </div>
-          <div class="leave-chips" id="leaveChips" hidden role="group" aria-label="Didn’t follow header width"></div>
-        </div>
         <div class="counters" id="counters"></div>
+        <div class="leave" id="leaveBox">
+          <span class="leave-lab" id="leaveLab">Didn’t follow</span>
+          <div class="counters" id="leaveCounters"></div>
+        </div>
       </section>
 
       <section class="panel">
@@ -453,7 +435,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
-        <p class="note"><b>Didn’t follow</b> — people who didn’t follow. Pick how many and their header size. Their cut is added once, like Outside, not as a full Skip pack jump.</p>
+        <p class="note"><b>Didn’t follow</b> — people who didn’t follow. Set how many of each header size. Each size’s cut is added once, like Outside, not as a full Skip pack jump.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
         <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
@@ -481,7 +463,7 @@ const KEY='strikeout.v1';
 const KEY_BAK=KEY+'.bak';
 const DEF={heads:[{id:'h35',w:35,label:''},{id:'h40',w:40,label:''}],
   lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false,
-  lineNow:null,lineDir:'up',fieldAxis:'ns',autoAdv:true,confirmFt:100,leaveN:0,leaveHead:null};
+  lineNow:null,lineDir:'up',fieldAxis:'ns',autoAdv:true,confirmFt:100,leaveCounts:{}};
 function readStore(){
   for(const k of [KEY,KEY_BAK]){
     try{
@@ -509,17 +491,37 @@ S.autoAdv=S.autoAdv===true;
   if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>99999)n=null;
   S.lineNow=n;
 })();
+function clampLeave(n){
+  n=Math.round(Number(n));
+  if(!Number.isFinite(n)||n<0)return 0;
+  return n>99?99:n;
+}
 (function(){
-  let n=Math.round(Number(S.leaveN));
-  if(!Number.isFinite(n)||n<0)n=0;
-  if(n>99)n=99;
-  S.leaveN=n;
-  if(typeof S.leaveHead!=='string'||!S.heads.some(h=>h.id===S.leaveHead))S.leaveHead=null;
-  if(S.leaveN>0&&!S.leaveHead){
-    const h=pickLeaveHead();
-    S.leaveHead=h?h.id:null;
-    if(!S.leaveHead)S.leaveN=0;
+  // Old phones stored one count × one shared header (leaveN / leaveHead).
+  // Fold that into per-size leaveCounts once, then drop the old keys.
+  const ids=S.heads.map(h=>h.id);
+  const idSet=new Set(ids);
+  const src=S.leaveCounts&&typeof S.leaveCounts==='object'&&!Array.isArray(S.leaveCounts)?S.leaveCounts:{};
+  const next={};
+  let any=0;
+  ids.forEach(id=>{const n=clampLeave(src[id]);if(n){next[id]=n;any+=n;}});
+  if(!any){
+    const n=clampLeave(S.leaveN);
+    let hid=typeof S.leaveHead==='string'&&idSet.has(S.leaveHead)?S.leaveHead:null;
+    if(n>0&&!hid){
+      let best=null,bestN=0;
+      S.heads.forEach(h=>{const c=(S.counts&&S.counts[h.id])||0;if(c>bestN){bestN=c;best=h;}});
+      if(!best){
+        const ld=S.heads.find(h=>h.id===S.lead)||S.heads[0];
+        best=S.heads.find(h=>!ld||h.id!==ld.id)||S.heads[0]||null;
+      }
+      hid=best?best.id:null;
+    }
+    if(n>0&&hid)next[hid]=n;
   }
+  S.leaveCounts=next;
+  delete S.leaveN;
+  delete S.leaveHead;
 })();
 function save(){
   // Every change is written immediately so headers, counts, Following on, Skip/Outside, theme, etc.
@@ -550,18 +552,6 @@ function fmtFtIn(inches){
 function fmtIn(i){return (i%1===0?i.toFixed(0):i.toFixed(1))+'"';}
 function ftTxt(w){return (w%1===0?w.toFixed(0):w.toFixed(1))+"'";}
 function lead(){return S.heads.find(h=>h.id===S.lead)||S.heads[0];}
-function pickLeaveHead(){
-  let best=null,bestN=0;
-  S.heads.forEach(h=>{const n=S.counts[h.id]||0;if(n>bestN){bestN=n;best=h;}});
-  if(best)return best;
-  const ld=lead();
-  return S.heads.find(h=>!ld||h.id!==ld.id)||S.heads[0]||null;
-}
-function ensureLeaveHead(){
-  if(S.heads.some(h=>h.id===S.leaveHead))return;
-  const h=pickLeaveHead();
-  S.leaveHead=h?h.id:null;
-}
 
 function calc(){
   const ld=lead();const L=ld.w*12;const o=S.overlapIn;
@@ -580,11 +570,17 @@ function calc(){
     else gap=folSum;
   }else gap=folSum;
   const liveGap=gap;
-  let leaveN=0,leaveW=0,leaveCut=0;
-  if((S.leaveN|0)>0){
-    const h=S.heads.find(x=>x.id===S.leaveHead)||pickLeaveHead();
-    if(h){leaveN=S.leaveN|0;leaveW=h.w;leaveCut=leaveN*eff(h.w);gap+=leaveCut;}
-  }
+  // Didn't follow: each size's cut × that size's count, added once (Outside-style).
+  // These ghosts are not Skip-pack followers.
+  let leaveN=0,leaveCut=0;
+  const leaveBits=[];
+  const lc=S.leaveCounts||{};
+  S.heads.forEach(h=>{
+    const n=clampLeave(lc[h.id]);
+    if(n>0){leaveN+=n;leaveCut+=n*eff(h.w);leaveBits.push(n+' × '+ftTxt(h.w));}
+  });
+  if(leaveCut)gap+=leaveCut;
+  const leaveTxt=leaveBits.join(' + ');
   const N=Math.floor(gap/L+1e-9);const rem=gap-N*L;
   // +lines is added to the GPS line you're driving now, including the first pass.
   // Following + Skip with followers: move is N (other way N+1). The gap is the
@@ -596,7 +592,7 @@ function calc(){
   let P=A,Alt=B;
   if(rem>L-rem){P=B;Alt=A;}
   if(Math.round(P.nudge*2)/2===0){P.nudge=0;}
-  return {ld,L,o,folSum,folN,crew,gap,liveGap,P,Alt,heads:folN+1,fromNow,leaveN,leaveW,leaveCut};
+  return {ld,L,o,folSum,folN,crew,gap,liveGap,P,Alt,heads:folN+1,fromNow,leaveN,leaveTxt,leaveCut};
 }
 function dirWord(d){ // S.cut = the way you turn at the end, seen from the pass you're on. Answer is left/right AFTER the turn.
   // When followers are on your left (rare), mirror the nudge side so the pack can come up on that side.
@@ -905,6 +901,13 @@ function renderField(){
       <span class="cnt">${n}</span>
       <button class="step" type="button" data-inc="${h.id}" aria-label="One more ${ftTxt(h.w)} following">+</button>
     </div>`;}).join('');
+  $('leaveCounters').innerHTML=S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);return `
+    <div class="ctr ${n?'has':''}">
+      <div class="nm"><span class="w">${ftTxt(h.w)}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</div>
+      <button class="step" type="button" data-leavedec="${h.id}" aria-label="One less ${ftTxt(h.w)} who didn’t follow" ${n?'':'disabled'}>−</button>
+      <span class="cnt">${n}</span>
+      <button class="step" type="button" data-leaveinc="${h.id}" aria-label="One more ${ftTxt(h.w)} who didn’t follow">+</button>
+    </div>`;}).join('');
   const c=calc();
   $('folTotal').textContent=`me: ${ftTxt(c.ld.w)}`+(c.folN?` + ${c.folN} other${c.folN===1?'':'s'}`:' only');
   $('ovlVal').innerHTML=`${fmtIn(S.overlapIn)}<small>each head</small>`;
@@ -917,15 +920,6 @@ function renderField(){
   document.querySelectorAll('[data-folside]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.folside===(S.folSide||'right')));
   document.querySelectorAll('[data-folskip]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.folskip==='1')===!!S.folSkip));
   document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===S.cut));
-  const ln=S.leaveN||0;
-  $('leaveVal').textContent=String(ln);
-  $('leaveMinus').disabled=ln<=0;
-  const lchips=$('leaveChips');
-  if(ln>0){
-    ensureLeaveHead();
-    lchips.hidden=false;
-    lchips.innerHTML=S.heads.map(h=>`<button type="button" data-leave="${h.id}" aria-pressed="${h.id===S.leaveHead}">${ftTxt(h.w)}</button>`).join('');
-  }else{lchips.hidden=true;lchips.innerHTML='';}
   renderResult();
   renderAutoUi();
 }
@@ -947,9 +941,17 @@ document.getElementById('field').addEventListener('click',e=>{
     resetTrack();
   }
   else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
-  else if(b.id==='leaveMinus'){S.leaveN=Math.max(0,(S.leaveN||0)-1);}
-  else if(b.id==='leavePlus'){S.leaveN=Math.min(99,(S.leaveN||0)+1);ensureLeaveHead();}
-  else if(b.dataset.leave){if(S.heads.some(h=>h.id===b.dataset.leave))S.leaveHead=b.dataset.leave;else return;}
+  else if(b.dataset.leaveinc){
+    const id=b.dataset.leaveinc;
+    if(!S.heads.some(h=>h.id===id))return;
+    if(!S.leaveCounts||typeof S.leaveCounts!=='object')S.leaveCounts={};
+    S.leaveCounts[id]=Math.min(99,clampLeave(S.leaveCounts[id])+1);
+  }
+  else if(b.dataset.leavedec){
+    const id=b.dataset.leavedec;
+    if(!S.leaveCounts)return;
+    S.leaveCounts[id]=Math.max(0,clampLeave(S.leaveCounts[id])-1);
+  }
   else if(b.id==='ovlMinus'){S.overlapIn=Math.max(0,Math.round((S.overlapIn-S.stepIn)*2)/2);}
   else if(b.id==='ovlPlus'){S.overlapIn=Math.min(48,Math.round((S.overlapIn+S.stepIn)*2)/2);}
   else return;
@@ -1038,7 +1040,7 @@ function renderSettings(){
       ?`gap = Skip: followers out + whole crew back\n    = ${fmtFtIn(c.folSum)} + ${fmtFtIn(c.crew)} = ${fmtFtIn(gapShown)}`
       :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(gapShown)}`)
     :`gap = other combines only (not you) = ${fmtFtIn(gapShown)}`)+
-    (c.leaveN>0?`\ndidn't follow once: ${c.leaveN} × ${ftTxt(c.leaveW)} cut = ${fmtFtIn(c.leaveCut)}\n    gap = ${fmtFtIn(c.gap)}`:'')+
+    (c.leaveN>0?`\ndidn't follow once: ${c.leaveTxt} cut = ${fmtFtIn(c.leaveCut)}\n    gap = ${fmtFtIn(c.gap)}`:'')+
     `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
     (c.fromNow?`move = that line count, from the pass you're on now`:`move = lines left standing + 1 (your own pass), from the line you're on now`)+
     `\n\nshown: +${c.P.move} lines${c.P.nudge?', nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}\nother way: +${c.Alt.move} lines${c.Alt.nudge?', nudge '+fmtFtIn(c.Alt.nudge)+' '+dirWord(c.Alt.dir):''}`;
@@ -1055,7 +1057,7 @@ $('headRows').addEventListener('click',e=>{
   const b=e.target.closest('[data-del]');if(!b||S.heads.length<2)return;
   const id=b.dataset.del;S.heads=S.heads.filter(h=>h.id!==id);delete S.counts[id];
   if(S.lead===id)S.lead=S.heads[0].id;
-  if(S.leaveHead===id){S.leaveHead=null;if(S.leaveN>0){const h=pickLeaveHead();S.leaveHead=h?h.id:null;if(!S.leaveHead)S.leaveN=0;}}
+  if(S.leaveCounts)delete S.leaveCounts[id];
   save();renderSettings();
 });
 $('addHead').addEventListener('click',()=>{
@@ -1099,7 +1101,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.23';
+const APP_VERSION='1.0.24';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
