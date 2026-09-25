@@ -451,6 +451,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
         <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
+        <p class="note"><b>Settings</b> — swipe right to go back to the field. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
         <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
@@ -1118,6 +1119,37 @@ function show(which){
 $('setBtn').addEventListener('click',()=>show('settings'));
 $('doneBtn').addEventListener('click',()=>show('field'));
 $('doneTopBtn').addEventListener('click',()=>show('field'));
+// Rightward swipe on Settings leaves, same as Back. Vertical drags stay scrolls.
+(function(){
+  const el=$('settings');
+  let sx=0,sy=0,on=false,axis='';
+  el.addEventListener('touchstart',e=>{
+    if(el.hidden||e.touches.length!==1){on=false;return;}
+    if(e.target.closest('input,textarea,select')){on=false;return;}
+    const t=e.touches[0];
+    sx=t.clientX;sy=t.clientY;on=true;axis='';
+  },{passive:true});
+  el.addEventListener('touchmove',e=>{
+    if(!on||e.touches.length!==1)return;
+    const t=e.touches[0];
+    const dx=t.clientX-sx,dy=t.clientY-sy;
+    if(!axis){
+      if(Math.abs(dx)<18&&Math.abs(dy)<18)return;
+      // Only claim the gesture once it is clearly rightward. Otherwise let the page scroll.
+      axis=dx>18&&dx>Math.abs(dy)*1.4?'x':'y';
+      if(axis==='y'){on=false;return;}
+    }
+    if(axis==='x'&&dx>0&&e.cancelable)e.preventDefault();
+  },{passive:false});
+  el.addEventListener('touchend',e=>{
+    if(!on||axis!=='x'){on=false;return;}
+    on=false;
+    const t=e.changedTouches[0];if(!t)return;
+    const dx=t.clientX-sx,dy=t.clientY-sy;
+    if(dx>=80&&dx>Math.abs(dy)*1.5)show('field');
+  },{passive:true});
+  el.addEventListener('touchcancel',()=>{on=false;},{passive:true});
+})();
 
 applyTheme();renderField();
 if(S.wake)wake();
@@ -1125,7 +1157,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.25';
+const APP_VERSION='1.0.26';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
