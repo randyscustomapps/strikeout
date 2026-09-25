@@ -1203,6 +1203,7 @@ function openSettings(){
   if(!sheetEl.hidden)return;
   window.scrollTo(0,0);
   renderSettings();
+  $('setBtn').hidden=true;
   sheetEl.classList.add('sheet');
   placeSheet();
   sheetEl.classList.remove('anim','spring');
@@ -1214,7 +1215,7 @@ function openSettings(){
   sheetEl.scrollTop=0;
   document.documentElement.classList.add('sheet-open');
   document.body.classList.add('sheet-open');
-  $('setBtn').hidden=true;
+  requestAnimationFrame(()=>{if(!sheetEl.hidden)placeSheet();});
   $('field').setAttribute('aria-hidden','true');
   $('field').setAttribute('inert','');
   wake();
@@ -1289,9 +1290,12 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if
     if(e.pointerId!==pid)return;
     const ddx=e.clientX-sx,ddy=e.clientY-sy;
     if(!axis){
-      if(Math.abs(ddx)<18&&Math.abs(ddy)<18)return;
+      const adx=Math.abs(ddx),ady=Math.abs(ddy);
+      if(adx<18&&ady<18)return;
       // Only claim a clearly rightward drag. A vertical drag stays a scroll.
-      axis=ddx>18&&ddx>Math.abs(ddy)*1.4?'x':'y';
+      if(ddx>=18&&ddx>ady*1.4)axis='x';
+      else if(ady>=18&&ady>=adx)axis='y';
+      else return;
       if(axis!=='x'){pid=null;return;}
       swallow=true;
       sheetDragging=true;
@@ -1313,8 +1317,9 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if
     if(!wasX)return;
     const x=Math.max(0,readSheetX());
     const w=sheetW();
+    const v=vel();
     const far=x>=Math.max(72,Math.min(150,w*0.33));
-    const flick=vel()>=0.55&&x>=40;
+    const flick=v>=0.4&&x>=36;
     if(far||flick)runSheetTo(w+48,'off',finishClose);
     else runSheetTo(0,'spring',()=>{
       if(sheetEl.hidden)return;
