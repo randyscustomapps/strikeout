@@ -468,7 +468,7 @@ html.sheet-open,body.sheet-open{overflow:hidden}
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
         <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
-        <p class="note"><b>Settings</b> — drag right to slide back to the field. Let go early and it springs back. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
+        <p class="note"><b>Settings</b> — drag right to slide back to the field. Halfway across, or a quick flick, finishes it. Let go earlier and it springs back. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
         <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
@@ -1126,8 +1126,11 @@ $('resetBtn').addEventListener('click',()=>{
   clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';renderSettings();
 });
 
-// Settings is a sheet over the field. A right drag moves it with the finger;
-// far enough or a flick finishes the slide, otherwise it springs back.
+// Settings is a sheet over the field. translateX tracks the finger.
+// On release, progress = translateX / width. Finish the slide at halfway
+// (0.5, same idea as iOS interactive pop and Material SwipeDismissBehavior)
+// or a clear rightward flick at 900 px/s (in the usual 800–1000 px/s band).
+// Short of halfway and slower than that, it springs back.
 const sheetEl=$('settings'),sheetScrim=$('sheetScrim');
 let sheetGen=0,sheetDragging=false;
 function motionOK(){return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;}
@@ -1266,14 +1269,14 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if
   const el=sheetEl;
   let pid=null,sx=0,sy=0,origin=0,axis='',swallow=false;
   const samples=[];
+  // Flick speed is px/s over the last 100ms of the drag. A pause drops those
+  // samples, so a held finger counts as stopped rather than a flick.
   function vel(now){
     while(samples.length&&now-samples[0].t>100)samples.shift();
     if(samples.length<2)return 0;
-    const last=samples[samples.length-1];
-    // A pause means they let go, not a flick. Only the tail of the drag counts.
-    if(now-last.t>70)return 0;
-    const dt=last.t-samples[0].t;
-    return dt>0?(last.x-samples[0].x)/dt:0;
+    const a=samples[0],b=samples[samples.length-1];
+    const dt=b.t-a.t;
+    return dt>0?(b.x-a.x)/dt*1000:0;
   }
   el.addEventListener('click',e=>{
     if(!swallow)return;
@@ -1308,7 +1311,7 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if
     if(axis!=='x')return;
     samples.push({x:e.clientX,t:e.timeStamp});
     const t=e.timeStamp;
-    while(samples.length&&t-samples[0].t>90)samples.shift();
+    while(samples.length&&t-samples[0].t>100)samples.shift();
     if(e.cancelable)e.preventDefault();
     applySheetX(origin+e.clientX-sx);
   });
@@ -1320,10 +1323,12 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if
     if(!wasX)return;
     const x=Math.max(0,readSheetX());
     const w=sheetW();
+    const progress=w>0?x/w:0;
     const v=vel(e.timeStamp);
-    const far=x>=Math.max(72,Math.min(150,w*0.33));
-    const flick=v>=0.4&&x>=36;
-    if(far||flick)runSheetTo(w+48,'off',finishClose);
+    // Halfway across the sheet, or a 900 px/s rightward flick.
+    const DISMISS_PROGRESS=0.5;
+    const DISMISS_FLICK=900;
+    if(progress>=DISMISS_PROGRESS||v>=DISMISS_FLICK)runSheetTo(w+48,'off',finishClose);
     else runSheetTo(0,'spring',()=>{
       if(sheetEl.hidden)return;
       sheetEl.classList.remove('anim','spring');
@@ -1347,7 +1352,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.28';
+const APP_VERSION='1.0.29';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
