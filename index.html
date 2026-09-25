@@ -1266,11 +1266,14 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if
   const el=sheetEl;
   let pid=null,sx=0,sy=0,origin=0,axis='',swallow=false;
   const samples=[];
-  function vel(){
+  function vel(now){
+    while(samples.length&&now-samples[0].t>100)samples.shift();
     if(samples.length<2)return 0;
-    const a=samples[0],b=samples[samples.length-1];
-    const dt=b.t-a.t;
-    return dt>0?(b.x-a.x)/dt:0;
+    const last=samples[samples.length-1];
+    // A pause means they let go, not a flick. Only the tail of the drag counts.
+    if(now-last.t>70)return 0;
+    const dt=last.t-samples[0].t;
+    return dt>0?(last.x-samples[0].x)/dt:0;
   }
   el.addEventListener('click',e=>{
     if(!swallow)return;
@@ -1317,7 +1320,7 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if
     if(!wasX)return;
     const x=Math.max(0,readSheetX());
     const w=sheetW();
-    const v=vel();
+    const v=vel(e.timeStamp);
     const far=x>=Math.max(72,Math.min(150,w*0.33));
     const flick=v>=0.4&&x>=36;
     if(far||flick)runSheetTo(w+48,'off',finishClose);
