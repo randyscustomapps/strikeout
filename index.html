@@ -327,6 +327,16 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
           <button class="tog yn" type="button" data-mode="double"><b>Following me</b></button>
           <button class="tog yn" type="button" data-mode="single"><b>Not following</b></button>
         </div>
+        <div class="leave" id="leaveBox">
+          <button class="leave-tog" id="leaveTog" type="button" aria-expanded="false" aria-controls="leavePanel">
+            <span class="leave-lab">Didn’t follow</span>
+            <span class="leave-sum" id="leaveSum">0</span>
+            <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <div class="leave-panel" id="leavePanel">
+            <div class="counters" id="leaveCounters"></div>
+          </div>
+        </div>
         <div id="folOpts" class="folOpts" hidden>
           <div class="frow">
             <div class="flab">Following on</div>
@@ -344,16 +354,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
           </div>
         </div>
         <div class="counters" id="counters"></div>
-        <div class="leave" id="leaveBox">
-          <button class="leave-tog" id="leaveTog" type="button" aria-expanded="false" aria-controls="leavePanel">
-            <span class="leave-lab">Didn’t follow</span>
-            <span class="leave-sum" id="leaveSum">0</span>
-            <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-          <div class="leave-panel" id="leavePanel">
-            <div class="counters" id="leaveCounters"></div>
-          </div>
-        </div>
       </section>
 
       <section class="panel">
@@ -1157,7 +1157,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.26';
+const APP_VERSION='1.0.27';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
