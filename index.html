@@ -254,7 +254,10 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 /* Settings fills the stage under the header — the same box as the field.
    The sheet itself never scrolls and is never position:fixed with a copied
    width: a transformed scrollport is what warped and stuttered on the phone.
-   Only translate3d moves it. The inner column scrolls. */
+   Only translate3d moves it. The inner column scrolls.
+   Open sheet: drop the root bottom safe-area pad so the sheet background
+   reaches the screen edge. The scroller keeps that inset plus a little,
+   so the last row can sit above the home indicator. */
 .stage{position:relative;isolation:isolate;min-width:0}
 .app.sheet-open{height:100%;overflow:hidden;padding-bottom:0}
 .app.sheet-open .stage{flex:1 1 auto;min-height:0;overflow:hidden}
@@ -270,9 +273,9 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   flex:1 1 auto;min-height:0;min-width:0;max-width:100%;
   overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;touch-action:pan-y;
-  padding-bottom:24px;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
 }
-@media (max-width:560px){#settings.sheet > .ctrls{padding-bottom:10px}}
+@media (max-width:560px){#settings.sheet > .ctrls{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}}
 #settings.sheet input,#settings.sheet textarea,#settings.sheet select{touch-action:auto}
 #settings.sheet.anim{transition:transform .34s cubic-bezier(0,0,.58,1)}
 #settings.sheet.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1)}
@@ -280,6 +283,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 #sheetScrim.anim{transition:opacity .34s linear}
 #sheetScrim.anim.spring{transition:opacity .34s linear}
 html.sheet-open,body.sheet-open{overflow:hidden;height:100%}
+html.sheet-open{padding-bottom:0}
 
 /* one-time install hint — overlay, does not reflow the field */
 .install{position:fixed;z-index:30;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(480px,calc(100% - 24px));background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
@@ -1424,7 +1428,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.30';
+const APP_VERSION='1.0.31';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
