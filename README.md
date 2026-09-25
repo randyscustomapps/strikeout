@@ -26,4 +26,5 @@ Barlow (500, 600, 700) and Big Shoulders Display (700, 800, 900) are self-hosted
 - Add the +lines to the GPS line you're driving now, including the first pass.
 - Following me + Skip: room = followers out + whole crew back. The line count is room ÷ your line (the other way is one more line, nudged back).
 - Following me + Outside: room = followers only. Not following: room = the other combines only. Lines = room ÷ your line + 1 (your own pass), still from the line you're on.
+- Didn’t follow: each header size is added once (like Outside), at that size’s own width, on top of the room above. Different sizes are not forced onto one header.
 - The remainder is the nudge, and the app picks whichever way needs the smaller nudge.
