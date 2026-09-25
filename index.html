@@ -227,6 +227,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .ctr .w{font-size:1.65rem}
   .ovl .big{font-size:2.05rem}
   .leave-lab{font-size:1.02rem}
+  .leave-sum{font-size:.95rem}
 }
 
 /* compact follow options under Following me — one row, not full-width */
@@ -238,7 +239,15 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .seg2 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink)}
 .seg2 button:active{transform:scale(.98)}
 .leave{display:flex;flex-direction:column;gap:6px;margin-top:2px}
-.leave-lab{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
+.leave-tog{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:6px 8px 6px 10px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);color:inherit;cursor:pointer;text-align:left}
+.leave-tog.has,.leave.is-open .leave-tog{border-color:var(--on)}
+.leave-tog:active{transform:scale(.98)}
+.leave-lab{flex:none;font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
+.leave-sum{margin-left:auto;font-family:var(--display);font-weight:800;font-size:1.05rem;line-height:1.15;text-align:right;font-variant-numeric:tabular-nums}
+.leave-chev{width:26px;height:26px;flex:none}
+.leave.is-open .leave-chev{transform:rotate(90deg)}
+.leave-panel{display:none !important}
+.leave.is-open .leave-panel{display:flex !important;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
@@ -336,8 +345,14 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         </div>
         <div class="counters" id="counters"></div>
         <div class="leave" id="leaveBox">
-          <span class="leave-lab" id="leaveLab">Didn’t follow</span>
-          <div class="counters" id="leaveCounters"></div>
+          <button class="leave-tog" id="leaveTog" type="button" aria-expanded="false" aria-controls="leavePanel">
+            <span class="leave-lab">Didn’t follow</span>
+            <span class="leave-sum" id="leaveSum">0</span>
+            <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <div class="leave-panel" id="leavePanel">
+            <div class="counters" id="leaveCounters"></div>
+          </div>
         </div>
       </section>
 
@@ -435,7 +450,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
-        <p class="note"><b>Didn’t follow</b> — people who didn’t follow. Set how many of each header size. Each size’s cut is added once, like Outside, not as a full Skip pack jump.</p>
+        <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
         <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
@@ -889,6 +904,7 @@ async function resumeAuto(){
   renderAutoUi();
 }
 
+let leaveOpen=false;
 function renderField(){
   $('turnL').innerHTML=uturnL+'<b>Left</b>';$('turnR').innerHTML='<b>Right</b>'+uturnR;
   // lead chips
@@ -901,13 +917,20 @@ function renderField(){
       <span class="cnt">${n}</span>
       <button class="step" type="button" data-inc="${h.id}" aria-label="One more ${ftTxt(h.w)} following">+</button>
     </div>`;}).join('');
-  $('leaveCounters').innerHTML=S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);return `
+  const leaveBits=[];
+  S.heads.forEach(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);if(n>0)leaveBits.push(ftTxt(h.w)+'×'+n);});
+  $('leaveBox').classList.toggle('is-open',leaveOpen);
+  const leaveTog=$('leaveTog');
+  leaveTog.setAttribute('aria-expanded',leaveOpen?'true':'false');
+  leaveTog.classList.toggle('has',leaveBits.length>0);
+  $('leaveSum').textContent=leaveBits.length?leaveBits.join(' · '):'0';
+  $('leaveCounters').innerHTML=leaveOpen?S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);return `
     <div class="ctr ${n?'has':''}">
-      <div class="nm"><span class="w">${ftTxt(h.w)}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</div>
+      <div class="nm"><span class="w">${ftTxt(h.w)}</span></div>
       <button class="step" type="button" data-leavedec="${h.id}" aria-label="One less ${ftTxt(h.w)} who didn’t follow" ${n?'':'disabled'}>−</button>
       <span class="cnt">${n}</span>
       <button class="step" type="button" data-leaveinc="${h.id}" aria-label="One more ${ftTxt(h.w)} who didn’t follow">+</button>
-    </div>`;}).join('');
+    </div>`;}).join(''):'';
   const c=calc();
   $('folTotal').textContent=`me: ${ftTxt(c.ld.w)}`+(c.folN?` + ${c.folN} other${c.folN===1?'':'s'}`:' only');
   $('ovlVal').innerHTML=`${fmtIn(S.overlapIn)}<small>each head</small>`;
@@ -941,6 +964,7 @@ document.getElementById('field').addEventListener('click',e=>{
     resetTrack();
   }
   else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
+  else if(b.id==='leaveTog'){leaveOpen=!leaveOpen;}
   else if(b.dataset.leaveinc){
     const id=b.dataset.leaveinc;
     if(!S.heads.some(h=>h.id===id))return;
@@ -1081,7 +1105,7 @@ let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';renderSettings();
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';renderSettings();
 });
 
 function show(which){
@@ -1101,7 +1125,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.24';
+const APP_VERSION='1.0.25';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
