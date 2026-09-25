@@ -251,6 +251,22 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
+/* Settings is a sheet over the field. translateX follows the finger. */
+#settings.sheet{
+  position:fixed;z-index:20;margin:0;
+  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:var(--bg);
+  box-shadow:-1px 0 0 rgba(0,0,0,.14),-16px 0 32px rgba(0,0,0,.24);
+  touch-action:pan-y;overscroll-behavior:contain;
+}
+#settings.sheet input,#settings.sheet textarea,#settings.sheet select{touch-action:auto}
+#settings.sheet.anim{transition:transform .28s cubic-bezier(.22,.8,.24,1)}
+#settings.sheet.anim.spring{transition:transform .48s cubic-bezier(.16,1.22,.28,1)}
+#sheetScrim{position:fixed;z-index:19;background:#000;pointer-events:auto;touch-action:none;opacity:0}
+#sheetScrim.anim{transition:opacity .28s linear}
+#sheetScrim.anim.spring{transition:opacity .48s linear}
+html.sheet-open,body.sheet-open{overflow:hidden}
+
 /* one-time install hint — overlay, does not reflow the field */
 .install{position:fixed;z-index:30;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(480px,calc(100% - 24px));background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
 .install h2{margin:0;font-family:var(--display);font-weight:800;font-size:1.45rem;letter-spacing:.06em;text-transform:uppercase}
@@ -367,6 +383,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
     </div>
   </main>
 
+  <div id="sheetScrim" hidden aria-hidden="true"></div>
   <!-- SETTINGS -->
   <main id="settings" class="set" hidden>
     <div class="ctrls">
@@ -451,7 +468,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
         <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
         <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
-        <p class="note"><b>Settings</b> — swipe right to go back to the field. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
+        <p class="note"><b>Settings</b> — drag right to slide back to the field. Let go early and it springs back. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
         <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
         <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
         <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
@@ -1109,46 +1126,219 @@ $('resetBtn').addEventListener('click',()=>{
   clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';renderSettings();
 });
 
-function show(which){
-  const set=which==='settings';
-  $('field').hidden=set;$('settings').hidden=!set;
-  $('setBtn').hidden=set;
-  if(set)renderSettings();else{S.heads.sort((a,b)=>a.w-b.w);save();renderField();}
+// Settings is a sheet over the field. A right drag moves it with the finger;
+// far enough or a flick finishes the slide, otherwise it springs back.
+const sheetEl=$('settings'),sheetScrim=$('sheetScrim');
+let sheetGen=0,sheetDragging=false;
+function motionOK(){return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;}
+function sheetW(){const w=sheetEl.getBoundingClientRect().width;return w>0?w:window.innerWidth;}
+function readSheetX(){
+  const tr=getComputedStyle(sheetEl).transform;
+  if(!tr||tr==='none')return 0;
+  try{return new DOMMatrix(tr).m41||0;}catch(e){return 0;}
+}
+function applySheetX(x){
+  const w=Math.max(1,sheetW());
+  const nx=Math.max(0,x);
+  const p=Math.min(1,nx/w);
+  sheetEl.style.transform='translate3d('+nx+'px,0,0)';
+  sheetScrim.style.opacity=(0.4*(1-p)).toFixed(3);
+  return nx;
+}
+function stopSheetAnim(){
+  const x=Math.max(0,readSheetX());
+  sheetGen++;
+  sheetEl.classList.remove('anim','spring');
+  sheetScrim.classList.remove('anim','spring');
+  applySheetX(x);
+  return x;
+}
+function runSheetTo(x,kind,done){
+  const g=++sheetGen;
+  if(!motionOK()){
+    applySheetX(x);
+    if(done)done();
+    return;
+  }
+  const now=Math.max(0,readSheetX());
+  sheetEl.classList.remove('anim','spring');
+  sheetScrim.classList.remove('anim','spring');
+  applySheetX(now);
+  void sheetEl.offsetWidth;
+  sheetEl.classList.add('anim');
+  sheetScrim.classList.add('anim');
+  if(kind==='spring'){sheetEl.classList.add('spring');sheetScrim.classList.add('spring');}
+  applySheetX(x);
+  let fired=false;
+  const ms=kind==='spring'?560:400;
+  const timer=setTimeout(fire,ms);
+  function fire(){
+    if(fired||g!==sheetGen)return;
+    fired=true;
+    clearTimeout(timer);
+    sheetEl.removeEventListener('transitionend',onEnd);
+    if(done)done();
+  }
+  function onEnd(ev){if(ev.target===sheetEl&&ev.propertyName==='transform')fire();}
+  sheetEl.addEventListener('transitionend',onEnd);
+}
+function placeSheet(){
+  const app=document.querySelector('.app');
+  const bar=document.querySelector('.bar');
+  const cs=getComputedStyle(app);
+  const gap=parseFloat(cs.rowGap)||0;
+  const padB=parseFloat(cs.paddingBottom)||0;
+  const ar=app.getBoundingClientRect();
+  const top=bar.getBoundingClientRect().bottom;
+  const vh=window.visualViewport?window.visualViewport.height:window.innerHeight;
+  const h=Math.max(120,vh-top);
+  sheetEl.style.top=sheetScrim.style.top=top+'px';
+  sheetEl.style.left=sheetScrim.style.left=ar.left+'px';
+  sheetEl.style.width=sheetScrim.style.width=ar.width+'px';
+  sheetEl.style.height=sheetScrim.style.height=h+'px';
+  sheetEl.style.paddingTop=gap+'px';
+  sheetEl.style.paddingBottom='calc('+padB+'px + env(safe-area-inset-bottom, 0px))';
+}
+function openSettings(){
+  if(!sheetEl.hidden)return;
+  window.scrollTo(0,0);
+  renderSettings();
+  $('setBtn').hidden=true;
+  sheetEl.classList.add('sheet');
+  placeSheet();
+  sheetEl.classList.remove('anim','spring');
+  sheetScrim.classList.remove('anim','spring');
+  applySheetX(0);
+  sheetEl.style.transform='';
+  sheetScrim.hidden=false;
+  sheetEl.hidden=false;
+  sheetEl.scrollTop=0;
+  document.documentElement.classList.add('sheet-open');
+  document.body.classList.add('sheet-open');
+  requestAnimationFrame(()=>{if(!sheetEl.hidden)placeSheet();});
+  $('field').setAttribute('aria-hidden','true');
+  $('field').setAttribute('inert','');
+  wake();
+}
+function finishClose(){
+  if(sheetEl.hidden)return;
+  sheetGen++;
+  sheetDragging=false;
+  sheetEl.classList.remove('anim','spring','sheet');
+  sheetScrim.classList.remove('anim','spring');
+  sheetEl.style.transform='';
+  sheetEl.style.top=sheetEl.style.left=sheetEl.style.width=sheetEl.style.height='';
+  sheetEl.style.paddingTop=sheetEl.style.paddingBottom='';
+  sheetScrim.style.top=sheetScrim.style.left=sheetScrim.style.width=sheetScrim.style.height='';
+  sheetScrim.style.opacity='';
+  sheetEl.hidden=true;
+  sheetScrim.hidden=true;
+  document.documentElement.classList.remove('sheet-open');
+  document.body.classList.remove('sheet-open');
+  $('field').removeAttribute('aria-hidden');
+  $('field').removeAttribute('inert');
+  $('setBtn').hidden=false;
+  S.heads.sort((a,b)=>a.w-b.w);save();renderField();
   window.scrollTo(0,0);wake();
 }
+function closeSettings(anim){
+  if(sheetEl.hidden)return;
+  if(!anim){finishClose();return;}
+  runSheetTo(sheetW()+48,'off',finishClose);
+}
+function show(which){
+  if(which==='settings')openSettings();
+  else closeSettings(false);
+}
 $('setBtn').addEventListener('click',()=>show('settings'));
-$('doneBtn').addEventListener('click',()=>show('field'));
-$('doneTopBtn').addEventListener('click',()=>show('field'));
-// Rightward swipe on Settings leaves, same as Back. Vertical drags stay scrolls.
+$('doneBtn').addEventListener('click',()=>closeSettings(true));
+$('doneTopBtn').addEventListener('click',()=>closeSettings(true));
+sheetScrim.addEventListener('click',()=>closeSettings(true));
+sheetEl.addEventListener('focusin',e=>{
+  const t=e.target;
+  if(!t||!t.closest||!t.closest('input,textarea,select'))return;
+  const nudge=()=>{try{t.scrollIntoView({block:'center'});}catch(err){}};
+  setTimeout(nudge,60);setTimeout(nudge,320);
+});
+window.addEventListener('resize',()=>{if(!sheetEl.hidden)placeSheet();});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if(!sheetEl.hidden)placeSheet();});
 (function(){
-  const el=$('settings');
-  let sx=0,sy=0,on=false,axis='';
-  el.addEventListener('touchstart',e=>{
-    if(el.hidden||e.touches.length!==1){on=false;return;}
-    if(e.target.closest('input,textarea,select')){on=false;return;}
-    const t=e.touches[0];
-    sx=t.clientX;sy=t.clientY;on=true;axis='';
-  },{passive:true});
-  el.addEventListener('touchmove',e=>{
-    if(!on||e.touches.length!==1)return;
-    const t=e.touches[0];
-    const dx=t.clientX-sx,dy=t.clientY-sy;
+  const el=sheetEl;
+  let pid=null,sx=0,sy=0,origin=0,axis='',swallow=false;
+  const samples=[];
+  function vel(now){
+    while(samples.length&&now-samples[0].t>100)samples.shift();
+    if(samples.length<2)return 0;
+    const last=samples[samples.length-1];
+    // A pause means they let go, not a flick. Only the tail of the drag counts.
+    if(now-last.t>70)return 0;
+    const dt=last.t-samples[0].t;
+    return dt>0?(last.x-samples[0].x)/dt:0;
+  }
+  el.addEventListener('click',e=>{
+    if(!swallow)return;
+    swallow=false;
+    e.preventDefault();
+    e.stopPropagation();
+  },true);
+  el.addEventListener('pointerdown',e=>{
+    if(el.hidden||pid!==null)return;
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    if(e.target.closest('input,textarea,select'))return;
+    pid=e.pointerId;sx=e.clientX;sy=e.clientY;axis='';swallow=false;
+    origin=Math.max(0,readSheetX());
+    samples.length=0;samples.push({x:e.clientX,t:e.timeStamp});
+  });
+  el.addEventListener('pointermove',e=>{
+    if(e.pointerId!==pid)return;
+    const ddx=e.clientX-sx,ddy=e.clientY-sy;
     if(!axis){
-      if(Math.abs(dx)<18&&Math.abs(dy)<18)return;
-      // Only claim the gesture once it is clearly rightward. Otherwise let the page scroll.
-      axis=dx>18&&dx>Math.abs(dy)*1.4?'x':'y';
-      if(axis==='y'){on=false;return;}
+      const adx=Math.abs(ddx),ady=Math.abs(ddy);
+      if(adx<18&&ady<18)return;
+      // Only claim a clearly rightward drag. A vertical drag stays a scroll.
+      if(ddx>=18&&ddx>ady*1.4)axis='x';
+      else if(ady>=18&&ady>=adx)axis='y';
+      else return;
+      if(axis!=='x'){pid=null;return;}
+      swallow=true;
+      sheetDragging=true;
+      stopSheetAnim();
+      try{el.setPointerCapture(e.pointerId);}catch(err){}
     }
-    if(axis==='x'&&dx>0&&e.cancelable)e.preventDefault();
+    if(axis!=='x')return;
+    samples.push({x:e.clientX,t:e.timeStamp});
+    const t=e.timeStamp;
+    while(samples.length&&t-samples[0].t>90)samples.shift();
+    if(e.cancelable)e.preventDefault();
+    applySheetX(origin+e.clientX-sx);
+  });
+  function endDrag(e){
+    if(e.pointerId!==pid)return;
+    const wasX=axis==='x';
+    pid=null;axis='';sheetDragging=false;
+    try{el.releasePointerCapture(e.pointerId);}catch(err){}
+    if(!wasX)return;
+    const x=Math.max(0,readSheetX());
+    const w=sheetW();
+    const v=vel(e.timeStamp);
+    const far=x>=Math.max(72,Math.min(150,w*0.33));
+    const flick=v>=0.4&&x>=36;
+    if(far||flick)runSheetTo(w+48,'off',finishClose);
+    else runSheetTo(0,'spring',()=>{
+      if(sheetEl.hidden)return;
+      sheetEl.classList.remove('anim','spring');
+      sheetScrim.classList.remove('anim','spring');
+      sheetEl.style.transform='';
+      sheetScrim.style.opacity='0.4';
+    });
+  }
+  el.addEventListener('pointerup',endDrag);
+  el.addEventListener('pointercancel',endDrag);
+  window.addEventListener('pointerup',endDrag);
+  window.addEventListener('pointercancel',endDrag);
+  el.addEventListener('touchmove',e=>{
+    if(sheetDragging&&e.cancelable)e.preventDefault();
   },{passive:false});
-  el.addEventListener('touchend',e=>{
-    if(!on||axis!=='x'){on=false;return;}
-    on=false;
-    const t=e.changedTouches[0];if(!t)return;
-    const dx=t.clientX-sx,dy=t.clientY-sy;
-    if(dx>=80&&dx>Math.abs(dy)*1.5)show('field');
-  },{passive:true});
-  el.addEventListener('touchcancel',()=>{on=false;},{passive:true});
 })();
 
 applyTheme();renderField();
@@ -1157,7 +1347,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.27';
+const APP_VERSION='1.0.28';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
