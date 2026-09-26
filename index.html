@@ -252,69 +252,52 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
-/* Settings is the same full-screen page as the field. Fixed to the glass,
-   no copied pixel box, only translate3d. The inner column scrolls.
-   Bottom corners stay square. Only the top leading corner rounds while moving. */
-.stage{position:relative;isolation:isolate;min-width:0}
-/* While the sheet is open the root safe-area pad is lifted onto .app.
-   Padding it on html shrinks the iOS fixed viewport by the top inset
-   (the notch) and anchors that short box to the top of the glass, which
-   leaves an empty non-scrolling band at the bottom. .app keeps the same
-   pad so the field does not jump under the swipe. */
-.app.sheet-open{
-  height:100%;overflow:hidden;
-  padding-top:calc(8px + env(safe-area-inset-top,0px));
-  padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
-}
-@media (max-width:560px){
-  .app.sheet-open{
-    padding-top:calc(6px + env(safe-area-inset-top,0px));
-    padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
-  }
-}
-.app.sheet-open .stage{flex:1 1 auto;min-height:0;overflow:hidden}
+/* Settings scrolls with the page, the same scroller as the field. No fixed
+   box and no inner scroller: an iPhone Home Screen app anchors fixed boxes
+   to a viewport short by the top inset, which clipped Settings above the
+   glass. Page content scrolls through that band, so Settings is page
+   content: a layer at the top of the document that clips the sideways slide.
+   Only translate3d moves it. Bottom corners stay square. Only the top
+   leading corner rounds while it moves. */
+.stage{position:relative;min-width:0}
 #setBtn.is-covered{visibility:hidden}
+#sheetLayer{
+  position:absolute;z-index:20;top:0;left:0;width:100%;
+  overflow:hidden;overflow:clip;
+}
 #settings.sheet{
-  position:fixed;z-index:20;top:0;right:0;bottom:0;left:0;
-  margin:0;width:auto;height:auto;
-  min-height:100dvh;
+  position:relative;z-index:2;margin:0;
+  min-height:100vh;min-height:100lvh;
   display:flex;flex-direction:column;gap:8px;
   padding-top:calc(8px + env(safe-area-inset-top,0px));
-  min-width:0;
-  overflow:hidden;background:var(--bg);
+  padding-bottom:24px;
+  background:var(--bg);
   touch-action:pan-y;
-  border-radius:0;
-  border-bottom-left-radius:0;border-bottom-right-radius:0;
 }
-@media (max-width:560px){#settings.sheet{gap:6px;padding-top:calc(6px + env(safe-area-inset-top,0px))}}
+@media (max-width:560px){#settings.sheet{gap:6px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:10px}}
 #settings.sheet .sheet-bar{flex:none;min-height:50px;padding-inline:max(12px,calc((100% - 1100px) / 2))}
 @media (max-width:560px){#settings.sheet .sheet-bar{min-height:46px}}
 #settings.sheet > .ctrls{
-  flex:1 1 auto;min-height:0;min-width:0;width:100%;max-width:none;
-  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;touch-action:pan-y;
-  padding:0 max(12px,calc((100% - 1100px) / 2)) 24px;
+  min-width:0;width:100%;max-width:none;
+  padding:0 max(12px,calc((100% - 1100px) / 2));
 }
-#settings.sheet > .ctrls > *{flex-shrink:0}
-@media (max-width:560px){#settings.sheet > .ctrls{padding-bottom:10px}}
-#settings.sheet.sheet-live{
-  border-top-left-radius:38px;
-  border-bottom-left-radius:0;border-bottom-right-radius:0;
-  box-shadow:-28px 0 64px rgba(0,0,0,.18);
-}
+/* --sheet-y is the page scroll when the slide starts, so the rounded corner
+   and its shadow sit at the top of the glass, not the top of the page. */
+#settings.sheet.sheet-live{clip-path:inset(var(--sheet-y,0px) 0 0 0 round 38px 0 0 0)}
 #settings.sheet input,#settings.sheet textarea,#settings.sheet select{touch-action:auto}
-#settings.sheet.anim{transition:transform .34s cubic-bezier(0,0,.58,1)}
-#settings.sheet.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1)}
+#settings.sheet.anim,#sheetEdge.anim{transition:transform .34s cubic-bezier(0,0,.58,1)}
+#settings.sheet.anim.spring,#sheetEdge.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1)}
+#sheetEdge{
+  position:absolute;z-index:1;top:var(--sheet-y,0px);left:0;right:0;bottom:0;
+  border-top-left-radius:38px;box-shadow:-28px 0 64px rgba(0,0,0,.18);
+  pointer-events:none;
+}
 #sheetScrim{
-  position:fixed;z-index:19;top:0;right:0;bottom:0;left:0;
-  margin:0;height:auto;
-  min-height:100dvh;
+  position:absolute;z-index:0;top:0;left:0;right:0;bottom:0;
   background:#000;pointer-events:auto;touch-action:none;opacity:0;
 }
 #sheetScrim.anim{transition:opacity .34s linear}
 #sheetScrim.anim.spring{transition:opacity .34s linear}
-html.sheet-open,body.sheet-open{overflow:hidden;height:100%;background:var(--bg)}
-html.sheet-open{padding-top:0;padding-bottom:0}
 
 /* one-time install hint — overlay, does not reflow the field */
 .install{position:fixed;z-index:30;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(480px,calc(100% - 24px));background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
@@ -432,8 +415,12 @@ html.sheet-open{padding-top:0;padding-bottom:0}
       </section>
     </div>
   </main>
+  </div>
+</div>
 
+<div id="sheetLayer" hidden>
   <div id="sheetScrim" hidden aria-hidden="true"></div>
+  <div id="sheetEdge" hidden aria-hidden="true"></div>
   <!-- SETTINGS -->
   <main id="settings" class="set" hidden>
     <div class="bar sheet-bar">
@@ -546,7 +533,6 @@ html.sheet-open{padding-top:0;padding-bottom:0}
       <button class="done" id="doneBtn" type="button">Back to field</button>
     </div>
   </main>
-  </div>
 </div>
 
 <div id="installHint" class="install" hidden role="region" aria-label="Install Strikeout">
@@ -1194,16 +1180,17 @@ $('resetBtn').addEventListener('click',()=>{
   clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';renderSettings();
 });
 
-// Settings fills the stage (the field's box) and slides with translate3d only.
-// The inner column scrolls; the sheet itself does not. Transforming a
-// scrollport, and copying a fixed pixel box over the field, is what warped
-// the panel and made the drag stutter.
+// Settings is page content and scrolls with the page, like the field. It
+// slides with translate3d only. While it moves, the field is lifted by the
+// page scroll so it shows at the top of the glass under the sheet, and the
+// scrim and edge shadow come out. At rest all of that is dropped.
 // On release, progress = translateX / width. Finish at halfway (0.5) or a
 // 900 px/s rightward flick. Short of that, it eases back.
-const sheetEl=$('settings'),sheetScrim=$('sheetScrim');
+const sheetLayer=$('sheetLayer'),sheetEl=$('settings'),sheetScrim=$('sheetScrim'),sheetEdge=$('sheetEdge');
+const fieldCol=document.querySelector('.app');
+const sheetMovers=[sheetEl,sheetEdge];
 let sheetGen=0,sheetDragging=false,sheetX=0,sheetWpx=0;
 function motionOK(){return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;}
-function sheetScroller(){return sheetEl.querySelector('.ctrls');}
 function sheetWidth(){
   if(sheetWpx>0)return sheetWpx;
   const w=sheetEl.offsetWidth;
@@ -1214,6 +1201,27 @@ function readSheetX(){
   if(!tr||tr==='none')return sheetX||0;
   try{return new DOMMatrix(tr).m41||0;}catch(e){return sheetX||0;}
 }
+function sheetAnim(add,spring){
+  for(const el of sheetMovers.concat(sheetScrim)){
+    el.classList.remove('anim','spring');
+    if(add){el.classList.add('anim');if(spring)el.classList.add('spring');}
+  }
+}
+function liftSheet(){
+  const y=Math.max(0,Math.round(window.scrollY||0));
+  sheetLayer.style.setProperty('--sheet-y',y+'px');
+  fieldCol.style.transform=y?'translate3d(0,'+y+'px,0)':'';
+  sheetEl.classList.add('sheet-live');
+  sheetScrim.hidden=false;
+  sheetEdge.hidden=false;
+}
+function restSheet(){
+  sheetEl.classList.remove('sheet-live');
+  sheetScrim.hidden=true;
+  sheetEdge.hidden=true;
+  fieldCol.style.transform='';
+  sheetLayer.style.removeProperty('--sheet-y');
+}
 function applySheetX(x){
   const w=Math.max(1,sheetWidth());
   const nx=x<0?0:x;
@@ -1221,30 +1229,32 @@ function applySheetX(x){
   const p=Math.min(1,nx/w);
   // Keep a translate3d even at 0 so the CSS transition can interpolate.
   // settleSheet drops it once the sheet is resting, so text stays sharp.
-  sheetEl.style.transform='translate3d('+nx+'px,0,0)';
+  const tf='translate3d('+nx+'px,0,0)';
+  for(const el of sheetMovers)el.style.transform=tf;
   sheetScrim.style.opacity=(0.4*(1-p)).toFixed(3);
   return nx;
+}
+function sheetWillChange(on){
+  for(const el of sheetMovers)el.style.willChange=on?'transform':'';
+  sheetScrim.style.willChange=on?'opacity':'';
 }
 function stopSheetAnim(){
   const x=Math.max(0,readSheetX());
   sheetGen++;
-  sheetEl.classList.remove('anim','spring');
-  sheetScrim.classList.remove('anim','spring');
-  sheetEl.style.willChange='transform';
-  sheetScrim.style.willChange='opacity';
+  sheetAnim(false);
+  sheetWillChange(true);
   applySheetX(x);
   return x;
 }
 function settleSheet(){
   if(sheetEl.hidden||sheetDragging)return;
-  sheetEl.classList.remove('anim','spring','sheet-live');
-  sheetScrim.classList.remove('anim','spring');
-  sheetEl.style.willChange='';
-  sheetScrim.style.willChange='';
+  sheetAnim(false);
+  sheetWillChange(false);
   if(sheetX<=0.5){
     sheetX=0;
-    sheetEl.style.transform='';
-    sheetScrim.style.opacity='0.4';
+    for(const el of sheetMovers)el.style.transform='';
+    sheetScrim.style.opacity='';
+    restSheet();
   }
 }
 function runSheetTo(x,kind,done){
@@ -1255,16 +1265,12 @@ function runSheetTo(x,kind,done){
     return;
   }
   const now=Math.max(0,readSheetX());
-  sheetEl.classList.remove('anim','spring');
-  sheetScrim.classList.remove('anim','spring');
-  sheetEl.classList.add('sheet-live');
-  sheetEl.style.willChange='transform';
-  sheetScrim.style.willChange='opacity';
+  sheetAnim(false);
+  liftSheet();
+  sheetWillChange(true);
   applySheetX(now);
   void sheetEl.offsetWidth;
-  sheetEl.classList.add('anim');
-  sheetScrim.classList.add('anim');
-  if(kind==='spring'){sheetEl.classList.add('spring');sheetScrim.classList.add('spring');}
+  sheetAnim(true,kind==='spring');
   applySheetX(x);
   let fired=false;
   const ms=kind==='spring'?480:450;
@@ -1279,70 +1285,32 @@ function runSheetTo(x,kind,done){
   function onEnd(ev){if(ev.target===sheetEl&&ev.propertyName==='transform')fire();}
   sheetEl.addEventListener('transitionend',onEnd);
 }
-function glassPx(){
-  const vv=window.visualViewport;
-  let h=window.innerHeight||0;
-  if(vv) h=Math.max(h, vv.offsetTop+vv.height);
-  // Installed app only: iOS can report a viewport short by the notch while
-  // screen.height is still the glass. A desktop monitor is much taller, so
-  // it never qualifies. Safari's toolbar is left alone (not standalone).
-  const standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-  const sh=window.screen&&window.screen.height;
-  if(standalone && sh>h && sh-h<=80) h=sh;
-  return Math.round(h);
-}
-function pinSheetBox(el, top, h){
-  el.style.top=top+'px';
-  el.style.bottom='auto';
-  el.style.height=Math.round(h)+'px';
-}
-function fitOpenSheet(){
-  if(sheetEl.hidden||sheetDragging)return;
-  const vv=window.visualViewport;
-  const covered=vv?window.innerHeight-vv.height-vv.offsetTop:0;
-  if(vv&&covered>80){
-    pinSheetBox(sheetEl, Math.max(0,vv.offsetTop), vv.height);
-    pinSheetBox(sheetScrim, Math.max(0,vv.offsetTop), vv.height);
-  }else{
-    const h=glassPx();
-    pinSheetBox(sheetEl, 0, h);
-    pinSheetBox(sheetScrim, 0, h);
-  }
-  const w=sheetEl.offsetWidth;
-  if(w>0)sheetWpx=w;
-}
 function openSettings(){
   if(!sheetEl.hidden)return;
   window.scrollTo(0,0);
   renderSettings();
   $('setBtn').classList.add('is-covered');
-  const app=document.querySelector('.app');
-  document.documentElement.classList.add('sheet-open');
-  document.body.classList.add('sheet-open');
-  app.classList.add('sheet-open');
+  sheetAnim(false);
   sheetEl.classList.add('sheet');
-  sheetEl.classList.remove('anim','spring');
-  sheetScrim.classList.remove('anim','spring');
-  sheetScrim.hidden=false;
+  sheetLayer.hidden=false;
   sheetEl.hidden=false;
-  const sc=sheetScroller();
-  if(sc)sc.scrollTop=0;
-  fitOpenSheet();
   sheetWpx=sheetEl.offsetWidth||window.innerWidth;
-  sheetEl.style.willChange='transform';
-  sheetScrim.style.willChange='opacity';
-  if(motionOK())sheetEl.classList.add('sheet-live');
-  applySheetX(motionOK()?sheetWpx:0);
   $('field').setAttribute('aria-hidden','true');
   $('field').setAttribute('inert','');
   if(motionOK()){
+    liftSheet();
+    sheetWillChange(true);
+    applySheetX(sheetWpx);
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
         if(sheetEl.hidden||sheetDragging)return;
         runSheetTo(0,'in',settleSheet);
       });
     });
-  }else settleSheet();
+  }else{
+    applySheetX(0);
+    settleSheet();
+  }
   wake();
 }
 function finishClose(){
@@ -1350,27 +1318,15 @@ function finishClose(){
   sheetGen++;
   sheetDragging=false;
   sheetX=0;sheetWpx=0;
-  sheetEl.classList.remove('anim','spring','sheet','sheet-live');
-  sheetScrim.classList.remove('anim','spring');
-  sheetEl.style.transform='';
-  sheetEl.style.willChange='';
+  sheetAnim(false);
+  sheetWillChange(false);
+  for(const el of sheetMovers)el.style.transform='';
   sheetEl.style.touchAction='';
-  sheetEl.style.top='';
-  sheetEl.style.bottom='';
-  sheetEl.style.height='';
-  sheetScrim.style.willChange='';
   sheetScrim.style.opacity='';
-  sheetScrim.style.top='';
-  sheetScrim.style.bottom='';
-  sheetScrim.style.height='';
-  const sc=sheetScroller();
-  if(sc)sc.style.touchAction='';
-  const app=document.querySelector('.app');
+  sheetEl.classList.remove('sheet');
+  restSheet();
   sheetEl.hidden=true;
-  sheetScrim.hidden=true;
-  document.documentElement.classList.remove('sheet-open');
-  document.body.classList.remove('sheet-open');
-  app.classList.remove('sheet-open');
+  sheetLayer.hidden=true;
   $('field').removeAttribute('aria-hidden');
   $('field').removeAttribute('inert');
   $('setBtn').classList.remove('is-covered');
@@ -1398,8 +1354,14 @@ sheetEl.addEventListener('focusin',e=>{
   const nudge=()=>{try{t.scrollIntoView({block:'center'});}catch(err){}};
   setTimeout(nudge,60);setTimeout(nudge,320);
 });
-window.addEventListener('resize',fitOpenSheet);
-if(window.visualViewport)window.visualViewport.addEventListener('resize',fitOpenSheet);
+window.addEventListener('resize',()=>{
+  if(sheetEl.hidden||sheetDragging)return;
+  const w=sheetEl.offsetWidth;
+  if(w>0)sheetWpx=w;
+});
+window.addEventListener('scroll',()=>{
+  if(!sheetEl.hidden&&!sheetDragging&&sheetEl.classList.contains('sheet-live'))liftSheet();
+},{passive:true});
 (function(){
   const el=sheetEl;
   let pid=null,sx=0,sy=0,origin=0,axis='',swallow=false,moveRaf=0,pendingX=0;
@@ -1444,10 +1406,8 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',fitOpen
       if(axis!=='x'){pid=null;return;}
       swallow=true;
       sheetDragging=true;
-      el.classList.add('sheet-live');
-      const sc=sheetScroller();
+      liftSheet();
       el.style.touchAction='none';
-      if(sc)sc.style.touchAction='none';
       stopSheetAnim();
       origin=Math.max(0,sheetX);
       const w=el.offsetWidth;
@@ -1468,8 +1428,6 @@ if(window.visualViewport)window.visualViewport.addEventListener('resize',fitOpen
     pid=null;axis='';
     if(moveRaf){cancelAnimationFrame(moveRaf);moveRaf=0;flushMove();}
     el.style.touchAction='';
-    const sc=sheetScroller();
-    if(sc)sc.style.touchAction='';
     try{el.releasePointerCapture(e.pointerId);}catch(err){}
     if(!wasX){sheetDragging=false;return;}
     const x=Math.max(0,sheetX);
@@ -1498,7 +1456,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.34';
+const APP_VERSION='1.0.35';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
