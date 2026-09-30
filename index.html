@@ -255,6 +255,69 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
+/* Field home fills the glass. Shorter phones squish; taller ones spread out.
+   Settings stays on the page scroller, outside .app. */
+.app{
+  height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  overflow:hidden;
+  padding-block:clamp(4px,0.7dvh,10px);
+  gap:clamp(2px,0.5dvh,8px);
+}
+.app>.stage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+#field.layout{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;gap:clamp(4px,0.8dvh,12px)}
+#field>.result{
+  flex:1 1 auto;min-height:0;
+  justify-content:space-between;
+  gap:clamp(2px,0.6dvh,8px);
+  padding:clamp(6px,1dvh,12px) clamp(10px,2vw,16px) clamp(6px,0.8dvh,10px);
+}
+#field>.ctrls{flex:1.15 1 auto;min-height:0;justify-content:space-between;gap:clamp(4px,0.8dvh,12px)}
+#field .panel{padding:clamp(4px,0.7dvh,8px);gap:clamp(3px,0.55dvh,7px)}
+#field .r-main{flex-wrap:nowrap}
+#field .r-num{font-size:clamp(2.55rem,8.6dvh,5.2rem)}
+#field .r-nval{font-size:clamp(1.35rem,3.4dvh,2.3rem)}
+#field .r-nval svg{width:clamp(22px,3.2dvh,32px);height:clamp(22px,3.2dvh,32px)}
+#field .r-tgt{font-size:clamp(1.8rem,4.6dvh,3.1rem)}
+#field .r-gps{gap:clamp(2px,0.45dvh,8px) 8px;padding-top:clamp(2px,0.45dvh,8px);margin-top:0}
+#field .r-now{gap:2px}
+#field .r-ref,#field .r-ndir,#field .r-nsub{line-height:1.05}
+#field .r-stepper button,#field .r-stepper input{height:clamp(36px,5.4dvh,48px)}
+#field .r-stepper button{width:clamp(36px,5.4dvh,48px)}
+#field .r-dir button{height:clamp(32px,4.6dvh,44px)}
+#field .tog.turn{min-height:clamp(40px,6.4dvh,68px)}
+#field .tog.turn b{font-size:clamp(1.25rem,3dvh,2.1rem)}
+#field .tog.yn{min-height:clamp(36px,5.2dvh,52px)}
+#field .step{width:clamp(40px,5.8dvh,56px);height:clamp(36px,5.4dvh,52px);font-size:clamp(1.35rem,2.8dvh,2rem)}
+#field .cnt{font-size:clamp(1.45rem,3.2dvh,2.4rem)}
+#field .ctr{padding:2px}
+#field .counters{gap:4px}
+#field .ctr .w{font-size:clamp(1.15rem,2.6dvh,1.8rem)}
+#field .ovl .big{font-size:clamp(1.35rem,3dvh,2.3rem)}
+#field .leave{gap:clamp(2px,0.4dvh,6px);margin-top:0}
+#field .leave-tog{min-height:clamp(32px,4.6dvh,44px);padding-block:clamp(3px,0.4dvh,6px)}
+#field .folOpts{margin-top:0;gap:6px}
+#field .folOpts .frow{gap:2px}
+#field .folOpts .seg2 button{height:26px}
+#field .ph h2{font-size:clamp(.95rem,2dvh,1.2rem)}
+@media (max-height:720px){
+  .app{padding-block:3px;gap:2px}
+  .app .iconbtn{height:40px;min-width:40px}
+  .app .brand{font-size:1.35rem}
+  .app .brand svg{width:34px;height:23px}
+  #field>.result{padding:4px 10px;gap:2px}
+  #field .panel{padding:3px 4px;gap:2px}
+  #field .r-num{font-size:clamp(2.15rem,6.4dvh,3.2rem)}
+}
+@media (max-height:660px){
+  #field.layout,#field>.ctrls{gap:2px}
+  #field>.result{padding-block:3px}
+}
+@media (min-width:760px) and (orientation:landscape){
+  #field.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:stretch}
+  #field>.result,#field>.ctrls{min-height:0;overflow:auto}
+}
+
 /* Settings scrolls with the page, the same scroller as the field. No fixed
    box and no inner scroller: an iPhone Home Screen app anchors fixed boxes
    to a viewport short by the top inset, which clipped Settings above the
@@ -1490,7 +1553,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.38';
+const APP_VERSION='1.0.39';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
