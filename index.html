@@ -343,10 +343,19 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 @media (max-width:560px){#settings.sheet{gap:6px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:10px}}
 #settings.sheet .sheet-bar{flex:none;min-height:50px;padding-inline:max(12px,calc((100% - 1100px) / 2))}
 @media (max-width:560px){#settings.sheet .sheet-bar{min-height:46px}}
-#settings.sheet > .ctrls{
+#settings.sheet > .ctrls,
+#settings.sheet #setView > .ctrls,
+#settings.sheet #helpScreen > .ctrls{
   min-width:0;width:100%;max-width:none;
   padding:0 max(12px,calc((100% - 1100px) / 2));
 }
+/* Help is its own page inside the same sheet, so swipe, the top edge,
+   and the bottom safe-area stay on #settings. */
+#setView,#helpScreen{display:flex;flex:1 1 auto;flex-direction:column;gap:inherit;min-width:0}
+#helpScreen.is-in{animation:helpIn .34s cubic-bezier(0,0,.58,1)}
+@keyframes helpIn{from{transform:translate3d(100%,0,0)}to{transform:none}}
+@media (prefers-reduced-motion: reduce){#helpScreen.is-in{animation:none!important}}
+a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit}
 /* --sheet-y is the page scroll when the slide starts, so the rounded corner
    and its shadow sit at the top of the glass, not the top of the page. */
 #settings.sheet.sheet-live{clip-path:inset(var(--sheet-y,0px) 0 0 0 round 38px 0 0 0)}
@@ -489,6 +498,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   <div id="sheetEdge" hidden aria-hidden="true"></div>
   <!-- SETTINGS -->
   <main id="settings" class="set" hidden>
+    <div id="setView">
     <div class="bar sheet-bar">
       <h1 class="brand">
         <svg viewBox="0 0 48 32" aria-hidden="true" class="combine">
@@ -506,7 +516,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         Strikeout
       </h1>
       <span class="sp"></span>
-      <button class="iconbtn" id="helpBtn" type="button" aria-expanded="false" aria-controls="helpCopy">
+      <button class="iconbtn" id="helpBtn" type="button" aria-expanded="false" aria-controls="helpScreen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14"/><path d="M12 17h.01"/></svg>
         Help
       </button>
@@ -516,16 +526,15 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 
       <section class="panel" id="updPanel">
         <div class="ph"><h2>App version</h2></div>
-        <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, Didn’t follow, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
         <div class="upd"><span class="ver" id="verNow"></span><span class="st" id="verSt">Checking…</span></div>
         <button class="updbtn" id="updBtn" type="button" hidden>Update now</button>
         <button class="chkbtn" id="chkBtn" type="button">Check for updates</button>
         <button class="chkbtn" id="installAgain" type="button">Show install tip again</button>
-        <p class="note"><a href="privacy.html">Privacy</a> — location is only for Auto. Your setup stays on this phone.</p>
+        <a class="chkbtn" href="privacy.html">Privacy</a>
       </section>
 
       <section class="panel">
-        <div class="ph"><h2>My header</h2><small>your GPS line width</small></div>
+        <div class="ph"><h2>My header</h2></div>
         <div class="chips" id="leadChips"></div>
       </section>
 
@@ -534,7 +543,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <div class="hlabel"><span>Width (ft)</span><span>Name (optional)</span><span></span></div>
         <div id="headRows" style="display:flex;flex-direction:column;gap:8px"></div>
         <button class="wide" id="addHead" type="button">+ Add a header size</button>
-        <p class="note">Add every header size your crew runs. Same size twice? You only need it once. In field mode you just set how many are following.</p>
       </section>
 
       <section class="panel">
@@ -554,15 +562,14 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
           <button type="button" data-theme-pick="night">Night</button>
         </div>
         <div class="two">
-          <button class="tog" type="button" id="wakeBtn"><b>Keep screen on</b><span id="wakeNote">Stops the phone going to sleep in field mode</span></button>
-          <button class="tog" type="button" id="dimBtn"><b>Extra-dim night</b><span>Darker still, for pitch-black nights</span></button>
+          <button class="tog" type="button" id="wakeBtn"><b>Keep screen on</b><span id="wakeNote"></span></button>
+          <button class="tog" type="button" id="dimBtn"><b>Extra-dim night</b></button>
         </div>
       </section>
 
       <section class="panel">
         <div class="ph"><h2>Auto</h2></div>
         <button class="tog" type="button" id="autoBtn" aria-pressed="false"><b id="autoBtnLbl">Auto off</b><span id="autoSetNote">Off. Type Current row on the field card.</span></button>
-        <p class="note">On iPhone, the first time, choose <b>Allow While Using App</b> (not Allow Once).</p>
         <div class="ph"><h2>Field axis</h2><small>passes run</small></div>
         <div class="seg2set" id="axisSeg" role="group" aria-label="Field axis">
           <button type="button" data-axis="ns" id="axisNs" aria-pressed="true">North–South</button>
@@ -574,35 +581,71 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
           <button type="button" data-confirm="100">100 ft</button>
           <button type="button" data-confirm="150">150 ft</button>
         </div>
-        <p class="note">Current row moves only after the phone has traveled this far the new way. A short backup, such as for plugged crop, does not count. Default is 100 ft.</p>
       </section>
 
       <section class="panel">
         <div class="ph"><h2>How it works it out</h2></div>
-        <p class="note">Your GPS lines are spaced at <b>your header width</b>. Everyone's cut counts as <b>header width minus overlap</b>.</p>
         <div class="math" id="mathBox"></div>
-        <p class="note">The field card shows whichever way needs the smaller nudge. The other way is the last line of the breakdown above.</p>
       </section>
 
       <section class="panel">
         <button class="danger" id="resetBtn" type="button">Reset everything to defaults</button>
       </section>
 
-      <section class="panel" id="helpCopy" hidden>
-        <div class="ph"><h2>How to use it</h2></div>
-        <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
-        <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
-        <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
-        <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
-        <p class="note"><b>Settings</b> — slides in from the right. Drag it back the same way. Halfway across, or a quick flick, finishes it. Let go earlier and it springs back. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
-        <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
-        <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
-        <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
-        <p class="note"><b>Quick check</b> when every header matches yours. <b>Following + Skip:</b> 2 × others + 1 (two others → <b>+5</b>, four others → <b>+9</b>). <b>Outside</b> or <b>Not following:</b> others + 1 (three others → <b>+4</b>, four others → <b>+5</b>). Mixed sizes: use the card. A leftover strip is not always fixed by more lines.</p>
-        <p class="note"><b>Nudge</b> is left or right <i>after</i> the turn, on the new heading, so it matches the GPS arrows. Farther out is away from cut land; back in is toward it. Add it to any nudge already set.</p>
-      </section>
-
       <button class="done" id="doneBtn" type="button">Back to field</button>
+    </div>
+    </div>
+
+    <div id="helpScreen" hidden>
+      <div class="bar sheet-bar">
+        <button class="iconbtn" id="helpBack" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+          Settings
+        </button>
+        <span class="sp"></span>
+        <h1 class="brand" id="helpTitle">Help</h1>
+      </div>
+      <div class="ctrls">
+        <section class="panel">
+          <div class="ph"><h2>How to use it</h2></div>
+          <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
+          <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
+          <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
+          <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
+          <p class="note"><b>Settings</b> — slides in from the right. Drag it back the same way. Halfway across, or a quick flick, finishes it. Let go earlier and it springs back. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
+          <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
+          <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
+          <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
+          <p class="note"><b>Quick check</b> when every header matches yours. <b>Following + Skip:</b> 2 × others + 1 (two others → <b>+5</b>, four others → <b>+9</b>). <b>Outside</b> or <b>Not following:</b> others + 1 (three others → <b>+4</b>, four others → <b>+5</b>). Mixed sizes: use the card. A leftover strip is not always fixed by more lines.</p>
+          <p class="note"><b>Nudge</b> is left or right <i>after</i> the turn, on the new heading, so it matches the GPS arrows. Farther out is away from cut land; back in is toward it. Add it to any nudge already set.</p>
+        </section>
+
+        <section class="panel">
+          <div class="ph"><h2>Headers</h2></div>
+          <p class="note">My header is your GPS line width.</p>
+          <p class="note">Add every header size your crew runs. Same size twice? You only need it once. In field mode you just set how many are following.</p>
+        </section>
+
+        <section class="panel">
+          <div class="ph"><h2>The line count</h2></div>
+          <p class="note">Your GPS lines are spaced at <b>your header width</b>. Everyone's cut counts as <b>header width minus overlap</b>.</p>
+          <p class="note">The field card shows whichever way needs the smaller nudge. The other way is the last line of the breakdown above.</p>
+        </section>
+
+        <section class="panel">
+          <div class="ph"><h2>Auto distance</h2></div>
+          <p class="note">Current row moves only after the phone has traveled this far the new way. A short backup, such as for plugged crop, does not count. Default is 100 ft.</p>
+        </section>
+
+        <section class="panel">
+          <div class="ph"><h2>On this phone</h2></div>
+          <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, Didn’t follow, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
+          <p class="note">Location is only for Auto. Your setup stays on this phone.</p>
+          <p class="note"><b>Keep screen on</b> stops the phone going to sleep in field mode. <b>Extra-dim night</b> is darker still, for pitch-black nights.</p>
+        </section>
+
+        <button class="done" id="helpDone" type="button">Back to Settings</button>
+      </div>
     </div>
   </main>
 </div>
@@ -1179,7 +1222,7 @@ async function wake(){
   catch(e){$('wakeNote').textContent='Blocked here. Set auto-lock to Never in phone settings';}
 }
 document.addEventListener('visibilitychange',wake);
-$('wakeBtn').addEventListener('click',()=>{S.wake=!S.wake;save();$('wakeBtn').setAttribute('aria-pressed',S.wake);if(!S.wake)$('wakeNote').textContent='Stops the phone going to sleep in field mode';wake();});
+$('wakeBtn').addEventListener('click',()=>{S.wake=!S.wake;save();$('wakeBtn').setAttribute('aria-pressed',S.wake);if(!S.wake)$('wakeNote').textContent='';wake();});
 $('autoBtn').addEventListener('click',()=>{
   if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
   if(S.autoAdv){autoGen++;S.autoAdv=false;autoMsg='';stopSensors();save();renderAutoUi();}
@@ -1368,23 +1411,38 @@ function runSheetTo(x,kind,done){
   function onEnd(ev){if(ev.target===sheetEl&&ev.propertyName==='transform')fire();}
   sheetEl.addEventListener('transitionend',onEnd);
 }
-function setHelp(open){
-  const panel=$('helpCopy'),btn=$('helpBtn');
-  if(!panel||!btn)return;
-  panel.hidden=!open;
-  btn.setAttribute('aria-expanded',open?'true':'false');
+function setHelp(open,instant){
+  const help=$('helpScreen'),view=$('setView'),btn=$('helpBtn');
+  if(!help||!view)return;
+  if(btn)btn.setAttribute('aria-expanded',open?'true':'false');
+  if(open){
+    window.scrollTo(0,0);
+    view.hidden=true;
+    help.hidden=false;
+    help.classList.remove('is-in');
+    if(!instant&&motionOK()){
+      void help.offsetWidth;
+      help.classList.add('is-in');
+    }
+    const back=$('helpBack');
+    if(back)try{back.focus({preventScroll:true});}catch(e){}
+    return;
+  }
+  help.classList.remove('is-in');
+  help.hidden=true;
+  view.hidden=false;
+  if(!instant){
+    window.scrollTo(0,0);
+    if(btn)try{btn.focus({preventScroll:true});}catch(e){}
+  }
 }
-$('helpBtn').addEventListener('click',()=>{
-  const open=!!$('helpCopy').hidden;
-  setHelp(open);
-  if(!open)return;
-  const nudge=()=>{try{$('helpCopy').scrollIntoView({block:'start'});}catch(e){}};
-  setTimeout(nudge,60);
-});
+$('helpBtn').addEventListener('click',()=>setHelp(true));
+$('helpBack').addEventListener('click',()=>setHelp(false));
+$('helpDone').addEventListener('click',()=>setHelp(false));
 function openSettings(){
   if(!sheetEl.hidden)return;
   window.scrollTo(0,0);
-  setHelp(false);
+  setHelp(false,true);
   renderSettings();
   $('setBtn').classList.add('is-covered');
   sheetAnim(false);
@@ -1553,7 +1611,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.39';
+const APP_VERSION='1.0.40';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
