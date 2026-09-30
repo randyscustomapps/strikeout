@@ -260,64 +260,80 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
    Settings stays on the page scroller, outside .app. --app-h is the glass
    minus the top inset and most of the bottom one, measured in script: an
    iPhone Home Screen app reports 100dvh short by the top inset, which left
-   a dead band under Overlap. */
+   a dead band under Overlap. --ah is one hundredth of that column times the
+   largest scale at which the whole field still fits (set by fitScale). */
 .app{
   height:var(--app-h,calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));
   max-height:var(--app-h,calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));
   overflow:hidden;
-  padding-block:clamp(4px,calc(0.7 * var(--ah,1dvh)),10px);
+  padding-block:clamp(3px,calc(0.6 * var(--ah,1dvh)),10px);
   gap:clamp(2px,calc(0.5 * var(--ah,1dvh)),8px);
 }
 /* Only the root: it clips at the viewport. body would clip at its own
    100% box, which iOS also reports short. */
 html.home-lock{overflow:hidden;overscroll-behavior:none}
 .app>.stage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
-#field.layout{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;gap:clamp(4px,calc(0.8 * var(--ah,1dvh)),12px)}
+#field.layout{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;gap:clamp(3px,calc(0.7 * var(--ah,1dvh)),12px)}
 #field>.result{
-  flex:1 1 auto;min-height:0;
+  flex:1 1 auto;
   justify-content:space-between;
-  gap:clamp(2px,calc(0.6 * var(--ah,1dvh)),8px);
-  padding:clamp(6px,calc(1 * var(--ah,1dvh)),12px) clamp(10px,2vw,16px) clamp(6px,calc(0.8 * var(--ah,1dvh)),10px);
+  gap:clamp(2px,calc(0.6 * var(--ah,1dvh)),10px);
+  padding:clamp(5px,calc(1 * var(--ah,1dvh)),14px) clamp(10px,2vw,16px) clamp(5px,calc(0.8 * var(--ah,1dvh)),12px);
 }
-#field>.ctrls{flex:1.15 1 auto;min-height:0;justify-content:space-between;gap:clamp(4px,calc(0.8 * var(--ah,1dvh)),12px)}
+#field>.ctrls{flex:1.15 1 auto;justify-content:space-between;gap:clamp(3px,calc(0.7 * var(--ah,1dvh)),12px)}
 /* Spare height goes into the cards, not beige gaps between them. */
 #field>.ctrls>.panel{flex:1 1 auto;justify-content:space-evenly}
-#field .panel{padding:clamp(4px,calc(0.7 * var(--ah,1dvh)),8px);gap:clamp(3px,calc(0.55 * var(--ah,1dvh)),7px)}
+#field .panel{padding:clamp(4px,calc(0.7 * var(--ah,1dvh)),10px);gap:clamp(3px,calc(0.55 * var(--ah,1dvh)),9px)}
 #field .r-main{flex-wrap:nowrap}
-#field .r-num{font-size:clamp(2.55rem,calc(8.6 * var(--ah,1dvh)),5.2rem)}
-#field .r-nval{font-size:clamp(1.35rem,calc(3.4 * var(--ah,1dvh)),2.3rem)}
-#field .r-nval svg{width:clamp(22px,calc(3.2 * var(--ah,1dvh)),32px);height:clamp(22px,calc(3.2 * var(--ah,1dvh)),32px)}
-#field .r-tgt{font-size:clamp(1.8rem,calc(4.6 * var(--ah,1dvh)),3.1rem)}
-#field .r-gps{gap:clamp(2px,calc(0.45 * var(--ah,1dvh)),8px) 8px;padding-top:clamp(2px,calc(0.45 * var(--ah,1dvh)),8px);margin-top:0}
+#field .r-num{font-size:clamp(2.2rem,calc(9 * var(--ah,1dvh)),6.4rem)}
+#field .r-lbl{font-size:clamp(1.1rem,calc(2.6 * var(--ah,1dvh)),1.9rem)}
+#field .r-nval{font-size:clamp(1.3rem,calc(3.6 * var(--ah,1dvh)),2.9rem)}
+#field .r-nval svg{width:clamp(20px,calc(3.3 * var(--ah,1dvh)),40px);height:clamp(20px,calc(3.3 * var(--ah,1dvh)),40px)}
+#field .r-ndir{font-size:clamp(.95rem,calc(2 * var(--ah,1dvh)),1.5rem)}
+#field .r-ref,#field .r-nsub{font-size:clamp(.78rem,calc(1.6 * var(--ah,1dvh)),1.1rem)}
+#field .r-tgt{font-size:clamp(1.7rem,calc(5 * var(--ah,1dvh)),3.9rem)}
+#field .r-now label,#field .r-go .r-lbl{font-size:clamp(.9rem,calc(1.9 * var(--ah,1dvh)),1.35rem)}
+#field .r-gps{gap:clamp(2px,calc(0.45 * var(--ah,1dvh)),10px) 8px;padding-top:clamp(2px,calc(0.45 * var(--ah,1dvh)),10px);margin-top:0}
 #field .r-now{gap:2px}
 #field .r-ref,#field .r-ndir,#field .r-nsub{line-height:1.05}
-#field .r-stepper button,#field .r-stepper input{height:clamp(36px,calc(5.4 * var(--ah,1dvh)),48px)}
-#field .r-stepper button{width:clamp(36px,calc(5.4 * var(--ah,1dvh)),48px)}
-#field .r-dir button{height:clamp(32px,calc(4.6 * var(--ah,1dvh)),44px)}
-#field .tog.turn{min-height:clamp(40px,calc(6.4 * var(--ah,1dvh)),68px)}
-#field .tog.turn b{font-size:clamp(1.25rem,calc(3 * var(--ah,1dvh)),2.1rem)}
-#field .tog.yn{min-height:clamp(36px,calc(5.2 * var(--ah,1dvh)),52px)}
-#field .step{width:clamp(40px,calc(5.8 * var(--ah,1dvh)),56px);height:clamp(36px,calc(5.4 * var(--ah,1dvh)),52px);font-size:clamp(1.35rem,calc(2.8 * var(--ah,1dvh)),2rem)}
-#field .cnt{font-size:clamp(1.45rem,calc(3.2 * var(--ah,1dvh)),2.4rem)}
+#field .r-autonote{font-size:clamp(.76rem,calc(1.5 * var(--ah,1dvh)),1rem)}
+#field .r-stepper button,#field .r-stepper input{height:clamp(34px,calc(5.6 * var(--ah,1dvh)),60px)}
+#field .r-stepper button{width:clamp(34px,calc(5.6 * var(--ah,1dvh)),60px)}
+#field .r-stepper button,#field .r-stepper input{font-size:clamp(1.6rem,calc(3.4 * var(--ah,1dvh)),2.5rem)}
+#field .r-dir button{height:clamp(30px,calc(4.8 * var(--ah,1dvh)),56px);font-size:clamp(.95rem,calc(2.1 * var(--ah,1dvh)),1.45rem)}
+#field .tog.turn{min-height:clamp(38px,calc(6.8 * var(--ah,1dvh)),88px)}
+#field .tog.turn b{font-size:clamp(1.2rem,calc(3.3 * var(--ah,1dvh)),2.7rem)}
+#field .tog.turn svg{width:clamp(22px,calc(3.4 * var(--ah,1dvh)),40px);height:clamp(22px,calc(3.4 * var(--ah,1dvh)),40px)}
+#field .tog.yn{min-height:clamp(34px,calc(5.6 * var(--ah,1dvh)),68px)}
+#field .tog.yn b{font-size:clamp(1.05rem,calc(2.5 * var(--ah,1dvh)),1.7rem)}
+#field .step{width:clamp(38px,calc(6 * var(--ah,1dvh)),68px);height:clamp(34px,calc(5.6 * var(--ah,1dvh)),64px);font-size:clamp(1.3rem,calc(3 * var(--ah,1dvh)),2.4rem)}
+#field .cnt{font-size:clamp(1.4rem,calc(3.5 * var(--ah,1dvh)),2.9rem)}
 #field .ctr{padding:2px}
-#field .counters{gap:4px}
-#field .ctr .w{font-size:clamp(1.15rem,calc(2.6 * var(--ah,1dvh)),1.8rem)}
-#field .ovl .big{font-size:clamp(1.35rem,calc(3 * var(--ah,1dvh)),2.3rem)}
-#field .leave{gap:clamp(2px,calc(0.4 * var(--ah,1dvh)),6px);margin-top:0}
-#field .leave-tog{min-height:clamp(32px,calc(4.6 * var(--ah,1dvh)),44px);padding-block:clamp(3px,calc(0.4 * var(--ah,1dvh)),6px)}
+#field .counters{gap:clamp(3px,calc(0.5 * var(--ah,1dvh)),8px)}
+#field .ctr .w{font-size:clamp(1.1rem,calc(2.8 * var(--ah,1dvh)),2.2rem)}
+#field .ovl .big{font-size:clamp(1.3rem,calc(3.2 * var(--ah,1dvh)),2.6rem)}
+#field .leave{gap:clamp(2px,calc(0.4 * var(--ah,1dvh)),8px);margin-top:0}
+#field .leave-tog{min-height:clamp(32px,calc(5 * var(--ah,1dvh)),58px);padding-block:clamp(3px,calc(0.4 * var(--ah,1dvh)),8px)}
+#field .leave-lab{font-size:clamp(1rem,calc(2.3 * var(--ah,1dvh)),1.6rem)}
+#field .leave-sum{font-size:clamp(.95rem,calc(2.1 * var(--ah,1dvh)),1.45rem)}
+#field .leave-chev{width:clamp(22px,calc(3 * var(--ah,1dvh)),32px);height:clamp(22px,calc(3 * var(--ah,1dvh)),32px)}
 #field .folOpts{margin-top:0;gap:6px}
 #field .folOpts .frow{gap:2px}
-#field .folOpts .seg2 button{height:26px}
-#field .ph h2{font-size:clamp(.95rem,calc(2 * var(--ah,1dvh)),1.2rem)}
+#field .folOpts .flab{font-size:clamp(.66rem,calc(1.3 * var(--ah,1dvh)),.95rem)}
+#field .folOpts .seg2 button{height:clamp(24px,calc(3.6 * var(--ah,1dvh)),42px);font-size:clamp(.8rem,calc(1.8 * var(--ah,1dvh)),1.2rem)}
+#field .ph h2{font-size:clamp(.95rem,calc(2.2 * var(--ah,1dvh)),1.55rem)}
+#field .ph small{font-size:clamp(.8rem,calc(1.7 * var(--ah,1dvh)),1.1rem)}
+/* Overlap is one row until opened for an adjustment. */
+#field .ovlBox{flex:none;display:flex;flex-direction:column;gap:clamp(3px,calc(0.55 * var(--ah,1dvh)),9px)}
+#field .ovlBox .ovl{display:none}
+#field .ovlBox.is-open .ovl{display:flex}
+#field .ovlBox.is-open .leave-tog{border-color:var(--on)}
+#field .ovlBox.is-open .leave-chev{transform:rotate(90deg)}
 /* fit-short / fit-tiny are set from the home column height, the same box
    the rules above scale against. */
-html.fit-short .app{padding-block:3px;gap:2px}
 html.fit-short .app .iconbtn{height:40px;min-width:40px}
 html.fit-short .app .brand{font-size:1.35rem}
 html.fit-short .app .brand svg{width:34px;height:23px}
-html.fit-short #field>.result{padding:4px 10px;gap:2px}
-html.fit-short #field .panel{padding:3px 4px;gap:2px}
-html.fit-short #field .r-num{font-size:clamp(2.15rem,calc(6.4 * var(--ah,1dvh)),3.2rem)}
 html.fit-tiny #field.layout,html.fit-tiny #field>.ctrls{gap:2px}
 html.fit-tiny #field>.result{padding-block:3px}
 @media (min-width:760px) and (orientation:landscape){
@@ -338,7 +354,7 @@ html.fit-tiny #field>.result{padding-block:3px}
   position:absolute;z-index:20;top:0;left:0;width:100%;
   overflow:hidden;overflow:clip;
 }
-#settings.sheet{
+.set.sheet{
   position:relative;z-index:2;margin:0;
   min-height:100vh;min-height:100lvh;
   display:flex;flex-direction:column;gap:8px;
@@ -347,39 +363,42 @@ html.fit-tiny #field>.result{padding-block:3px}
   background:var(--bg);
   touch-action:pan-y;
 }
-@media (max-width:560px){#settings.sheet{gap:6px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:10px}}
-#settings.sheet .sheet-bar{flex:none;min-height:50px;padding-inline:max(12px,calc((100% - 1100px) / 2))}
-@media (max-width:560px){#settings.sheet .sheet-bar{min-height:46px}}
-#settings.sheet > .ctrls,
-#settings.sheet #setView > .ctrls,
-#settings.sheet #helpScreen > .ctrls{
+@media (max-width:560px){.set.sheet{gap:6px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:10px}}
+.set.sheet .sheet-bar{flex:none;min-height:50px;padding-inline:max(12px,calc((100% - 1100px) / 2))}
+@media (max-width:560px){.set.sheet .sheet-bar{min-height:46px}}
+.set.sheet > .ctrls,
+#settings.sheet #setView > .ctrls{
   min-width:0;width:100%;max-width:none;
   padding:0 max(12px,calc((100% - 1100px) / 2));
 }
-/* Help is its own page inside the same sheet, so swipe, the top edge,
-   and the bottom safe-area stay on #settings. */
-#setView,#helpScreen{display:flex;flex:1 1 auto;flex-direction:column;gap:inherit;min-width:0}
-#helpScreen.is-in{animation:helpIn .34s cubic-bezier(0,0,.58,1)}
-@keyframes helpIn{from{transform:translate3d(100%,0,0)}to{transform:none}}
-@media (prefers-reduced-motion: reduce){#helpScreen.is-in{animation:none!important}}
+#setView{display:flex;flex:1 1 auto;flex-direction:column;gap:inherit;min-width:0}
 a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit}
-/* --sheet-y is the page scroll when the slide starts, so the rounded corner
-   and its shadow sit at the top of the glass, not the top of the page. */
+/* Help and Privacy stack over Settings. While one is up, Settings is out of
+   the page flow: shown under a moving page, dropped once that page rests. */
+.sub.sheet{z-index:4}
+#settings.under{position:absolute;top:0;left:0;right:0}
+#settings.under.under-hide{display:none}
+/* --sheet-y / --sub-y are the page scroll when the slide starts, so the
+   rounded corner and its shadow sit at the top of the glass, not the top
+   of the page. */
 #settings.sheet.sheet-live{clip-path:inset(var(--sheet-y,0px) 0 0 0 round 38px 0 0 0)}
-#settings.sheet input,#settings.sheet textarea,#settings.sheet select{touch-action:auto}
-#settings.sheet.anim,#sheetEdge.anim{transition:transform .34s cubic-bezier(0,0,.58,1)}
-#settings.sheet.anim.spring,#sheetEdge.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1)}
-#sheetEdge{
+.sub.sheet.sheet-live{clip-path:inset(var(--sub-y,0px) 0 0 0 round 38px 0 0 0)}
+.set.sheet input,.set.sheet textarea,.set.sheet select{touch-action:auto}
+.set.sheet.anim,#sheetEdge.anim,#subEdge.anim{transition:transform .34s cubic-bezier(0,0,.58,1)}
+.set.sheet.anim.spring,#sheetEdge.anim.spring,#subEdge.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1)}
+#sheetEdge,#subEdge{
   position:absolute;z-index:1;top:var(--sheet-y,0px);left:0;right:0;bottom:0;
   border-top-left-radius:38px;box-shadow:-28px 0 64px rgba(0,0,0,.18);
   pointer-events:none;
 }
-#sheetScrim{
+#subEdge{z-index:3;top:var(--sub-y,0px)}
+#sheetScrim,#subScrim{
   position:absolute;z-index:0;top:0;left:0;right:0;bottom:0;
   background:#000;pointer-events:auto;touch-action:none;opacity:0;
 }
-#sheetScrim.anim{transition:opacity .34s linear}
-#sheetScrim.anim.spring{transition:opacity .34s linear}
+#subScrim{z-index:3}
+#sheetScrim.anim,#subScrim.anim{transition:opacity .34s linear}
+#sheetScrim.anim.spring,#subScrim.anim.spring{transition:opacity .34s linear}
 
 /* one-time install hint — overlay, does not reflow the field */
 .install{position:fixed;z-index:30;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(480px,calc(100% - 24px));background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
@@ -487,14 +506,18 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
         <div class="counters" id="counters"></div>
       </section>
 
-      <section class="panel">
-        <div class="ph"><h2>Overlap per head</h2><small id="ovlTotal"></small></div>
-        <div class="ovl">
+      <div class="ovlBox" id="ovlBox">
+        <button class="leave-tog" id="ovlTog" type="button" aria-expanded="false" aria-controls="ovlPanel">
+          <span class="leave-lab">Overlap</span>
+          <span class="leave-sum" id="ovlSum"></span>
+          <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <div class="ovl" id="ovlPanel">
           <button class="step" id="ovlMinus" type="button" aria-label="Less overlap">−</button>
           <div class="big" id="ovlVal"></div>
           <button class="step" id="ovlPlus" type="button" aria-label="More overlap">+</button>
         </div>
-      </section>
+      </div>
     </div>
   </main>
   </div>
@@ -523,7 +546,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
         Strikeout
       </h1>
       <span class="sp"></span>
-      <button class="iconbtn" id="helpBtn" type="button" aria-expanded="false" aria-controls="helpScreen">
+      <button class="iconbtn" id="helpBtn" type="button" aria-expanded="false" aria-controls="helpSheet">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14"/><path d="M12 17h.01"/></svg>
         Help
       </button>
@@ -537,7 +560,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
         <button class="updbtn" id="updBtn" type="button" hidden>Update now</button>
         <button class="chkbtn" id="chkBtn" type="button">Check for updates</button>
         <button class="chkbtn" id="installAgain" type="button">Show install tip again</button>
-        <a class="chkbtn" href="privacy.html">Privacy</a>
+        <a class="chkbtn" id="privLink" href="privacy.html" aria-controls="privSheet" aria-expanded="false">Privacy</a>
       </section>
 
       <section class="panel">
@@ -598,8 +621,12 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
       <button class="done" id="doneBtn" type="button">Back to field</button>
     </div>
     </div>
+  </main>
 
-    <div id="helpScreen" hidden>
+  <!-- HELP and PRIVACY: pages that slide over Settings -->
+  <div id="subScrim" hidden aria-hidden="true"></div>
+  <div id="subEdge" hidden aria-hidden="true"></div>
+  <main id="helpSheet" class="set sub" hidden aria-labelledby="helpTitle">
       <div class="bar sheet-bar">
         <button class="iconbtn" id="helpBack" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
@@ -616,6 +643,8 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
           <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
           <p class="note"><b>Settings</b> — slides in from the right. Drag it back the same way. Halfway across, or a quick flick, finishes it. Let go earlier and it springs back. Same as <b>Back to field</b>. A vertical drag still scrolls.</p>
+          <p class="note"><b>Help</b> and <b>Privacy</b> — slide in over Settings and drag back the same way, straight to Settings.</p>
+          <p class="note"><b>Overlap</b> — one row on the field showing each head and the total. Tap it to open the − and + buttons, tap again to fold it away.</p>
           <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
           <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
           <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
@@ -651,6 +680,20 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 
         <button class="done" id="helpDone" type="button">Back to Settings</button>
       </div>
+  </main>
+
+  <main id="privSheet" class="set sub" hidden aria-labelledby="privTitle">
+    <div class="bar sheet-bar">
+      <button class="iconbtn" id="privBack" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        Settings
+      </button>
+      <span class="sp"></span>
+      <h1 class="brand" id="privTitle">Privacy</h1>
+    </div>
+    <div class="ctrls">
+      <div id="privBody" style="display:flex;flex-direction:column;gap:inherit"></div>
+      <button class="done" id="privDone" type="button">Back to Settings</button>
     </div>
   </main>
 </div>
@@ -950,6 +993,7 @@ function renderAutoUi(){
     if(!S.autoAdv)setNote.textContent=autoMsg||'';
     else setNote.textContent=onLine||'Auto on';
   }
+  fitScale();
 }
 function commitBump(side){
   const editing=document.activeElement&&document.activeElement.id==='lineNowIn';
@@ -1100,7 +1144,7 @@ async function resumeAuto(){
   renderAutoUi();
 }
 
-let leaveOpen=false;
+let leaveOpen=false,ovlOpen=false;
 function renderField(){
   $('turnL').innerHTML=uturnL+'<b>Left</b>';$('turnR').innerHTML='<b>Right</b>'+uturnR;
   // lead chips
@@ -1130,7 +1174,9 @@ function renderField(){
   const c=calc();
   $('folTotal').textContent=`me: ${ftTxt(c.ld.w)}`+(c.folN?` + ${c.folN} other${c.folN===1?'':'s'}`:' only');
   $('ovlVal').innerHTML=`${fmtIn(S.overlapIn)}<small>each head</small>`;
-  $('ovlTotal').textContent=`${fmtIn(S.overlapIn*c.heads)} total`;
+  $('ovlSum').textContent=`${fmtIn(S.overlapIn)} each · ${fmtIn(S.overlapIn*c.heads)} total`;
+  $('ovlBox').classList.toggle('is-open',ovlOpen);
+  $('ovlTog').setAttribute('aria-expanded',ovlOpen?'true':'false');
   $('ovlMinus').disabled=S.overlapIn<=0;
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   const folOn=S.mode==='double';
@@ -1141,6 +1187,7 @@ function renderField(){
   document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===S.cut));
   renderResult();
   renderAutoUi();
+  fitScale();
 }
 
 // field interactions
@@ -1161,6 +1208,7 @@ document.getElementById('field').addEventListener('click',e=>{
   }
   else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
   else if(b.id==='leaveTog'){leaveOpen=!leaveOpen;}
+  else if(b.id==='ovlTog'){ovlOpen=!ovlOpen;}
   else if(b.dataset.leaveinc){
     const id=b.dataset.leaveinc;
     if(!S.heads.some(h=>h.id===id))return;
@@ -1307,144 +1355,264 @@ let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;ovlOpen=false;S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';
   if(S.autoAdv)startAuto();
   renderSettings();
 });
 
-// Settings is page content and scrolls with the page, like the field. It
-// slides with translate3d only. While it moves, the field is lifted by the
-// page scroll so it shows at the top of the glass under the sheet, and the
-// scrim and edge shadow come out. At rest all of that is dropped.
+// Every slide-over page (Settings over the field; Help and Privacy over
+// Settings) is page content and scrolls with the page. It slides with
+// translate3d only. While it moves, the page under it is lifted by the page
+// scroll so it shows at the top of the glass, and the scrim and edge shadow
+// come out. At rest all of that is dropped.
 // On release, progress = translateX / width. Finish at halfway (0.5) or a
 // 900 px/s rightward flick. Short of that, it eases back.
-const sheetLayer=$('sheetLayer'),sheetEl=$('settings'),sheetScrim=$('sheetScrim'),sheetEdge=$('sheetEdge');
+const sheetLayer=$('sheetLayer');
 const fieldCol=document.querySelector('.app');
-const sheetMovers=[sheetEl,sheetEdge];
-let sheetGen=0,sheetDragging=false,sheetX=0,sheetWpx=0;
 function motionOK(){return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;}
-function sheetWidth(){
-  if(sheetWpx>0)return sheetWpx;
-  const w=sheetEl.offsetWidth;
-  return w>0?w:window.innerWidth;
-}
-function readSheetX(){
-  const tr=getComputedStyle(sheetEl).transform;
-  if(!tr||tr==='none')return sheetX||0;
-  try{return new DOMMatrix(tr).m41||0;}catch(e){return sheetX||0;}
-}
-function sheetAnim(add,spring){
-  for(const el of sheetMovers.concat(sheetScrim)){
-    el.classList.remove('anim','spring');
-    if(add){el.classList.add('anim');if(spring)el.classList.add('spring');}
+function makeSheet(o){
+  const el=o.el,edge=o.edge,scrim=o.scrim,movers=[o.el,o.edge];
+  const st={gen:0,dragging:false,x:0,wpx:0};
+  function width(){
+    if(st.wpx>0)return st.wpx;
+    const w=el.offsetWidth;
+    return w>0?w:window.innerWidth;
   }
-}
-function liftSheet(){
-  const y=Math.max(0,Math.round(window.scrollY||0));
-  sheetLayer.style.setProperty('--sheet-y',y+'px');
-  fieldCol.style.transform=y?'translate3d(0,'+y+'px,0)':'';
-  sheetEl.classList.add('sheet-live');
-  sheetScrim.hidden=false;
-  sheetEdge.hidden=false;
-}
-function restSheet(){
-  sheetEl.classList.remove('sheet-live');
-  sheetScrim.hidden=true;
-  sheetEdge.hidden=true;
-  fieldCol.style.transform='';
-  sheetLayer.style.removeProperty('--sheet-y');
-}
-function applySheetX(x){
-  const w=Math.max(1,sheetWidth());
-  const nx=x<0?0:x;
-  sheetX=nx;
-  const p=Math.min(1,nx/w);
-  // Keep a translate3d even at 0 so the CSS transition can interpolate.
-  // settleSheet drops it once the sheet is resting, so text stays sharp.
-  const tf='translate3d('+nx+'px,0,0)';
-  for(const el of sheetMovers)el.style.transform=tf;
-  sheetScrim.style.opacity=(0.4*(1-p)).toFixed(3);
-  return nx;
-}
-function sheetWillChange(on){
-  for(const el of sheetMovers)el.style.willChange=on?'transform':'';
-  sheetScrim.style.willChange=on?'opacity':'';
-}
-function stopSheetAnim(){
-  const x=Math.max(0,readSheetX());
-  sheetGen++;
-  sheetAnim(false);
-  sheetWillChange(true);
-  applySheetX(x);
-  return x;
-}
-function settleSheet(){
-  if(sheetEl.hidden||sheetDragging)return;
-  sheetAnim(false);
-  sheetWillChange(false);
-  if(sheetX<=0.5){
-    sheetX=0;
-    for(const el of sheetMovers)el.style.transform='';
-    sheetScrim.style.opacity='';
-    restSheet();
+  function readX(){
+    const tr=getComputedStyle(el).transform;
+    if(!tr||tr==='none')return st.x||0;
+    try{return new DOMMatrix(tr).m41||0;}catch(e){return st.x||0;}
   }
-}
-function runSheetTo(x,kind,done){
-  const g=++sheetGen;
-  if(!motionOK()){
-    applySheetX(x);
-    if(done)done();
-    return;
-  }
-  const now=Math.max(0,readSheetX());
-  sheetAnim(false);
-  liftSheet();
-  sheetWillChange(true);
-  applySheetX(now);
-  void sheetEl.offsetWidth;
-  sheetAnim(true,kind==='spring');
-  applySheetX(x);
-  let fired=false;
-  const ms=kind==='spring'?480:450;
-  const timer=setTimeout(fire,ms);
-  function fire(){
-    if(fired||g!==sheetGen)return;
-    fired=true;
-    clearTimeout(timer);
-    sheetEl.removeEventListener('transitionend',onEnd);
-    if(done)done();
-  }
-  function onEnd(ev){if(ev.target===sheetEl&&ev.propertyName==='transform')fire();}
-  sheetEl.addEventListener('transitionend',onEnd);
-}
-function setHelp(open,instant){
-  const help=$('helpScreen'),view=$('setView'),btn=$('helpBtn');
-  if(!help||!view)return;
-  if(btn)btn.setAttribute('aria-expanded',open?'true':'false');
-  if(open){
-    window.scrollTo(0,0);
-    view.hidden=true;
-    help.hidden=false;
-    help.classList.remove('is-in');
-    if(!instant&&motionOK()){
-      void help.offsetWidth;
-      help.classList.add('is-in');
+  function anim(add,spring){
+    for(const n of movers.concat(scrim)){
+      n.classList.remove('anim','spring');
+      if(add){n.classList.add('anim');if(spring)n.classList.add('spring');}
     }
-    const back=$('helpBack');
-    if(back)try{back.focus({preventScroll:true});}catch(e){}
-    return;
   }
-  help.classList.remove('is-in');
-  help.hidden=true;
-  view.hidden=false;
-  if(!instant){
-    window.scrollTo(0,0);
-    if(btn)try{btn.focus({preventScroll:true});}catch(e){}
+  function lift(){
+    const y=Math.max(0,Math.round(window.scrollY||0));
+    sheetLayer.style.setProperty(o.yVar,y+'px');
+    o.lift(y);
+    el.classList.add('sheet-live');
+    scrim.hidden=false;
+    edge.hidden=false;
   }
+  function rest(){
+    el.classList.remove('sheet-live');
+    scrim.hidden=true;
+    edge.hidden=true;
+    o.rest();
+    sheetLayer.style.removeProperty(o.yVar);
+  }
+  function apply(x){
+    const w=Math.max(1,width());
+    const nx=x<0?0:x;
+    st.x=nx;
+    const p=Math.min(1,nx/w);
+    // Keep a translate3d even at 0 so the CSS transition can interpolate.
+    // settle drops it once the sheet is resting, so text stays sharp.
+    const tf='translate3d('+nx+'px,0,0)';
+    for(const n of movers)n.style.transform=tf;
+    scrim.style.opacity=(0.4*(1-p)).toFixed(3);
+    return nx;
+  }
+  function willChange(on){
+    for(const n of movers)n.style.willChange=on?'transform':'';
+    scrim.style.willChange=on?'opacity':'';
+  }
+  function stopAnim(){
+    const x=Math.max(0,readX());
+    st.gen++;
+    anim(false);
+    willChange(true);
+    apply(x);
+    return x;
+  }
+  function settle(){
+    if(el.hidden||st.dragging)return;
+    anim(false);
+    willChange(false);
+    if(st.x<=0.5){
+      st.x=0;
+      for(const n of movers)n.style.transform='';
+      scrim.style.opacity='';
+      rest();
+    }
+  }
+  function runTo(x,kind,done){
+    const g=++st.gen;
+    if(!motionOK()){
+      apply(x);
+      if(done)done();
+      return;
+    }
+    const now=Math.max(0,readX());
+    anim(false);
+    lift();
+    willChange(true);
+    apply(now);
+    void el.offsetWidth;
+    anim(true,kind==='spring');
+    apply(x);
+    let fired=false;
+    const ms=kind==='spring'?480:450;
+    const timer=setTimeout(fire,ms);
+    function fire(){
+      if(fired||g!==st.gen)return;
+      fired=true;
+      clearTimeout(timer);
+      el.removeEventListener('transitionend',onEnd);
+      if(done)done();
+    }
+    function onEnd(ev){if(ev.target===el&&ev.propertyName==='transform')fire();}
+    el.addEventListener('transitionend',onEnd);
+  }
+  function open(){
+    if(!el.hidden)return;
+    if(o.beforeOpen)o.beforeOpen();
+    anim(false);
+    el.classList.add('sheet');
+    sheetLayer.hidden=false;
+    el.hidden=false;
+    st.wpx=el.offsetWidth||window.innerWidth;
+    if(o.shown)o.shown();
+    if(motionOK()){
+      lift();
+      willChange(true);
+      apply(st.wpx);
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          if(el.hidden||st.dragging)return;
+          runTo(0,'in',settle);
+        });
+      });
+    }else{
+      apply(0);
+      settle();
+    }
+    if(o.afterOpen)o.afterOpen();
+  }
+  function finish(){
+    if(el.hidden)return;
+    st.gen++;
+    st.dragging=false;
+    st.x=0;st.wpx=0;
+    anim(false);
+    willChange(false);
+    for(const n of movers)n.style.transform='';
+    el.style.touchAction='';
+    scrim.style.opacity='';
+    el.classList.remove('sheet');
+    rest();
+    el.hidden=true;
+    if(o.closed)o.closed();
+  }
+  function close(animate){
+    if(el.hidden)return;
+    if(!animate||!motionOK()){finish();return;}
+    const w=el.offsetWidth;
+    if(w>0)st.wpx=w;
+    runTo(width()+32,'off',finish);
+  }
+  scrim.addEventListener('click',()=>close(true));
+  window.addEventListener('resize',()=>{
+    if(el.hidden||st.dragging)return;
+    const w=el.offsetWidth;
+    if(w>0)st.wpx=w;
+  });
+  window.addEventListener('scroll',()=>{
+    if(!el.hidden&&!st.dragging&&el.classList.contains('sheet-live'))lift();
+  },{passive:true});
+  (function(){
+    let pid=null,sx=0,sy=0,origin=0,axis='',swallow=false,moveRaf=0,pendingX=0;
+    const samples=[];
+    // Flick speed is px/s over the last 100ms of the drag. A pause drops those
+    // samples, so a held finger counts as stopped rather than a flick.
+    function vel(now){
+      while(samples.length&&now-samples[0].t>100)samples.shift();
+      if(samples.length<2)return 0;
+      const a=samples[0],b=samples[samples.length-1];
+      const dt=b.t-a.t;
+      return dt>0?(b.x-a.x)/dt*1000:0;
+    }
+    function flushMove(){
+      moveRaf=0;
+      apply(pendingX);
+    }
+    el.addEventListener('click',e=>{
+      if(!swallow)return;
+      swallow=false;
+      e.preventDefault();
+      e.stopPropagation();
+    },true);
+    el.addEventListener('pointerdown',e=>{
+      if(el.hidden||pid!==null)return;
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      if(e.target.closest('input,textarea,select'))return;
+      pid=e.pointerId;sx=e.clientX;sy=e.clientY;axis='';swallow=false;
+      origin=Math.max(0,readX());
+      samples.length=0;samples.push({x:e.clientX,t:e.timeStamp});
+    });
+    el.addEventListener('pointermove',e=>{
+      if(e.pointerId!==pid)return;
+      const ddx=e.clientX-sx,ddy=e.clientY-sy;
+      if(!axis){
+        const adx=Math.abs(ddx),ady=Math.abs(ddy);
+        if(adx<18&&ady<18)return;
+        // Only claim a clearly rightward drag. A vertical drag stays a scroll.
+        if(ddx>=18&&ddx>ady*1.4)axis='x';
+        else if(ady>=18&&ady>=adx)axis='y';
+        else return;
+        if(axis!=='x'){pid=null;return;}
+        swallow=true;
+        st.dragging=true;
+        lift();
+        el.style.touchAction='none';
+        stopAnim();
+        origin=Math.max(0,st.x);
+        const w=el.offsetWidth;
+        if(w>0)st.wpx=w;
+        try{el.setPointerCapture(e.pointerId);}catch(err){}
+      }
+      if(axis!=='x')return;
+      samples.push({x:e.clientX,t:e.timeStamp});
+      const t=e.timeStamp;
+      while(samples.length&&t-samples[0].t>100)samples.shift();
+      if(e.cancelable)e.preventDefault();
+      pendingX=origin+e.clientX-sx;
+      if(!moveRaf)moveRaf=requestAnimationFrame(flushMove);
+    });
+    function endDrag(e){
+      if(e.pointerId!==pid)return;
+      const wasX=axis==='x';
+      pid=null;axis='';
+      if(moveRaf){cancelAnimationFrame(moveRaf);moveRaf=0;flushMove();}
+      el.style.touchAction='';
+      try{el.releasePointerCapture(e.pointerId);}catch(err){}
+      if(!wasX){st.dragging=false;return;}
+      // Only the click the browser fires for this same lift is dropped.
+      setTimeout(()=>{swallow=false;},350);
+      const x=Math.max(0,st.x);
+      const w=width();
+      const progress=w>0?x/w:0;
+      const v=vel(e.timeStamp);
+      st.dragging=false;
+      // Halfway across the sheet, or a 900 px/s rightward flick.
+      const DISMISS_PROGRESS=0.5;
+      const DISMISS_FLICK=900;
+      if(progress>=DISMISS_PROGRESS||v>=DISMISS_FLICK)runTo(w+32,'off',finish);
+      else runTo(0,'spring',settle);
+    }
+    el.addEventListener('pointerup',endDrag);
+    el.addEventListener('pointercancel',endDrag);
+    window.addEventListener('pointerup',endDrag);
+    window.addEventListener('pointercancel',endDrag);
+    el.addEventListener('touchmove',e=>{
+      if(st.dragging&&e.cancelable)e.preventDefault();
+    },{passive:false});
+  })();
+  return {el,open,close,finish,isOpen:()=>!el.hidden};
 }
-$('helpBtn').addEventListener('click',()=>setHelp(true));
-$('helpBack').addEventListener('click',()=>setHelp(false));
-$('helpDone').addEventListener('click',()=>setHelp(false));
 // The home column is sized to the real glass. An iPhone Home Screen app
 // reports innerHeight and 100dvh short by the top inset while screen.height
 // is still the glass. navigator.standalone is iOS only, so Android keeps
@@ -1478,9 +1646,32 @@ function fitHome(){
   if(typing&&was&&h<was)return;
   const root=document.documentElement;
   root.style.setProperty('--app-h',h+'px');
-  root.style.setProperty('--ah',(h/100).toFixed(2)+'px');
   root.classList.toggle('fit-short',h<=720);
   root.classList.toggle('fit-tiny',h<=660);
+  const base=h/100;
+  if(base!==fitBase){fitBase=base;fitScale(true);}
+}
+var fitBase=0,fitK=1,fitSig='';
+function fieldOver(){
+  let o=0;
+  for(const el of [$('field'),document.querySelector('#field>.result'),document.querySelector('#field>.ctrls')])
+    if(el)o=Math.max(o,el.scrollHeight-el.clientHeight);
+  return o;
+}
+// Cards grow until the field would scroll: one hundredth of the column is
+// the floor, and the search walks --ah up or down from there.
+function fitScale(force){
+  if(!fitBase)return;
+  const root=document.documentElement;
+  const set=k=>root.style.setProperty('--ah',(fitBase*k).toFixed(2)+'px');
+  const note=$('autoNote');
+  const sig=[ovlOpen,leaveOpen,note&&note.hidden,S.mode,S.heads.length,S.heads.map(h=>h.label||'').join('|')].join(',');
+  if(sig!==fitSig){fitSig=sig;force=true;}
+  set(fitK);
+  if(!force&&fieldOver()<=0)return;
+  let lo=0.5,hi=2;
+  for(let i=0;i<9;i++){const k=(lo+hi)/2;set(k);if(fieldOver()<=0)lo=k;else hi=k;}
+  fitK=lo;set(lo);
 }
 function lockHome(on){
   document.documentElement.classList.toggle('home-lock',!!on);
@@ -1491,63 +1682,116 @@ window.addEventListener('resize',fitHome);
 window.addEventListener('orientationchange',()=>{fitHome();setTimeout(fitHome,300);});
 if(window.visualViewport)window.visualViewport.addEventListener('resize',fitHome);
 window.addEventListener('pageshow',fitHome);
-function openSettings(){
-  if(!sheetEl.hidden)return;
-  lockHome(false);
-  window.scrollTo(0,0);
-  setHelp(false,true);
-  renderSettings();
-  $('setBtn').classList.add('is-covered');
-  sheetAnim(false);
-  sheetEl.classList.add('sheet');
-  sheetLayer.hidden=false;
-  sheetEl.hidden=false;
-  sheetWpx=sheetEl.offsetWidth||window.innerWidth;
-  $('field').setAttribute('aria-hidden','true');
-  $('field').setAttribute('inert','');
-  if(motionOK()){
-    liftSheet();
-    sheetWillChange(true);
-    applySheetX(sheetWpx);
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        if(sheetEl.hidden||sheetDragging)return;
-        runSheetTo(0,'in',settleSheet);
-      });
-    });
-  }else{
-    applySheetX(0);
-    settleSheet();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitScale(true));
+const sheetEl=$('settings');
+const subSheets=[];
+const settingsSheet=makeSheet({
+  el:sheetEl,edge:$('sheetEdge'),scrim:$('sheetScrim'),yVar:'--sheet-y',
+  lift(y){fieldCol.style.transform=y?'translate3d(0,'+y+'px,0)':'';},
+  rest(){fieldCol.style.transform='';},
+  beforeOpen(){
+    lockHome(false);
+    window.scrollTo(0,0);
+    renderSettings();
+    void loadPrivacy();
+    $('setBtn').classList.add('is-covered');
+  },
+  shown(){
+    $('field').setAttribute('aria-hidden','true');
+    $('field').setAttribute('inert','');
+  },
+  afterOpen(){wake();},
+  closed(){
+    for(const s of subSheets)s.finish();
+    sheetLayer.hidden=true;
+    $('field').removeAttribute('aria-hidden');
+    $('field').removeAttribute('inert');
+    $('setBtn').classList.remove('is-covered');
+    S.heads.sort((a,b)=>a.w-b.w);save();renderField();
+    window.scrollTo(0,0);lockHome(true);wake();
   }
-  wake();
+});
+// Help and Privacy slide over Settings the way Settings slides over the
+// field. While one moves, Settings is lifted to the glass under it at the
+// scroll it was left at. At rest Settings is dropped from layout, so the
+// page scroll belongs to the open page.
+let underY=0;
+function makeSub(el,opener,back){
+  const sub=makeSheet({
+    el,edge:$('subEdge'),scrim:$('subScrim'),yVar:'--sub-y',
+    lift(y){
+      sheetEl.classList.remove('under-hide');
+      sheetEl.style.transform='translate3d(0,'+(y-underY)+'px,0)';
+    },
+    rest(){
+      if(!el.hidden)sheetEl.classList.add('under-hide');
+      sheetEl.style.transform='';
+    },
+    beforeOpen(){
+      underY=Math.max(0,Math.round(window.scrollY||0));
+      sheetEl.classList.add('under');
+      sheetEl.setAttribute('inert','');
+      window.scrollTo(0,0);
+      if(opener)opener.setAttribute('aria-expanded','true');
+    },
+    afterOpen(){
+      if(back)try{back.focus({preventScroll:true});}catch(e){}
+    },
+    closed(){
+      sheetEl.classList.remove('under','under-hide');
+      sheetEl.style.transform='';
+      sheetEl.removeAttribute('inert');
+      window.scrollTo(0,underY);
+      if(opener){
+        opener.setAttribute('aria-expanded','false');
+        if(!sheetEl.hidden)try{opener.focus({preventScroll:true});}catch(e){}
+      }
+    }
+  });
+  subSheets.push(sub);
+  return sub;
 }
-function finishClose(){
-  if(sheetEl.hidden)return;
-  sheetGen++;
-  sheetDragging=false;
-  sheetX=0;sheetWpx=0;
-  sheetAnim(false);
-  sheetWillChange(false);
-  for(const el of sheetMovers)el.style.transform='';
-  sheetEl.style.touchAction='';
-  sheetScrim.style.opacity='';
-  sheetEl.classList.remove('sheet');
-  restSheet();
-  sheetEl.hidden=true;
-  sheetLayer.hidden=true;
-  $('field').removeAttribute('aria-hidden');
-  $('field').removeAttribute('inert');
-  $('setBtn').classList.remove('is-covered');
-  S.heads.sort((a,b)=>a.w-b.w);save();renderField();
-  window.scrollTo(0,0);lockHome(true);wake();
+const helpSheet=makeSub($('helpSheet'),$('helpBtn'),$('helpBack'));
+const privSheet=makeSub($('privSheet'),$('privLink'),$('privBack'));
+$('helpBtn').addEventListener('click',()=>helpSheet.open());
+$('helpBack').addEventListener('click',()=>helpSheet.close(true));
+$('helpDone').addEventListener('click',()=>helpSheet.close(true));
+$('privBack').addEventListener('click',()=>privSheet.close(true));
+$('privDone').addEventListener('click',()=>privSheet.close(true));
+// The privacy page stays the public privacy.html. Settings shows the same
+// words in a sheet, read from that file (it is in the offline cache).
+let privLoaded=null;
+function loadPrivacy(){
+  if(privLoaded)return privLoaded;
+  privLoaded=fetch('privacy.html').then(r=>r.ok?r.text():Promise.reject(r.status)).then(html=>{
+    const main=new DOMParser().parseFromString(html,'text/html').querySelector('main');
+    if(!main)throw new Error('no privacy text');
+    const box=$('privBody');
+    box.textContent='';
+    let sec=null;
+    const section=()=>{sec=document.createElement('section');sec.className='panel';box.appendChild(sec);return sec;};
+    for(const n of Array.from(main.children)){
+      if(n.tagName==='H1'||n.classList.contains('brand')||n.classList.contains('back'))continue;
+      if(n.tagName==='H2'){
+        const ph=document.createElement('div');ph.className='ph';
+        const h=document.createElement('h2');h.textContent=n.textContent;
+        ph.appendChild(h);section().appendChild(ph);
+      }else if(n.tagName==='P'){
+        const p=document.createElement('p');p.className='note';p.textContent=n.textContent;
+        (sec||section()).appendChild(p);
+      }
+    }
+    return true;
+  }).catch(()=>{privLoaded=null;return false;});
+  return privLoaded;
 }
-function closeSettings(anim){
-  if(sheetEl.hidden)return;
-  if(!anim||!motionOK()){finishClose();return;}
-  const w=sheetEl.offsetWidth;
-  if(w>0)sheetWpx=w;
-  runSheetTo(sheetWidth()+32,'off',finishClose);
-}
+$('privLink').addEventListener('click',async e=>{
+  e.preventDefault();
+  if(await loadPrivacy())privSheet.open();
+  else location.href='privacy.html';
+});
+function openSettings(){settingsSheet.open();}
+function closeSettings(anim){settingsSheet.close(anim);}
 function show(which){
   if(which==='settings')openSettings();
   else closeSettings(false);
@@ -1555,108 +1799,12 @@ function show(which){
 $('setBtn').addEventListener('click',()=>show('settings'));
 $('doneBtn').addEventListener('click',()=>closeSettings(true));
 $('doneTopBtn').addEventListener('click',()=>closeSettings(true));
-sheetScrim.addEventListener('click',()=>closeSettings(true));
 sheetEl.addEventListener('focusin',e=>{
   const t=e.target;
   if(!t||!t.closest||!t.closest('input,textarea,select'))return;
   const nudge=()=>{try{t.scrollIntoView({block:'center'});}catch(err){}};
   setTimeout(nudge,60);setTimeout(nudge,320);
 });
-window.addEventListener('resize',()=>{
-  if(sheetEl.hidden||sheetDragging)return;
-  const w=sheetEl.offsetWidth;
-  if(w>0)sheetWpx=w;
-});
-window.addEventListener('scroll',()=>{
-  if(!sheetEl.hidden&&!sheetDragging&&sheetEl.classList.contains('sheet-live'))liftSheet();
-},{passive:true});
-(function(){
-  const el=sheetEl;
-  let pid=null,sx=0,sy=0,origin=0,axis='',swallow=false,moveRaf=0,pendingX=0;
-  const samples=[];
-  // Flick speed is px/s over the last 100ms of the drag. A pause drops those
-  // samples, so a held finger counts as stopped rather than a flick.
-  function vel(now){
-    while(samples.length&&now-samples[0].t>100)samples.shift();
-    if(samples.length<2)return 0;
-    const a=samples[0],b=samples[samples.length-1];
-    const dt=b.t-a.t;
-    return dt>0?(b.x-a.x)/dt*1000:0;
-  }
-  function flushMove(){
-    moveRaf=0;
-    applySheetX(pendingX);
-  }
-  el.addEventListener('click',e=>{
-    if(!swallow)return;
-    swallow=false;
-    e.preventDefault();
-    e.stopPropagation();
-  },true);
-  el.addEventListener('pointerdown',e=>{
-    if(el.hidden||pid!==null)return;
-    if(e.pointerType==='mouse'&&e.button!==0)return;
-    if(e.target.closest('input,textarea,select'))return;
-    pid=e.pointerId;sx=e.clientX;sy=e.clientY;axis='';swallow=false;
-    origin=Math.max(0,readSheetX());
-    samples.length=0;samples.push({x:e.clientX,t:e.timeStamp});
-  });
-  el.addEventListener('pointermove',e=>{
-    if(e.pointerId!==pid)return;
-    const ddx=e.clientX-sx,ddy=e.clientY-sy;
-    if(!axis){
-      const adx=Math.abs(ddx),ady=Math.abs(ddy);
-      if(adx<18&&ady<18)return;
-      // Only claim a clearly rightward drag. A vertical drag stays a scroll.
-      if(ddx>=18&&ddx>ady*1.4)axis='x';
-      else if(ady>=18&&ady>=adx)axis='y';
-      else return;
-      if(axis!=='x'){pid=null;return;}
-      swallow=true;
-      sheetDragging=true;
-      liftSheet();
-      el.style.touchAction='none';
-      stopSheetAnim();
-      origin=Math.max(0,sheetX);
-      const w=el.offsetWidth;
-      if(w>0)sheetWpx=w;
-      try{el.setPointerCapture(e.pointerId);}catch(err){}
-    }
-    if(axis!=='x')return;
-    samples.push({x:e.clientX,t:e.timeStamp});
-    const t=e.timeStamp;
-    while(samples.length&&t-samples[0].t>100)samples.shift();
-    if(e.cancelable)e.preventDefault();
-    pendingX=origin+e.clientX-sx;
-    if(!moveRaf)moveRaf=requestAnimationFrame(flushMove);
-  });
-  function endDrag(e){
-    if(e.pointerId!==pid)return;
-    const wasX=axis==='x';
-    pid=null;axis='';
-    if(moveRaf){cancelAnimationFrame(moveRaf);moveRaf=0;flushMove();}
-    el.style.touchAction='';
-    try{el.releasePointerCapture(e.pointerId);}catch(err){}
-    if(!wasX){sheetDragging=false;return;}
-    const x=Math.max(0,sheetX);
-    const w=sheetWidth();
-    const progress=w>0?x/w:0;
-    const v=vel(e.timeStamp);
-    sheetDragging=false;
-    // Halfway across the sheet, or a 900 px/s rightward flick.
-    const DISMISS_PROGRESS=0.5;
-    const DISMISS_FLICK=900;
-    if(progress>=DISMISS_PROGRESS||v>=DISMISS_FLICK)runSheetTo(w+32,'off',finishClose);
-    else runSheetTo(0,'spring',settleSheet);
-  }
-  el.addEventListener('pointerup',endDrag);
-  el.addEventListener('pointercancel',endDrag);
-  window.addEventListener('pointerup',endDrag);
-  window.addEventListener('pointercancel',endDrag);
-  el.addEventListener('touchmove',e=>{
-    if(sheetDragging&&e.cancelable)e.preventDefault();
-  },{passive:false});
-})();
 
 applyTheme();renderField();
 if(S.wake)wake();
@@ -1664,7 +1812,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.41';
+const APP_VERSION='1.0.42';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
