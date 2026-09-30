@@ -91,6 +91,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .iconbtn{height:50px;min-width:50px;padding:0 14px;border:0;background:transparent;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;cursor:pointer}
 .iconbtn svg{width:26px;height:26px;flex:none}
 .iconbtn:active{transform:scale(.97)}
+#helpBtn{flex:none}
+#helpBtn[aria-expanded="true"]{color:var(--on)}
 #setBtn{position:relative}
 .dot{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#E0301E;border:2px solid var(--bg);animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,48,30,.7)}70%{box-shadow:0 0 0 10px rgba(224,48,30,0)}100%{box-shadow:0 0 0 0 rgba(224,48,30,0)}}
@@ -440,6 +442,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         </svg>
         Strikeout
       </h1>
+      <span class="sp"></span>
+      <button class="iconbtn" id="helpBtn" type="button" aria-expanded="false" aria-controls="helpCopy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14"/><path d="M12 17h.01"/></svg>
+        Help
+      </button>
     </div>
     <div class="ctrls">
       <button class="done" id="doneTopBtn" type="button">Back to field</button>
@@ -518,7 +525,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
         <button class="danger" id="resetBtn" type="button">Reset everything to defaults</button>
       </section>
 
-      <section class="panel">
+      <section class="panel" id="helpCopy" hidden>
         <div class="ph"><h2>How to use it</h2></div>
         <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
         <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
@@ -1298,9 +1305,23 @@ function runSheetTo(x,kind,done){
   function onEnd(ev){if(ev.target===sheetEl&&ev.propertyName==='transform')fire();}
   sheetEl.addEventListener('transitionend',onEnd);
 }
+function setHelp(open){
+  const panel=$('helpCopy'),btn=$('helpBtn');
+  if(!panel||!btn)return;
+  panel.hidden=!open;
+  btn.setAttribute('aria-expanded',open?'true':'false');
+}
+$('helpBtn').addEventListener('click',()=>{
+  const open=!!$('helpCopy').hidden;
+  setHelp(open);
+  if(!open)return;
+  const nudge=()=>{try{$('helpCopy').scrollIntoView({block:'start'});}catch(e){}};
+  setTimeout(nudge,60);
+});
 function openSettings(){
   if(!sheetEl.hidden)return;
   window.scrollTo(0,0);
+  setHelp(false);
   renderSettings();
   $('setBtn').classList.add('is-covered');
   sheetAnim(false);
@@ -1469,7 +1490,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.37';
+const APP_VERSION='1.0.38';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
