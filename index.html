@@ -202,6 +202,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .danger{height:56px;border-radius:12px;border:2px solid var(--danger);color:var(--danger);background:transparent;font-weight:700;font-size:1rem;cursor:pointer}
 .danger.arm{background:var(--danger);color:#fff}
 .done{height:64px;flex-shrink:0;border-radius:16px;border:0;background:var(--on);color:var(--on-ink);font-family:var(--display);font-weight:900;font-size:1.8rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.mline{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:.03em;padding:2px 4px;color:var(--ink);font-variant-numeric:tabular-nums}
 .math{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9rem;background:transparent;border-radius:0;padding:2px 4px;color:var(--ink);user-select:text;-webkit-user-select:text;white-space:pre-wrap}
 
 /* light phone trim: keep original layout, shave a little vertical space */
@@ -256,63 +257,69 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
 /* Field home fills the glass. Shorter phones squish; taller ones spread out.
-   Settings stays on the page scroller, outside .app. */
+   Settings stays on the page scroller, outside .app. --app-h is the glass
+   minus the top inset and most of the bottom one, measured in script: an
+   iPhone Home Screen app reports 100dvh short by the top inset, which left
+   a dead band under Overlap. */
 .app{
-  height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
-  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  height:var(--app-h,calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));
+  max-height:var(--app-h,calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));
   overflow:hidden;
-  padding-block:clamp(4px,0.7dvh,10px);
-  gap:clamp(2px,0.5dvh,8px);
+  padding-block:clamp(4px,calc(0.7 * var(--ah,1dvh)),10px);
+  gap:clamp(2px,calc(0.5 * var(--ah,1dvh)),8px);
 }
+/* Only the root: it clips at the viewport. body would clip at its own
+   100% box, which iOS also reports short. */
+html.home-lock{overflow:hidden;overscroll-behavior:none}
 .app>.stage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
-#field.layout{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;gap:clamp(4px,0.8dvh,12px)}
+#field.layout{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;gap:clamp(4px,calc(0.8 * var(--ah,1dvh)),12px)}
 #field>.result{
   flex:1 1 auto;min-height:0;
   justify-content:space-between;
-  gap:clamp(2px,0.6dvh,8px);
-  padding:clamp(6px,1dvh,12px) clamp(10px,2vw,16px) clamp(6px,0.8dvh,10px);
+  gap:clamp(2px,calc(0.6 * var(--ah,1dvh)),8px);
+  padding:clamp(6px,calc(1 * var(--ah,1dvh)),12px) clamp(10px,2vw,16px) clamp(6px,calc(0.8 * var(--ah,1dvh)),10px);
 }
-#field>.ctrls{flex:1.15 1 auto;min-height:0;justify-content:space-between;gap:clamp(4px,0.8dvh,12px)}
-#field .panel{padding:clamp(4px,0.7dvh,8px);gap:clamp(3px,0.55dvh,7px)}
+#field>.ctrls{flex:1.15 1 auto;min-height:0;justify-content:space-between;gap:clamp(4px,calc(0.8 * var(--ah,1dvh)),12px)}
+/* Spare height goes into the cards, not beige gaps between them. */
+#field>.ctrls>.panel{flex:1 1 auto;justify-content:space-evenly}
+#field .panel{padding:clamp(4px,calc(0.7 * var(--ah,1dvh)),8px);gap:clamp(3px,calc(0.55 * var(--ah,1dvh)),7px)}
 #field .r-main{flex-wrap:nowrap}
-#field .r-num{font-size:clamp(2.55rem,8.6dvh,5.2rem)}
-#field .r-nval{font-size:clamp(1.35rem,3.4dvh,2.3rem)}
-#field .r-nval svg{width:clamp(22px,3.2dvh,32px);height:clamp(22px,3.2dvh,32px)}
-#field .r-tgt{font-size:clamp(1.8rem,4.6dvh,3.1rem)}
-#field .r-gps{gap:clamp(2px,0.45dvh,8px) 8px;padding-top:clamp(2px,0.45dvh,8px);margin-top:0}
+#field .r-num{font-size:clamp(2.55rem,calc(8.6 * var(--ah,1dvh)),5.2rem)}
+#field .r-nval{font-size:clamp(1.35rem,calc(3.4 * var(--ah,1dvh)),2.3rem)}
+#field .r-nval svg{width:clamp(22px,calc(3.2 * var(--ah,1dvh)),32px);height:clamp(22px,calc(3.2 * var(--ah,1dvh)),32px)}
+#field .r-tgt{font-size:clamp(1.8rem,calc(4.6 * var(--ah,1dvh)),3.1rem)}
+#field .r-gps{gap:clamp(2px,calc(0.45 * var(--ah,1dvh)),8px) 8px;padding-top:clamp(2px,calc(0.45 * var(--ah,1dvh)),8px);margin-top:0}
 #field .r-now{gap:2px}
 #field .r-ref,#field .r-ndir,#field .r-nsub{line-height:1.05}
-#field .r-stepper button,#field .r-stepper input{height:clamp(36px,5.4dvh,48px)}
-#field .r-stepper button{width:clamp(36px,5.4dvh,48px)}
-#field .r-dir button{height:clamp(32px,4.6dvh,44px)}
-#field .tog.turn{min-height:clamp(40px,6.4dvh,68px)}
-#field .tog.turn b{font-size:clamp(1.25rem,3dvh,2.1rem)}
-#field .tog.yn{min-height:clamp(36px,5.2dvh,52px)}
-#field .step{width:clamp(40px,5.8dvh,56px);height:clamp(36px,5.4dvh,52px);font-size:clamp(1.35rem,2.8dvh,2rem)}
-#field .cnt{font-size:clamp(1.45rem,3.2dvh,2.4rem)}
+#field .r-stepper button,#field .r-stepper input{height:clamp(36px,calc(5.4 * var(--ah,1dvh)),48px)}
+#field .r-stepper button{width:clamp(36px,calc(5.4 * var(--ah,1dvh)),48px)}
+#field .r-dir button{height:clamp(32px,calc(4.6 * var(--ah,1dvh)),44px)}
+#field .tog.turn{min-height:clamp(40px,calc(6.4 * var(--ah,1dvh)),68px)}
+#field .tog.turn b{font-size:clamp(1.25rem,calc(3 * var(--ah,1dvh)),2.1rem)}
+#field .tog.yn{min-height:clamp(36px,calc(5.2 * var(--ah,1dvh)),52px)}
+#field .step{width:clamp(40px,calc(5.8 * var(--ah,1dvh)),56px);height:clamp(36px,calc(5.4 * var(--ah,1dvh)),52px);font-size:clamp(1.35rem,calc(2.8 * var(--ah,1dvh)),2rem)}
+#field .cnt{font-size:clamp(1.45rem,calc(3.2 * var(--ah,1dvh)),2.4rem)}
 #field .ctr{padding:2px}
 #field .counters{gap:4px}
-#field .ctr .w{font-size:clamp(1.15rem,2.6dvh,1.8rem)}
-#field .ovl .big{font-size:clamp(1.35rem,3dvh,2.3rem)}
-#field .leave{gap:clamp(2px,0.4dvh,6px);margin-top:0}
-#field .leave-tog{min-height:clamp(32px,4.6dvh,44px);padding-block:clamp(3px,0.4dvh,6px)}
+#field .ctr .w{font-size:clamp(1.15rem,calc(2.6 * var(--ah,1dvh)),1.8rem)}
+#field .ovl .big{font-size:clamp(1.35rem,calc(3 * var(--ah,1dvh)),2.3rem)}
+#field .leave{gap:clamp(2px,calc(0.4 * var(--ah,1dvh)),6px);margin-top:0}
+#field .leave-tog{min-height:clamp(32px,calc(4.6 * var(--ah,1dvh)),44px);padding-block:clamp(3px,calc(0.4 * var(--ah,1dvh)),6px)}
 #field .folOpts{margin-top:0;gap:6px}
 #field .folOpts .frow{gap:2px}
 #field .folOpts .seg2 button{height:26px}
-#field .ph h2{font-size:clamp(.95rem,2dvh,1.2rem)}
-@media (max-height:720px){
-  .app{padding-block:3px;gap:2px}
-  .app .iconbtn{height:40px;min-width:40px}
-  .app .brand{font-size:1.35rem}
-  .app .brand svg{width:34px;height:23px}
-  #field>.result{padding:4px 10px;gap:2px}
-  #field .panel{padding:3px 4px;gap:2px}
-  #field .r-num{font-size:clamp(2.15rem,6.4dvh,3.2rem)}
-}
-@media (max-height:660px){
-  #field.layout,#field>.ctrls{gap:2px}
-  #field>.result{padding-block:3px}
-}
+#field .ph h2{font-size:clamp(.95rem,calc(2 * var(--ah,1dvh)),1.2rem)}
+/* fit-short / fit-tiny are set from the home column height, the same box
+   the rules above scale against. */
+html.fit-short .app{padding-block:3px;gap:2px}
+html.fit-short .app .iconbtn{height:40px;min-width:40px}
+html.fit-short .app .brand{font-size:1.35rem}
+html.fit-short .app .brand svg{width:34px;height:23px}
+html.fit-short #field>.result{padding:4px 10px;gap:2px}
+html.fit-short #field .panel{padding:3px 4px;gap:2px}
+html.fit-short #field .r-num{font-size:clamp(2.15rem,calc(6.4 * var(--ah,1dvh)),3.2rem)}
+html.fit-tiny #field.layout,html.fit-tiny #field>.ctrls{gap:2px}
+html.fit-tiny #field>.result{padding-block:3px}
 @media (min-width:760px) and (orientation:landscape){
   #field.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:stretch}
   #field>.result,#field>.ctrls{min-height:0;overflow:auto}
@@ -543,6 +550,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
         <div class="hlabel"><span>Width (ft)</span><span>Name (optional)</span><span></span></div>
         <div id="headRows" style="display:flex;flex-direction:column;gap:8px"></div>
         <button class="wide" id="addHead" type="button">+ Add a header size</button>
+        <div class="mline" id="mathLine" aria-live="polite"></div>
       </section>
 
       <section class="panel">
@@ -569,7 +577,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 
       <section class="panel">
         <div class="ph"><h2>Auto</h2></div>
-        <button class="tog" type="button" id="autoBtn" aria-pressed="false"><b id="autoBtnLbl">Auto off</b><span id="autoSetNote">Off. Type Current row on the field card.</span></button>
+        <button class="tog" type="button" id="autoBtn" aria-pressed="false"><b id="autoBtnLbl">Auto off</b><span id="autoSetNote"></span></button>
         <div class="ph"><h2>Field axis</h2><small>passes run</small></div>
         <div class="seg2set" id="axisSeg" role="group" aria-label="Field axis">
           <button type="button" data-axis="ns" id="axisNs" aria-pressed="true">North–South</button>
@@ -581,11 +589,6 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <button type="button" data-confirm="100">100 ft</button>
           <button type="button" data-confirm="150">150 ft</button>
         </div>
-      </section>
-
-      <section class="panel">
-        <div class="ph"><h2>How it works it out</h2></div>
-        <div class="math" id="mathBox"></div>
       </section>
 
       <section class="panel">
@@ -627,14 +630,16 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
         </section>
 
         <section class="panel">
-          <div class="ph"><h2>The line count</h2></div>
+          <div class="ph"><h2>How it works it out</h2></div>
           <p class="note">Your GPS lines are spaced at <b>your header width</b>. Everyone's cut counts as <b>header width minus overlap</b>.</p>
-          <p class="note">The field card shows whichever way needs the smaller nudge. The other way is the last line of the breakdown above.</p>
+          <div class="math" id="mathBox"></div>
+          <p class="note">The field card shows whichever way needs the smaller nudge. The other way is the last line of the breakdown above. The same result sits under the headers in Settings and updates as you type.</p>
         </section>
 
         <section class="panel">
           <div class="ph"><h2>Auto distance</h2></div>
           <p class="note">Current row moves only after the phone has traveled this far the new way. A short backup, such as for plugged crop, does not count. Default is 100 ft.</p>
+          <p class="note">If Auto shows <b>allow location</b>, tap Auto off, then on, and allow location.</p>
         </section>
 
         <section class="panel">
@@ -942,9 +947,8 @@ function renderAutoUi(){
   const fieldLine=onLine||((!S.autoAdv&&autoMsg)?autoMsg:'');
   if(note){note.hidden=!fieldLine;note.textContent=fieldLine||'';}
   if(setNote){
-    if(!S.autoAdv)setNote.textContent=autoMsg||'Off. Type Current row on the field card.';
-    else if(!watching)setNote.textContent='On. Tap off, then on, to allow location.';
-    else setNote.textContent=onLine||'On. Current row advances after a real turnaround.';
+    if(!S.autoAdv)setNote.textContent=autoMsg||'';
+    else setNote.textContent=onLine||'Auto on';
   }
 }
 function commitBump(side){
@@ -1264,6 +1268,8 @@ function paintMath(){
     `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
     (c.fromNow?`move = that line count, from the pass you're on now`:`move = lines left standing + 1 (your own pass), from the line you're on now`)+
     `\n\nshown: ${signedMove(c.P.move)} lines${c.P.nudge?', nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}\nother way: ${signedMove(c.Alt.move)} lines${c.Alt.nudge?', nudge '+fmtFtIn(c.Alt.nudge)+' '+dirWord(c.Alt.dir):''}`;
+  const ml=$('mathLine');
+  if(ml)ml.textContent=`${signedMove(c.P.move)} ${Math.abs(c.P.move)===1?'line':'lines'}${c.P.nudge?' · nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}`;
 }
 $('headRows').addEventListener('input',e=>{
   const row=e.target.closest('.hrow');if(!row)return;const h=S.heads.find(x=>x.id===row.dataset.id);if(!h)return;
@@ -1439,8 +1445,55 @@ function setHelp(open,instant){
 $('helpBtn').addEventListener('click',()=>setHelp(true));
 $('helpBack').addEventListener('click',()=>setHelp(false));
 $('helpDone').addEventListener('click',()=>setHelp(false));
+// The home column is sized to the real glass. An iPhone Home Screen app
+// reports innerHeight and 100dvh short by the top inset while screen.height
+// is still the glass. navigator.standalone is iOS only, so Android keeps
+// innerHeight, which already excludes its system bars.
+const insetProbe=document.createElement('div');
+insetProbe.setAttribute('aria-hidden','true');
+insetProbe.style.cssText='position:absolute;visibility:hidden;pointer-events:none;top:0;left:0;width:0;height:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)';
+document.body.appendChild(insetProbe);
+function glassHeight(){
+  const vv=window.visualViewport;
+  let h=window.innerHeight||document.documentElement.clientHeight||0;
+  if(vv)h=Math.max(h,vv.offsetTop+vv.height);
+  if(window.navigator.standalone===true&&window.screen){
+    const a=window.screen.width||0,b=window.screen.height||0;
+    const sh=window.innerWidth>window.innerHeight?Math.min(a,b):Math.max(a,b);
+    if(sh>h&&sh-h<=80)h=sh;
+  }
+  return h;
+}
+function fitHome(){
+  const cs=getComputedStyle(insetProbe);
+  const top=parseFloat(cs.paddingTop)||0,bottom=parseFloat(cs.paddingBottom)||0;
+  // Reach into the home-indicator band and keep the last buttons clear of
+  // the bar itself, which sits in the bottom few points of that band.
+  const reserve=bottom>0?Math.max(8,bottom-16):0;
+  const h=Math.floor(glassHeight()-top-reserve);
+  if(!(h>200))return;
+  // A keyboard opening for Current row should not squish the field under it.
+  const typing=document.activeElement&&document.activeElement.matches&&document.activeElement.matches('input,textarea');
+  const was=parseFloat(document.documentElement.style.getPropertyValue('--app-h'))||0;
+  if(typing&&was&&h<was)return;
+  const root=document.documentElement;
+  root.style.setProperty('--app-h',h+'px');
+  root.style.setProperty('--ah',(h/100).toFixed(2)+'px');
+  root.classList.toggle('fit-short',h<=720);
+  root.classList.toggle('fit-tiny',h<=660);
+}
+function lockHome(on){
+  document.documentElement.classList.toggle('home-lock',!!on);
+}
+fitHome();
+lockHome(true);
+window.addEventListener('resize',fitHome);
+window.addEventListener('orientationchange',()=>{fitHome();setTimeout(fitHome,300);});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',fitHome);
+window.addEventListener('pageshow',fitHome);
 function openSettings(){
   if(!sheetEl.hidden)return;
+  lockHome(false);
   window.scrollTo(0,0);
   setHelp(false,true);
   renderSettings();
@@ -1486,7 +1539,7 @@ function finishClose(){
   $('field').removeAttribute('inert');
   $('setBtn').classList.remove('is-covered');
   S.heads.sort((a,b)=>a.w-b.w);save();renderField();
-  window.scrollTo(0,0);wake();
+  window.scrollTo(0,0);lockHome(true);wake();
 }
 function closeSettings(anim){
   if(sheetEl.hidden)return;
@@ -1611,7 +1664,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.40';
+const APP_VERSION='1.0.41';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
