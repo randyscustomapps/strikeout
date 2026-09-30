@@ -7,6 +7,7 @@ no framework and no server code. **Do not rewrite, reformat or "improve" the fil
 | File | What it is |
 |---|---|
 | `index.html` | The whole app (HTML, CSS and JS in one file) |
+| `privacy.html` | Privacy page. Same site, linked from Settings. |
 | `manifest.webmanifest` | Makes it installable ("Add to Home Screen") |
 | `sw.js` | Service worker, so it works offline |
 | `fonts/` | Self-hosted Barlow and Big Shoulders Display (SIL Open Font License) |

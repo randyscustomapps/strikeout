@@ -2,10 +2,11 @@
 // When you publish an update: bump APP_VERSION in index.html AND "version" in version.json.
 // Bump VERSION to a new cache name that includes that app version so phones drop the old cache.
 // Never add version.json here — the update check must always hit the network.
-const VERSION = 'strikeout-cache-1.0.35';
+const VERSION = 'strikeout-cache-1.0.36';
 const CORE = [
   './',
   './index.html',
+  './privacy.html',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
@@ -34,6 +35,19 @@ self.addEventListener('fetch', e => {
   if (url.pathname.endsWith('/version.json')) return;
   // The app page: network first (so restarts pick up updates), cached copy when there's no signal.
   if (req.mode === 'navigate') {
+    const leaf = url.pathname.split('/').pop();
+    const isApp = leaf === '' || leaf === 'index.html';
+    if (!isApp) {
+      e.respondWith(
+        fetch(req, { cache: 'no-store' })
+          .then(r => {
+            if (r && r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
+            return r;
+          })
+          .catch(() => caches.match(req))
+      );
+      return;
+    }
     e.respondWith(
       fetch(req, { cache: 'no-store' })
         .then(r => { const copy = r.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return r; })

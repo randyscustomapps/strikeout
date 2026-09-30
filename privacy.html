@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2DFA7">
+<meta name="description" content="Strikeout privacy: location is only for the optional Auto line advance. Settings stay on the phone. No ads, no trackers, nothing sent to a server.">
+<title>Privacy — Strikeout</title>
+<style>
+@font-face{font-family:"Barlow";font-style:normal;font-weight:500;font-display:swap;src:url("fonts/barlow-latin-500.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow";font-style:normal;font-weight:600;font-display:swap;src:url("fonts/barlow-latin-600.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/barlow-latin-700.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Big Shoulders Display";font-style:normal;font-weight:800;font-display:swap;src:url("fonts/big-shoulders-display-latin-800.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{color-scheme:light;--bg:#F2DFA7;--ink:#2A1D0A;--muted:#6E5731;--line:#C9A75A}
+@media (prefers-color-scheme: dark){
+  :root{color-scheme:dark;--bg:#0C0904;--ink:#D9BE85;--muted:#8F7A52;--line:#35291A}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow","Segoe UI",Roboto,system-ui,sans-serif;font-size:1.125rem;line-height:1.45}
+main{max-width:40rem;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(36px + env(safe-area-inset-bottom,0px))}
+.brand{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:1.4rem;margin:0 0 8px}
+h1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:3rem;line-height:.9;margin:0 0 16px}
+h2{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:800;letter-spacing:.05em;text-transform:uppercase;font-size:1.45rem;margin:1.4rem 0 .35rem}
+p{margin:0 0 .9rem;max-width:62ch}
+a{color:var(--ink);font-weight:700}
+.back{display:inline-block;margin-top:8px;padding-top:12px;border-top:2px solid var(--line)}
+</style>
+</head>
+<body>
+<main>
+  <p class="brand">Strikeout</p>
+  <h1>Privacy</h1>
+  <p>Strikeout runs on your phone. This is what it does with information, in plain words.</p>
+  <h2>Location</h2>
+  <p>Location is used only for the optional Auto line advance. Auto watches how far you have driven along the field so the current row can move after a real turnaround. If Auto is off, Strikeout does not use location.</p>
+  <h2>On this phone</h2>
+  <p>Header sizes, crew counts, the current row, and the rest of your field setup stay on this phone. They are not uploaded. Updating the app refreshes the files and leaves that setup where it is.</p>
+  <h2>No ads, no trackers</h2>
+  <p>There are no ads and no trackers. Nothing is sent to a server — not your numbers, not your location, not a name. There is no account to sign in to.</p>
+  <p class="back"><a href="./">Back to Strikeout</a></p>
+</main>
+</body>
+</html>
