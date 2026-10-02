@@ -316,11 +316,9 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .leave-lab{font-size:clamp(1rem,calc(2.3 * var(--ah,1dvh)),1.6rem)}
 #field .leave-sum{font-size:clamp(.95rem,calc(2.1 * var(--ah,1dvh)),1.45rem)}
 #field .leave-chev{width:clamp(22px,calc(3 * var(--ah,1dvh)),32px);height:clamp(22px,calc(3 * var(--ah,1dvh)),32px)}
-/* Not following: keep Didn't follow out of sight, but hold the closed row's
-   box so the field does not collapse and refit. An open per-size breakdown
-   stays folded; the blank slot matches that closed row. */
-#field .leave.is-held{visibility:hidden;pointer-events:none}
-#field .leave.is-held .leave-panel{display:none !important}
+/* Not following: Didn't follow stays in this slot, gray and not tappable. */
+#field .leave.is-off{opacity:.5;filter:grayscale(1);pointer-events:none}
+#field .leave.is-off .leave-tog{cursor:default}
 #field .folOpts{margin-top:0;gap:6px}
 #field .folOpts .frow{gap:2px}
 #field .folOpts .flab{font-size:clamp(.66rem,calc(1.3 * var(--ah,1dvh)),.95rem)}
@@ -631,8 +629,8 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <div class="ph"><h2>How to use it</h2></div>
           <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
           <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
-          <p class="note"><b>Not following</b> — you go out alone. Count the others on the rows below. <b>Didn’t follow</b> stays hidden, because nobody is with you and those counts are not added again.</p>
-          <p class="note"><b>Didn’t follow</b> — only while <b>Following me</b>, for the ones who peeled off. Tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
+          <p class="note"><b>Not following</b> — you go out alone. Count the others on the rows below. <b>Didn’t follow</b> stays in place but grayed out, and those counts are not added again.</p>
+          <p class="note"><b>Didn’t follow</b> — while <b>Following me</b>, for the ones who peeled off. Tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it. Under <b>Not following</b> that row is still there, just not tappable.</p>
           <p class="note"><b>Settings</b> — slides in from the right. Drag it back the same way. Halfway across, or a quick flick, finishes it. Let go earlier and it springs back. Same as the <b>back arrow</b>. A vertical drag still scrolls.</p>
           <p class="note"><b>Help</b> and <b>Privacy</b> — slide in over Settings and drag back the same way, straight to Settings.</p>
           <p class="note"><b>Overlap</b> — one row on the field showing each head and the total. Tap it to open the − and + buttons, tap again to fold it away.</p>
@@ -1153,19 +1151,19 @@ function renderField(){
     </div>`;}).join('');
   const leaveBits=[];
   S.heads.forEach(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);if(n>0)leaveBits.push(ftTxt(h.w)+'×'+n);});
-  // Not following folds the breakdown so the held slot is the closed row.
-  if(S.mode!=='double')leaveOpen=false;
+  const folOn=S.mode==='double';
   $('leaveBox').classList.toggle('is-open',leaveOpen);
   const leaveTog=$('leaveTog');
+  leaveTog.disabled=!folOn;
   leaveTog.setAttribute('aria-expanded',leaveOpen?'true':'false');
   leaveTog.classList.toggle('has',leaveBits.length>0);
   $('leaveSum').textContent=leaveBits.length?leaveBits.join(' · '):'0';
-  $('leaveCounters').innerHTML=leaveOpen?S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);return `
+  $('leaveCounters').innerHTML=leaveOpen?S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);const off=folOn?'':'disabled';return `
     <div class="ctr ${n?'has':''}">
       <div class="nm"><span class="w">${ftTxt(h.w)}</span></div>
-      <button class="step" type="button" data-leavedec="${h.id}" aria-label="One less ${ftTxt(h.w)} who didn’t follow" ${n?'':'disabled'}>−</button>
+      <button class="step" type="button" data-leavedec="${h.id}" aria-label="One less ${ftTxt(h.w)} who didn’t follow" ${n&&folOn?'':'disabled'}>−</button>
       <span class="cnt">${n}</span>
-      <button class="step" type="button" data-leaveinc="${h.id}" aria-label="One more ${ftTxt(h.w)} who didn’t follow">+</button>
+      <button class="step" type="button" data-leaveinc="${h.id}" aria-label="One more ${ftTxt(h.w)} who didn’t follow" ${off}>+</button>
     </div>`;}).join(''):'';
   const c=calc();
   $('folTotal').textContent=`me: ${ftTxt(c.ld.w)}`+(c.folN?` + ${c.folN} other${c.folN===1?'':'s'}`:' only');
@@ -1175,13 +1173,11 @@ function renderField(){
   $('ovlTog').setAttribute('aria-expanded',ovlOpen?'true':'false');
   $('ovlMinus').disabled=S.overlapIn<=0;
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
-  const folOn=S.mode==='double';
   $('folOpts').hidden=!folOn;
   const leaveBox=$('leaveBox');
-  leaveBox.hidden=false;
-  leaveBox.classList.toggle('is-held',!folOn);
-  if(folOn)leaveBox.removeAttribute('aria-hidden');
-  else leaveBox.setAttribute('aria-hidden','true');
+  leaveBox.classList.toggle('is-off',!folOn);
+  if(folOn)leaveBox.removeAttribute('aria-disabled');
+  else leaveBox.setAttribute('aria-disabled','true');
   if(S.folSkip===undefined)S.folSkip=true;
   document.querySelectorAll('[data-folside]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.folside===(S.folSide||'right')));
   document.querySelectorAll('[data-folskip]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.folskip==='1')===!!S.folSkip));
@@ -1208,15 +1204,17 @@ document.getElementById('field').addEventListener('click',e=>{
     resetTrack();
   }
   else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
-  else if(b.id==='leaveTog'){leaveOpen=!leaveOpen;}
+  else if(b.id==='leaveTog'){if(S.mode!=='double')return;leaveOpen=!leaveOpen;}
   else if(b.id==='ovlTog'){ovlOpen=!ovlOpen;}
   else if(b.dataset.leaveinc){
+    if(S.mode!=='double')return;
     const id=b.dataset.leaveinc;
     if(!S.heads.some(h=>h.id===id))return;
     if(!S.leaveCounts||typeof S.leaveCounts!=='object')S.leaveCounts={};
     S.leaveCounts[id]=Math.min(99,clampLeave(S.leaveCounts[id])+1);
   }
   else if(b.dataset.leavedec){
+    if(S.mode!=='double')return;
     const id=b.dataset.leavedec;
     if(!S.leaveCounts)return;
     S.leaveCounts[id]=Math.max(0,clampLeave(S.leaveCounts[id])-1);
