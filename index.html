@@ -784,6 +784,16 @@ function fmtFtIn(inches){
 function fmtIn(i){return (i%1===0?i.toFixed(0):i.toFixed(1))+'"';}
 function ftTxt(w){return (w%1===0?w.toFixed(0):w.toFixed(1))+"'";}
 function lead(){return S.heads.find(h=>h.id===S.lead)||S.heads[0];}
+// Settings "My header" chips: one per width. Named crew rows can still share a size.
+function leadSizes(){
+  const ld=lead(),seen=new Set(),out=[];
+  S.heads.forEach(h=>{
+    if(seen.has(h.w))return;
+    seen.add(h.w);
+    out.push(ld&&ld.w===h.w?ld:h);
+  });
+  return out;
+}
 
 function calc(){
   const ld=lead();const L=ld.w*12;const o=S.overlapIn;
@@ -1211,7 +1221,7 @@ let leaveOpen=false,ovlOpen=false;
 function renderField(){
   $('turnL').innerHTML=uturnL+'<b>Left</b>';$('turnR').innerHTML='<b>Right</b>'+uturnR;
   // lead chips
-  const lc=$('leadChips');if(lc)lc.innerHTML=S.heads.map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}" title="${esc(h.label)}">${ftTxt(h.w)}</button>`).join('');
+  const lc=$('leadChips');if(lc)lc.innerHTML=leadSizes().map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}" title="${esc(h.label)}">${ftTxt(h.w)}</button>`).join('');
   // counters
   $('counters').innerHTML=S.heads.map(h=>{const n=S.counts[h.id]||0;return `
     <div class="ctr ${n?'has':''}">
@@ -1358,7 +1368,7 @@ $('dimBtn').addEventListener('click',()=>{S.dim=!S.dim;save();applyTheme();});
 
 // settings
 function renderSettings(){
-  $('leadChips').innerHTML=S.heads.map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}">${ftTxt(h.w)}</button>`).join('');
+  $('leadChips').innerHTML=leadSizes().map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}">${ftTxt(h.w)}</button>`).join('');
   $('headRows').innerHTML=S.heads.map(h=>`
     <div class="hrow" data-id="${h.id}">
       <input class="wft" id="w-${h.id}" type="number" inputmode="decimal" min="5" max="80" step="0.5" value="${h.w}" aria-label="Header width in feet">
@@ -1392,7 +1402,7 @@ $('headRows').addEventListener('input',e=>{
   if(e.target.classList.contains('wft')){const v=parseFloat(e.target.value);if(v>0&&v<=100){h.w=v;}}
   else{h.label=e.target.value;}
   save();
-  $('leadChips').innerHTML=S.heads.map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}">${ftTxt(h.w)}</button>`).join('');
+  $('leadChips').innerHTML=leadSizes().map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}">${ftTxt(h.w)}</button>`).join('');
   paintMath();
 });
 $('headRows').addEventListener('click',e=>{
@@ -1877,7 +1887,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.48';
+const APP_VERSION='1.0.49';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
