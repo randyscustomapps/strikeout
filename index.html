@@ -193,9 +193,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .seg3 button{height:60px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1.05rem;cursor:pointer}
 .seg3 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
-.seg2set{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.seg2set button{height:60px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1.02rem;cursor:pointer;padding:0 6px}
-.seg2set button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .note{color:var(--muted);font-size:.95rem;margin:0;max-width:62ch;user-select:text;-webkit-user-select:text}
 .note b{color:var(--ink)}
 .note a{color:var(--ink);font-weight:700}
@@ -589,11 +586,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
       <section class="panel">
         <div class="ph"><h2>Auto</h2></div>
         <button class="tog" type="button" id="autoBtn" aria-pressed="false"><b id="autoBtnLbl">Auto off</b><span id="autoSetNote"></span></button>
-        <div class="ph"><h2>Field axis</h2><small>passes run</small></div>
-        <div class="seg2set" id="axisSeg" role="group" aria-label="Field axis">
-          <button type="button" data-axis="ns" id="axisNs" aria-pressed="true">North–South</button>
-          <button type="button" data-axis="ew" id="axisEw" aria-pressed="false">East–West</button>
-        </div>
+        <p class="note" id="axisNote">Pass direction follows GPS heading. Until a heading arrives, Auto keeps the last one.</p>
         <div class="ph"><h2>Auto advance confirms after</h2><small>new direction</small></div>
         <div class="seg3" id="confirmSeg">
           <button type="button" data-confirm="50">50 ft</button>
@@ -633,7 +626,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <p class="note"><b>Overlap</b> — one row on the field showing each head and the total. Tap it to open the − and + buttons, tap again to fold it away.</p>
           <p class="note"><b>Turn</b> — the way you turn off the pass you're driving. North, then east to come back south, is <b>Right</b>.</p>
           <p class="note"><b>Count from the line you're on now,</b> including the first pass. On 78 and it says <b>+5</b>? Go to 83, or 73 if the numbers count down. Enter <b>Current row</b>, then <b>Count up</b> or <b>Count down</b>. <b>Go to</b> is that line plus or minus the move.</p>
-          <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there, and pick <b>North–South</b> or <b>East–West</b>. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
+          <p class="note"><b>Auto</b> lives in Settings and starts on for a new install. Turn it on or off there. Auto reads which way the passes run, <b>North–South</b> or <b>East–West</b>, from the GPS heading, so there is nothing to set. Until a heading arrives it keeps the last direction. The field shows a one-line status only while Auto is on. After a real turnaround, Current row advances once you’ve gone the confirm distance the new way. A short reverse does not. If location is denied, Auto turns off and the typed row still works. On iPhone, choose <b>Allow While Using App</b> (not Allow Once) the first time.</p>
           <p class="note"><b>Quick check</b> when every header matches yours. <b>Following + Skip:</b> 2 × others + 1 (two others → <b>+5</b>, four others → <b>+9</b>). <b>Outside</b> or <b>Not following:</b> others + 1 (three others → <b>+4</b>, four others → <b>+5</b>). Mixed sizes: use the card. A leftover strip is not always fixed by more lines.</p>
           <p class="note"><b>Nudge</b> is left or right <i>after</i> the turn, on the new heading, so it matches the GPS arrows. Farther out is away from cut land; back in is toward it. Add it to any nudge already set.</p>
         </section>
@@ -659,7 +652,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 
         <section class="panel">
           <div class="ph"><h2>On this phone</h2></div>
-          <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, field axis, auto, Didn’t follow, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
+          <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, last pass direction, auto, Didn’t follow, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
           <p class="note">Location is only for Auto. Your setup stays on this phone.</p>
           <p class="note"><b>Keep screen on</b> stops the phone going to sleep in field mode. <b>Extra-dim night</b> is darker still, for pitch-black nights.</p>
         </section>
@@ -897,8 +890,10 @@ function paintTarget(move){
   if(dn)dn.setAttribute('aria-pressed',S.lineDir==='down');
 }
 
-// Auto advance: GPS travel along the field axis. A reverse counts only after
-// confirmFt of movement the new way. Stopped or short backups add no distance.
+// Auto advance: GPS travel along the pass axis. The axis comes from GPS heading
+// (North–South or East–West). A reverse counts only after confirmFt of movement
+// the new way. Stopped or short backups add no distance. fieldAxis in
+// strikeout.v1 is the last axis, kept when heading is missing.
 function normDeg(d){d%=360;if(d<0)d+=360;return d;}
 function angDiff(a,b){const d=Math.abs(normDeg(a)-normDeg(b))%360;return d>180?360-d:d;}
 function axisSide(h,axis){
@@ -911,6 +906,30 @@ function axisSide(h,axis){
   if(angDiff(h,0)<=50)return 'n';
   if(angDiff(h,180)<=50)return 's';
   return null;
+}
+function currentAxis(){return S.fieldAxis==='ew'?'ew':'ns';}
+function axisWord(ax){return ax==='ew'?'E–W':'N–S';}
+function axisName(ax){return ax==='ew'?'East–West':'North–South';}
+function axisOfSide(side){return (side==='e'||side==='w')?'ew':'ns';}
+// Closer cardinal axis. An exact diagonal is neither, so a turn in between
+// the two axes does not flip the pass.
+function detectAxis(h){
+  if(!Number.isFinite(h))return null;
+  const ns=Math.min(angDiff(h,0),angDiff(h,180));
+  const ew=Math.min(angDiff(h,90),angDiff(h,270));
+  if(ns===ew)return null;
+  return ns<ew?'ns':'ew';
+}
+function gpsHeading(fix){
+  const h=fix&&fix.heading;
+  if(typeof h==='number'&&Number.isFinite(h)&&h>=0&&h<=360)return normDeg(h);
+  return null;
+}
+function adoptAxis(ax){
+  if(ax!=='ns'&&ax!=='ew')return;
+  if(S.fieldAxis===ax)return;
+  S.fieldAxis=ax;
+  save();
 }
 function metersBetween(a,b){
   const R=6371000,p1=a.lat*Math.PI/180,p2=b.lat*Math.PI/180;
@@ -926,10 +945,12 @@ function bearingDeg(a,b){
 }
 function confirmMeters(){return (S.confirmFt||100)*0.3048;}
 function sideWord(side){return {n:'north',s:'south',e:'east',w:'west'}[side]||'';}
-let geoId=null,oriOn=false,watching=false,autoGen=0,autoMsg='',geoWeak=false;
+let geoId=null,oriOn=false,watching=false,autoGen=0,autoMsg='',geoWeak=false,axisFromGps=false;
 let passSide=null,pendingSide=null,pendingM=0,lockSide=null,lockM=0,lastFix=null;
+let passRun=0,shiftSide=null,shiftM=0,axisSticky=false;
 function resetTrack(){
   passSide=null;pendingSide=null;pendingM=0;lockSide=null;lockM=0;lastFix=null;
+  passRun=0;shiftSide=null;shiftM=0;axisSticky=false;
 }
 function stopSensors(){
   watching=false;
@@ -942,6 +963,7 @@ function stopSensors(){
   }
   resetTrack();
   geoWeak=false;
+  axisFromGps=false;
 }
 function headingFromOri(e){
   if(!e)return null;
@@ -956,23 +978,28 @@ function autoStatusText(){
   if(autoMsg)return autoMsg;
   if(!watching)return 'Auto on · allow location in Settings';
   if(geoWeak)return 'Auto on · GPS weak';
+  const ax=axisWord(currentAxis());
+  if(!axisFromGps){
+    // Compass only hints a direction already on the saved axis. It never
+    // picks the axis — a phone in the cab is not the combine's heading.
+    const hinted=lastCompass==null?null:axisSide(lastCompass,currentAxis());
+    if(hinted)return 'Auto on · '+ax+' · headed '+sideWord(hinted);
+    return 'Auto on · '+ax+' · waiting for heading';
+  }
+  if(shiftSide)return 'Auto on · '+ax+' · turning';
   if(!passSide){
     const ft=Math.min(S.confirmFt,Math.round(lockM/0.3048));
-    if(lockSide)return 'Auto on · headed '+sideWord(lockSide)+' · '+ft+' / '+S.confirmFt+' ft';
-    const hinted=lastCompass==null?null:axisSide(lastCompass,S.fieldAxis==='ew'?'ew':'ns');
-    if(hinted)return 'Auto on · headed '+sideWord(hinted);
-    return 'Auto on · drive to learn direction';
+    if(lockSide)return 'Auto on · '+ax+' · headed '+sideWord(lockSide)+' · '+ft+' / '+S.confirmFt+' ft';
+    return 'Auto on · '+ax+' · drive to learn direction';
   }
   if(pendingSide){
     const ft=Math.min(S.confirmFt,Math.round(pendingM/0.3048));
-    return 'Auto on · headed '+sideWord(pendingSide)+' · '+ft+' / '+S.confirmFt+' ft';
+    return 'Auto on · '+ax+' · headed '+sideWord(pendingSide)+' · '+ft+' / '+S.confirmFt+' ft';
   }
-  return 'Auto on · headed '+sideWord(passSide);
+  return 'Auto on · '+ax+' · headed '+sideWord(passSide);
 }
 function renderAutoUi(){
-  const ns=$('axisNs'),ew=$('axisEw'),btn=$('autoBtn'),note=$('autoNote'),setNote=$('autoSetNote'),lbl=$('autoBtnLbl');
-  if(ns)ns.setAttribute('aria-pressed',S.fieldAxis!=='ew');
-  if(ew)ew.setAttribute('aria-pressed',S.fieldAxis==='ew');
+  const btn=$('autoBtn'),note=$('autoNote'),setNote=$('autoSetNote'),lbl=$('autoBtnLbl'),axisNote=$('axisNote');
   if(btn)btn.setAttribute('aria-pressed',!!S.autoAdv);
   if(lbl)lbl.textContent=S.autoAdv?'Auto on':'Auto off';
   const onLine=S.autoAdv?autoStatusText():'';
@@ -982,11 +1009,20 @@ function renderAutoUi(){
     if(!S.autoAdv)setNote.textContent=autoMsg||'';
     else setNote.textContent=onLine||'Auto on';
   }
+  if(axisNote){
+    const name=axisName(currentAxis());
+    axisNote.textContent=axisFromGps
+      ?'Pass direction from GPS heading: '+name+'.'
+      :'Pass direction follows GPS heading. Until a heading arrives, Auto keeps '+name+'.';
+  }
   fitScale();
 }
 function commitBump(side){
   const editing=document.activeElement&&document.activeElement.id==='lineNowIn';
-  passSide=side;pendingSide=null;pendingM=0;lockSide=null;lockM=0;
+  passSide=side;
+  passRun=pendingM>0?pendingM:confirmMeters();
+  pendingSide=null;pendingM=0;lockSide=null;lockM=0;shiftSide=null;shiftM=0;
+  axisSticky=true;
   if(editing){renderAutoUi();return;}
   const now=lineNowNum();
   const move=calc().P.move;
@@ -1014,18 +1050,50 @@ function onFix(pos){
   const minD=speedKnown?4:8;
   if(d<minD)return;
   if(d>250){lastFix=fix;renderAutoUi();return;}
-  const heading=bearingDeg(lastFix,fix);
+  const gpsH=gpsHeading(fix);
+  const heading=gpsH!=null?gpsH:bearingDeg(lastFix,fix);
   lastFix=fix;
-  const side=axisSide(heading,S.fieldAxis==='ew'?'ew':'ns');
+  applyCourse(heading,d);
+}
+// Prefer coords.heading. The movement bearing is the fallback when the
+// phone has no course. Until the first turnaround, a longer run on the other
+// axis takes over without advancing the row. After that, a headland does not.
+function applyCourse(heading,d){
+  const detected=detectAxis(heading);
+  if(!detected){renderAutoUi();return;}
+  const side=axisSide(heading,detected);
   if(!side){renderAutoUi();return;}
+  axisFromGps=true;
   if(!passSide){
+    shiftSide=null;shiftM=0;
+    adoptAxis(detected);
     if(side===lockSide)lockM+=d;
     else{lockSide=side;lockM=d;}
-    if(lockM>=confirmMeters()){passSide=lockSide;lockSide=null;lockM=0;}
+    if(lockM>=confirmMeters()){passSide=lockSide;passRun=lockM;lockSide=null;lockM=0;}
     renderAutoUi();
     return;
   }
+  if(axisOfSide(passSide)!==detected){
+    if(side===shiftSide)shiftM+=d;
+    else{shiftSide=side;shiftM=d;}
+    // Before the first real turnaround, a longer run on the other axis
+    // (the pass, after a headland was learned first) takes over. After a
+    // reverse, the axis stays put so the turn at the end does not.
+    if(!axisSticky&&shiftM>=confirmMeters()&&shiftM>passRun){
+      adoptAxis(detected);
+      passSide=side;
+      passRun=shiftM;
+      pendingSide=null;pendingM=0;
+      lockSide=null;lockM=0;
+      shiftSide=null;shiftM=0;
+    }
+    renderAutoUi();
+    return;
+  }
+  shiftSide=null;shiftM=0;
+  adoptAxis(detected);
   if(side===passSide){
+    passRun+=d;
     if(pendingSide){pendingSide=null;pendingM=0;}
     renderAutoUi();
     return;
@@ -1269,12 +1337,6 @@ $('autoBtn').addEventListener('click',()=>{
   if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
   if(S.autoAdv){autoGen++;S.autoAdv=false;autoMsg='';stopSensors();save();renderAutoUi();}
   else void startAuto();
-});
-$('axisSeg').addEventListener('click',e=>{
-  const b=e.target.closest('[data-axis]');if(!b)return;
-  const ax=b.dataset.axis==='ew'?'ew':'ns';
-  if(ax!==S.fieldAxis){S.fieldAxis=ax;resetTrack();}
-  save();renderAutoUi();
 });
 $('dimBtn').addEventListener('click',()=>{S.dim=!S.dim;save();applyTheme();});
 
@@ -1799,7 +1861,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.45';
+const APP_VERSION='1.0.46';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
