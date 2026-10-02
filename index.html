@@ -316,6 +316,11 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .leave-lab{font-size:clamp(1rem,calc(2.3 * var(--ah,1dvh)),1.6rem)}
 #field .leave-sum{font-size:clamp(.95rem,calc(2.1 * var(--ah,1dvh)),1.45rem)}
 #field .leave-chev{width:clamp(22px,calc(3 * var(--ah,1dvh)),32px);height:clamp(22px,calc(3 * var(--ah,1dvh)),32px)}
+/* Not following: keep Didn't follow out of sight, but hold the closed row's
+   box so the field does not collapse and refit. An open per-size breakdown
+   stays folded; the blank slot matches that closed row. */
+#field .leave.is-held{visibility:hidden;pointer-events:none}
+#field .leave.is-held .leave-panel{display:none !important}
 #field .folOpts{margin-top:0;gap:6px}
 #field .folOpts .frow{gap:2px}
 #field .folOpts .flab{font-size:clamp(.66rem,calc(1.3 * var(--ah,1dvh)),.95rem)}
@@ -1148,6 +1153,8 @@ function renderField(){
     </div>`;}).join('');
   const leaveBits=[];
   S.heads.forEach(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);if(n>0)leaveBits.push(ftTxt(h.w)+'×'+n);});
+  // Not following folds the breakdown so the held slot is the closed row.
+  if(S.mode!=='double')leaveOpen=false;
   $('leaveBox').classList.toggle('is-open',leaveOpen);
   const leaveTog=$('leaveTog');
   leaveTog.setAttribute('aria-expanded',leaveOpen?'true':'false');
@@ -1170,7 +1177,11 @@ function renderField(){
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   const folOn=S.mode==='double';
   $('folOpts').hidden=!folOn;
-  $('leaveBox').hidden=!folOn;
+  const leaveBox=$('leaveBox');
+  leaveBox.hidden=false;
+  leaveBox.classList.toggle('is-held',!folOn);
+  if(folOn)leaveBox.removeAttribute('aria-hidden');
+  else leaveBox.setAttribute('aria-hidden','true');
   if(S.folSkip===undefined)S.folSkip=true;
   document.querySelectorAll('[data-folside]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.folside===(S.folSide||'right')));
   document.querySelectorAll('[data-folskip]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.folskip==='1')===!!S.folSkip));
@@ -1799,7 +1810,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.45';
+const APP_VERSION='1.0.46';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
