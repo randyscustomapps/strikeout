@@ -626,8 +626,8 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <div class="ph"><h2>How to use it</h2></div>
           <p class="note"><b>Other combines</b> — everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
           <p class="note"><b>Following me.</b> <b>Following on</b> is their side (usually Right). <b>Skip</b> jumps over the pack: followers out, then the whole crew back. <b>Outside</b> leaves room for the followers only, so the crop stays outside.</p>
-          <p class="note"><b>Not following</b> — you go out alone. Use <b>Didn’t follow</b> for the others only, not yourself.</p>
-          <p class="note"><b>Didn’t follow</b> — tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
+          <p class="note"><b>Not following</b> — you go out alone. Count the others on the rows below. <b>Didn’t follow</b> stays hidden, because nobody is with you and those counts are not added again.</p>
+          <p class="note"><b>Didn’t follow</b> — only while <b>Following me</b>, for the ones who peeled off. Tap the row to open it, then set each header size (a 35' and a 40' can both be on). Each size’s cut is added once, like Outside, not as a full Skip pack jump. Tap the row again to close it.</p>
           <p class="note"><b>Settings</b> — slides in from the right. Drag it back the same way. Halfway across, or a quick flick, finishes it. Let go earlier and it springs back. Same as the <b>back arrow</b>. A vertical drag still scrolls.</p>
           <p class="note"><b>Help</b> and <b>Privacy</b> — slide in over Settings and drag back the same way, straight to Settings.</p>
           <p class="note"><b>Overlap</b> — one row on the field showing each head and the total. Tap it to open the − and + buttons, tap again to fold it away.</p>
@@ -803,16 +803,22 @@ function calc(){
     else gap=folSum;
   }else gap=folSum;
   const liveGap=gap;
-  // Didn't follow: each size's cut × that size's count, added once (Outside-style).
+  // Didn't follow: only while Following me, for the subset that peeled off.
+  // Each size's cut × that size's count, added once (Outside-style).
   // These ghosts are not Skip-pack followers.
+  // Not following already means the whole crew stayed back — those machines
+  // are the other-combine counts. Leave the stored leave counts alone, but
+  // do not add them again.
   let leaveN=0,leaveCut=0;
   const leaveBits=[];
-  const lc=S.leaveCounts||{};
-  S.heads.forEach(h=>{
-    const n=clampLeave(lc[h.id]);
-    if(n>0){leaveN+=n;leaveCut+=n*eff(h.w);leaveBits.push(n+' × '+ftTxt(h.w));}
-  });
-  if(leaveCut)gap+=leaveCut;
+  if(S.mode==='double'){
+    const lc=S.leaveCounts||{};
+    S.heads.forEach(h=>{
+      const n=clampLeave(lc[h.id]);
+      if(n>0){leaveN+=n;leaveCut+=n*eff(h.w);leaveBits.push(n+' × '+ftTxt(h.w));}
+    });
+    if(leaveCut)gap+=leaveCut;
+  }
   const leaveTxt=leaveBits.join(' + ');
   const N=Math.floor(gap/L+1e-9);const rem=gap-N*L;
   // +lines is added to the GPS line you're driving now, including the first pass.
@@ -1164,6 +1170,7 @@ function renderField(){
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   const folOn=S.mode==='double';
   $('folOpts').hidden=!folOn;
+  $('leaveBox').hidden=!folOn;
   if(S.folSkip===undefined)S.folSkip=true;
   document.querySelectorAll('[data-folside]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.folside===(S.folSide||'right')));
   document.querySelectorAll('[data-folskip]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.folskip==='1')===!!S.folSkip));
@@ -1792,7 +1799,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.44';
+const APP_VERSION='1.0.45';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
