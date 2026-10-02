@@ -584,6 +584,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <button type="button" data-theme-pick="day">Day</button>
           <button type="button" data-theme-pick="night">Night</button>
         </div>
+        <p class="note">Auto follows sunrise and sunset from location. It does not use the light sensor.</p>
         <div class="two">
           <button class="tog" type="button" id="wakeBtn"><b>Keep screen on</b><span id="wakeNote"></span></button>
           <button class="tog" type="button" id="dimBtn"><b>Extra-dim night</b></button>
@@ -660,7 +661,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
         <section class="panel">
           <div class="ph"><h2>On this phone</h2></div>
           <p class="note">Your settings stay on this phone — headers, counts, current row, count direction, last pass direction, auto, Didn’t follow, Following on, Skip/Outside, theme, and the rest. They survive offline use and Update now. Only <b>Reset everything</b> clears them.</p>
-          <p class="note">Location is only for Auto. Your setup stays on this phone.</p>
+          <p class="note">Location is for Auto row advance, and for Screen set to Auto so day and night follow sunrise and sunset. It does not use the light sensor. Your setup stays on this phone.</p>
           <p class="note"><b>Keep screen on</b> stops the phone going to sleep in field mode. <b>Extra-dim night</b> is darker still, for pitch-black nights.</p>
         </section>
       </div>
@@ -1056,6 +1057,7 @@ function onFix(pos){
   if(!S.autoAdv||!watching)return;
   const c=pos&&pos.coords;
   if(!c||!Number.isFinite(c.latitude)||!Number.isFinite(c.longitude))return;
+  noteSun(c.latitude,c.longitude);
   const acc=Number.isFinite(c.accuracy)?c.accuracy:999;
   if(acc>100){geoWeak=true;renderAutoUi();return;}
   geoWeak=false;
@@ -1129,6 +1131,7 @@ function onGeoErr(err){
     stopSensors();
     save();
     renderAutoUi();
+    void syncThemeGeo();
     return;
   }
   geoWeak=true;
@@ -1163,6 +1166,7 @@ async function attachCompassIfGranted(){
 }
 function beginWatch(listenOri){
   stopSensors();
+  stopThemeWatch();
   watching=true;
   if(listenOri)attachOri();
   try{
@@ -1177,6 +1181,7 @@ function beginWatch(listenOri){
   }
   renderAutoUi();
   if(!oriOn&&watching)void attachCompassIfGranted();
+  if(!watching)void syncThemeGeo();
 }
 function startAuto(){
   autoGen++;
@@ -1326,9 +1331,104 @@ $('lineNowIn').addEventListener('input',()=>{
 $('lineNowIn').addEventListener('focusout',()=>syncLineInput(true));
 $('lineNowIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.target.blur();}});
 
+// Screen Auto: sunrise/sunset from GPS. Not the phone light sensor.
+// Coords stay in memory. They are not written into strikeout.v1.
+let sunLat=null,sunLng=null,sunNight=null,themeGeoId=null,sunArmed=false,themeGeoBusy=false,sunPermListening=false;
+function solarEvent(lat,lng,when,rise){
+  const rad=Math.PI/180,deg=180/Math.PI,zenith=90.833;
+  const y=when.getFullYear(),mo=when.getMonth(),day=when.getDate();
+  const N=Math.floor((Date.UTC(y,mo,day)-Date.UTC(y,0,0))/86400000);
+  const lngHour=lng/15;
+  const t=N+(((rise?6:18)-lngHour)/24);
+  const M=(0.9856*t)-3.289;
+  let L=normDeg(M+(1.916*Math.sin(M*rad))+(0.020*Math.sin(2*M*rad))+282.634);
+  let RA=normDeg(Math.atan(0.91764*Math.tan(L*rad))*deg);
+  const Lq=Math.floor(L/90)*90,RAq=Math.floor(RA/90)*90;
+  RA=(RA+(Lq-RAq))/15;
+  const sinDec=0.39782*Math.sin(L*rad);
+  const cosDec=Math.cos(Math.asin(sinDec));
+  const cosH=(Math.cos(zenith*rad)-(sinDec*Math.sin(lat*rad)))/(cosDec*Math.cos(lat*rad));
+  if(!Number.isFinite(cosH))return false;
+  if(cosH>1)return false;
+  if(cosH<-1)return true;
+  const H=(rise?(360-Math.acos(cosH)*deg):(Math.acos(cosH)*deg))/15;
+  const T=H+RA-(0.06571*t)-6.622;
+  const approx=(rise?6:18)-lngHour;
+  let UT=T-lngHour,guard=0;
+  while(UT-approx>12&&guard++<4)UT-=24;
+  while(approx-UT>12&&guard++<8)UT+=24;
+  const noon=new Date(y,mo,day,12,0,0,0);
+  const off=-noon.getTimezoneOffset()/60;
+  const local=new Date(y,mo,day,0,0,0,0);
+  local.setTime(local.getTime()+Math.round((UT+off)*3600000));
+  return local;
+}
+function solarIsNight(lat,lng,when){
+  const rise=solarEvent(lat,lng,when,true),set=solarEvent(lat,lng,when,false);
+  if(rise===true||set===true)return false;
+  if(rise===false||set===false)return true;
+  return when<rise||when>=set;
+}
+function noteSun(lat,lng){
+  if(!Number.isFinite(lat)||!Number.isFinite(lng))return;
+  sunLat=lat;sunLng=lng;
+  if(S.theme==='day'||S.theme==='night')return;
+  const night=solarIsNight(lat,lng,new Date());
+  if(night===sunNight)return;
+  sunNight=night;
+  applyTheme();
+}
+function refreshSun(){
+  if(S.theme==='day'||S.theme==='night'||sunLat==null)return;
+  const night=solarIsNight(sunLat,sunLng,new Date());
+  if(night===sunNight)return;
+  sunNight=night;
+  applyTheme();
+}
+function stopThemeWatch(){
+  if(themeGeoId!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(themeGeoId);}catch(e){}}
+  themeGeoId=null;
+}
+function armSun(){
+  if(sunArmed)return;
+  sunArmed=true;
+  setInterval(refreshSun,60000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshSun();void syncThemeGeo();}});
+}
+// Ask for a fix only when Screen is Auto and the row-advance watch is not
+// already running. If that watch is about to prompt, wait for its grant —
+// a second request before Allow is what left Auto day/night without a fix.
+async function syncThemeGeo(){
+  if(S.theme==='day'||S.theme==='night'){stopThemeWatch();return;}
+  armSun();
+  if(watching){stopThemeWatch();if(lastFix)noteSun(lastFix.lat,lastFix.lng);return;}
+  if(!navigator.geolocation||themeGeoId!=null||themeGeoBusy)return;
+  themeGeoBusy=true;
+  let state='unknown',perm=null;
+  try{
+    if(navigator.permissions&&navigator.permissions.query){
+      perm=await navigator.permissions.query({name:'geolocation'});
+      state=perm.state;
+    }
+  }catch(e){}
+  if(S.theme==='day'||S.theme==='night'||watching||themeGeoId!=null){themeGeoBusy=false;return;}
+  if(perm&&!sunPermListening){
+    sunPermListening=true;
+    try{perm.addEventListener('change',()=>{if(perm.state==='granted')void syncThemeGeo();});}catch(e){}
+  }
+  if(state==='denied'||(S.autoAdv&&state==='prompt')){themeGeoBusy=false;return;}
+  try{
+    themeGeoId=navigator.geolocation.watchPosition(pos=>{
+      const c=pos&&pos.coords;
+      if(c)noteSun(c.latitude,c.longitude);
+    },()=>{},{enableHighAccuracy:false,maximumAge:600000,timeout:20000});
+  }catch(e){themeGeoId=null;}
+  themeGeoBusy=false;
+}
 // theme
 function isNight(){
   if(S.theme==='night')return true;if(S.theme==='day')return false;
+  if(sunNight===true)return true;if(sunNight===false)return false;
   const r=document.documentElement;
   if(r.getAttribute('data-theme')==='dark')return true;
   if(r.getAttribute('data-theme')==='light')return false;
@@ -1336,8 +1436,9 @@ function isNight(){
 }
 function applyTheme(){
   const r=document.documentElement;
-  r.classList.toggle('force-day',S.theme==='day');
-  r.classList.toggle('force-night',S.theme==='night');
+  const auto=S.theme!=='day'&&S.theme!=='night';
+  r.classList.toggle('force-day',S.theme==='day'||(auto&&sunNight===false));
+  r.classList.toggle('force-night',S.theme==='night'||(auto&&sunNight===true));
   const night=isNight();
   document.body.style.filter=(night&&S.dim)?'brightness(.6)':'';
   document.querySelectorAll('[data-theme-pick]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themePick===S.theme));
@@ -1358,7 +1459,7 @@ document.addEventListener('visibilitychange',wake);
 $('wakeBtn').addEventListener('click',()=>{S.wake=!S.wake;save();$('wakeBtn').setAttribute('aria-pressed',S.wake);if(!S.wake)$('wakeNote').textContent='';wake();});
 $('autoBtn').addEventListener('click',()=>{
   if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
-  if(S.autoAdv){autoGen++;S.autoAdv=false;autoMsg='';stopSensors();save();renderAutoUi();}
+  if(S.autoAdv){autoGen++;S.autoAdv=false;autoMsg='';stopSensors();save();renderAutoUi();void syncThemeGeo();}
   else void startAuto();
 });
 $('dimBtn').addEventListener('click',()=>{S.dim=!S.dim;save();applyTheme();});
@@ -1425,7 +1526,14 @@ $('confirmSeg').addEventListener('click',e=>{
   else if(!passSide&&lockSide&&lockM>=confirmMeters()){passSide=lockSide;lockSide=null;lockM=0;renderAutoUi();}
   else renderAutoUi();
 });
-$('themeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-theme-pick]');if(!b)return;S.theme=b.dataset.themePick;save();applyTheme();});
+$('themeSeg').addEventListener('click',e=>{
+  const b=e.target.closest('[data-theme-pick]');if(!b)return;
+  S.theme=b.dataset.themePick;save();
+  if(S.theme==='day'||S.theme==='night')sunNight=null;
+  else if(sunLat!=null)sunNight=solarIsNight(sunLat,sunLng,new Date());
+  applyTheme();
+  void syncThemeGeo();
+});
 let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
@@ -1880,7 +1988,7 @@ sheetEl.addEventListener('focusin',e=>{
 
 applyTheme();renderField();
 if(S.wake)wake();
-void resumeAuto();
+void resumeAuto().finally(()=>{void syncThemeGeo();});
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
