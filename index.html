@@ -363,8 +363,8 @@ html.fit-tiny #field>.result{padding-block:3px}
   touch-action:pan-y;
 }
 @media (max-width:560px){.set.sheet{gap:6px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:10px}}
-.set.sheet .sheet-bar{flex:none;min-height:50px;padding-inline:max(12px,calc((100% - 1100px) / 2))}
-#settings .sheet-bar .brand{overflow:hidden}
+.set.sheet .sheet-bar{position:relative;flex:none;min-height:50px;padding-inline:max(12px,calc((100% - 1100px) / 2))}
+.set.sheet .sheet-bar .brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none}
 @media (max-width:560px){.set.sheet .sheet-bar{min-height:46px}}
 .set.sheet > .ctrls,
 #settings.sheet #setView > .ctrls{
@@ -1792,7 +1792,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.43';
+const APP_VERSION='1.0.44';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
