@@ -1059,12 +1059,10 @@ function renderAutoUi(){
   fitScale();
 }
 function commitBump(side){
-  const editing=document.activeElement&&document.activeElement.id==='lineNowIn';
   passSide=side;
   passRun=pendingM>0?pendingM:confirmMeters();
   pendingSide=null;pendingM=0;lockSide=null;lockM=0;shiftSide=null;shiftM=0;
   axisSticky=true;
-  if(editing){renderAutoUi();return;}
   const now=lineNowNum();
   const move=calc().P.move;
   if(now===null||!(move>0)){renderAutoUi();return;}
@@ -2046,7 +2044,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.56';
+const APP_VERSION='1.0.57';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
