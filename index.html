@@ -94,7 +94,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 #helpBtn{flex:none}
 #helpBtn[aria-expanded="true"]{color:var(--on)}
 #setBtn{position:relative}
-.dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#E0301E;border:2px solid var(--bg);animation:pulse 1.6s ease-in-out infinite}
+.dot{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#E0301E;border:2px solid var(--bg);animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,48,30,.7)}70%{box-shadow:0 0 0 10px rgba(224,48,30,0)}100%{box-shadow:0 0 0 0 rgba(224,48,30,0)}}
 @media (prefers-reduced-motion: reduce){.dot{animation:none}}
 .upd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 4px}
@@ -2046,7 +2046,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.55';
+const APP_VERSION='1.0.56';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
