@@ -143,14 +143,17 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .ph h2{font-family:var(--display);font-weight:800;font-size:1.2rem;letter-spacing:.06em;text-transform:uppercase;margin:0;white-space:nowrap}
 .ph small{text-align:right}
 .ph small{color:var(--muted);font-size:.9rem}
-.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
-.chip{height:64px;border-radius:14px;border:2px solid var(--line);background:var(--surface2);font-family:var(--display);font-weight:800;font-size:1.9rem;cursor:pointer;font-variant-numeric:tabular-nums}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.chip{height:auto;min-height:64px;padding:6px 8px;border-radius:14px;border:2px solid var(--line);background:var(--surface2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.05}
+.chip .cn{font-family:var(--ui);font-weight:700;font-size:.82rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip .cs{font-family:var(--display);font-weight:800;font-size:1.2rem;font-variant-numeric:tabular-nums}
 .chip[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .chip:active{transform:scale(.97)}
 .counters{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}
 .ctr{display:flex;align-items:center;gap:6px;background:var(--surface2);border-radius:12px;padding:4px}
-.ctr .nm{flex:1;display:flex;flex-direction:column;padding-left:8px;min-width:0}
-.ctr .w{font-family:var(--display);font-weight:800;font-size:1.8rem;line-height:1}
+.ctr .nm{flex:1;display:flex;flex-direction:column;padding:0 0 0 8px;min-width:0;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.ctr .nm[aria-pressed="true"]{box-shadow:inset 4px 0 0 var(--on)}
+.ctr .w{font-family:var(--display);font-weight:800;font-size:1.8rem;line-height:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ctr .lb{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .step{width:56px;height:52px;border-radius:10px;border:2px solid var(--line);background:var(--surface);font-size:2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
 .step:active{transform:scale(.95);background:var(--on);color:var(--on-ink)}
@@ -185,11 +188,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 /* settings — section groups sit on the page; field combine rows keep .panel cards */
 .set h2{font-family:var(--display);font-weight:800;font-size:1.35rem;letter-spacing:.06em;text-transform:uppercase;margin:0}
 .set .panel{background:transparent;border:0}
-.hrow{display:grid;grid-template-columns:110px 1fr 56px;gap:8px;align-items:center}
+.hrow{display:grid;grid-template-columns:68px 68px minmax(0,1fr) 52px;gap:8px;align-items:center}
 .hrow input{height:56px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);color:var(--ink);font-family:var(--ui);font-size:1.15rem;font-weight:600;padding:0 12px;width:100%;min-width:0;user-select:text;-webkit-user-select:text}
 .hrow input::placeholder{color:var(--muted);opacity:1}
-.hrow input.wft{font-family:var(--display);font-weight:800;font-size:1.6rem;text-align:center}
-.hlabel{font-size:.8rem;color:var(--muted);display:grid;grid-template-columns:110px 1fr 56px;gap:8px}
+.hrow input.wft{font-family:var(--display);font-weight:800;font-size:1.35rem;text-align:center;padding:0 4px}
+.hlabel{font-size:.8rem;color:var(--muted);display:grid;grid-template-columns:68px 68px minmax(0,1fr) 52px;gap:8px}
 .del{height:56px;border-radius:12px;border:2px solid var(--line);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .del svg{width:22px;height:22px}
 .wide{height:60px;border-radius:14px;border:2px dashed var(--line);background:transparent;font-weight:700;font-size:1.05rem;cursor:pointer}
@@ -309,6 +312,19 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .cnt{font-size:clamp(1.4rem,calc(3.5 * var(--ah,1dvh)),2.9rem)}
 #field .ctr{padding:2px}
 #field .counters{gap:clamp(3px,calc(0.5 * var(--ah,1dvh)),8px)}
+/* Names, following counts, and didn’t-follow counts scroll in this window.
+   Height is two rows, so a long list does not move Turn, Following, or Overlap. */
+#field .hdr-slot{
+  flex:0 0 auto;
+  height:calc(2 * (clamp(34px, calc(5.6 * var(--ah, 1dvh)), 64px) + 4px) + clamp(3px, calc(0.5 * var(--ah, 1dvh)), 8px));
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+}
+#field #leavePanel{display:none !important}
+#field .hdr-sub{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:4px 4px 0}
 #field .ctr .w{font-size:clamp(1.1rem,calc(2.8 * var(--ah,1dvh)),2.2rem)}
 #field .ovl .big{font-size:clamp(1.3rem,calc(3.2 * var(--ah,1dvh)),2.6rem)}
 #field .leave{gap:clamp(2px,calc(0.4 * var(--ah,1dvh)),8px);margin-top:0}
@@ -335,8 +351,9 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .folOpts .frow{gap:2px}
 #field .folOpts .flab{font-size:clamp(.66rem,calc(1.3 * var(--ah,1dvh)),.95rem)}
 #field .folOpts .seg2 button{height:clamp(24px,calc(3.6 * var(--ah,1dvh)),42px);font-size:clamp(.8rem,calc(1.8 * var(--ah,1dvh)),1.2rem)}
-#field .ph h2{font-size:clamp(.95rem,calc(2.2 * var(--ah,1dvh)),1.55rem)}
-#field .ph small{font-size:clamp(.8rem,calc(1.7 * var(--ah,1dvh)),1.1rem)}
+#field .ph h2{font-size:clamp(.95rem,calc(2.2 * var(--ah,1dvh)),1.55rem);flex:none}
+#field .ph small{font-size:clamp(.8rem,calc(1.7 * var(--ah,1dvh)),1.1rem);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#field .leave-sum{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Overlap is one row until opened for an adjustment. */
 #field .ovlBox{flex:none;display:flex;flex-direction:column;gap:clamp(3px,calc(0.55 * var(--ah,1dvh)),9px)}
 #field .ovlBox .ovl{display:none}
@@ -511,9 +528,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
             <span class="leave-sum" id="leaveSum">0</span>
             <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
           </button>
-          <div class="leave-panel" id="leavePanel">
-            <div class="counters" id="leaveCounters"></div>
-          </div>
+          <div class="leave-panel" id="leavePanel"></div>
         </div>
         <div id="folOpts" class="folOpts">
           <div class="frow">
@@ -531,7 +546,11 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
             </div>
           </div>
         </div>
-        <div class="counters" id="counters"></div>
+        <div class="hdr-slot" id="hdrSlot">
+          <div class="counters" id="counters"></div>
+          <div class="hdr-sub" id="leaveCap" hidden>Didn’t follow</div>
+          <div class="counters" id="leaveCounters"></div>
+        </div>
       </section>
 
       <div class="ovlBox" id="ovlBox">
@@ -584,10 +603,14 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
       </section>
 
       <section class="panel">
-        <div class="ph"><h2>Headers in the crew</h2><small>feet</small></div>
-        <div class="hlabel"><span>Width (ft)</span><span>Name (optional)</span><span></span></div>
+        <div class="ph"><h2>Headers in the crew</h2><small>feet and inches</small></div>
+        <div class="hlabel"><span>Feet</span><span>Inches</span><span>Name (optional)</span><span></span></div>
         <div id="headRows" style="display:flex;flex-direction:column;gap:8px"></div>
         <button class="wide" id="addHead" type="button">+ Add a header size</button>
+        <button class="wide" id="exportHeads" type="button">Share header file</button>
+        <button class="wide" id="importHeads" type="button">Import header file</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+        <p class="note" id="headFileNote" role="status">Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.</p>
         <div class="mline" id="mathLine" aria-live="polite"></div>
       </section>
 
@@ -668,7 +691,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 
         <section class="panel">
           <div class="ph"><h2>Didn’t follow</h2></div>
-          <p class="note">While <b>Following me</b>, for the ones who peeled off. Tap the row to open it, then set each header size (a 35' and a 40' can both be on). Tap the row again to close it.</p>
+          <p class="note">While <b>Following me</b>, for the ones who peeled off. Tap the row to open it, then set each header (Joe at 35 ft 1 in and a 40 ft header can both be on). Those counts stay in the header box, so the rest of the screen does not jump. Tap the row again to close it.</p>
           <p class="note">Each size’s cut is added once, like Outside, not as a full Skip pack jump. Under <b>Not following</b> that row is still there, just not tappable.</p>
         </section>
 
@@ -703,8 +726,8 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 
         <section class="panel">
           <div class="ph"><h2>Headers</h2></div>
-          <p class="note">My header is your GPS line width.</p>
-          <p class="note">Add every header size your crew runs. Same size twice? You only need it once. In field mode you just set how many are following.</p>
+          <p class="note">My header is your GPS line width. On the field, tap the name and size. The same width with a different name is a different header.</p>
+          <p class="note">Width is feet and inches, such as 35 ft 1 in. Share header file sends every name, feet, and inches. Import header file adds those headers and leaves counts, overlap, and the rest alone. The same name and the same width is not added twice.</p>
         </section>
 
         <section class="panel">
@@ -744,7 +767,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 (function(){
 const KEY='strikeout.v1';
 const KEY_BAK=KEY+'.bak';
-const DEF={heads:[{id:'h35',w:35,label:''},{id:'h40',w:40,label:''}],
+const DEF={heads:[{id:'h35',in:420,label:''},{id:'h40',in:480,label:''}],
   lead:'h35',counts:{h40:2},overlapIn:6,stepIn:1,mode:'double',folSide:'right',folSkip:true,cut:'right',theme:'day',wake:false,dim:false,
   lineNow:null,lineDir:'up',fieldAxis:'ns',autoAdv:true,confirmFt:100,leaveCounts:{}};
 function readStore(){
@@ -774,6 +797,7 @@ S.autoAdv=S.autoAdv===true;
   if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>99999)n=null;
   S.lineNow=n;
 })();
+migrateHeadWidths();
 function clampLeave(n){
   n=Math.round(Number(n));
   if(!Number.isFinite(n)||n<0)return 0;
@@ -833,25 +857,92 @@ function fmtFtIn(inches){
   return (neg?'−':'')+(ft?ft+"' ":'')+ins+'"';
 }
 function fmtIn(i){return (i%1===0?i.toFixed(0):i.toFixed(1))+'"';}
-function ftTxt(w){return (w%1===0?w.toFixed(0):w.toFixed(1))+"'";}
-function lead(){return S.heads.find(h=>h.id===S.lead)||S.heads[0];}
-// Settings "My header" chips: one per width. Named crew rows can still share a size.
-function leadSizes(){
-  const ld=lead(),seen=new Set(),out=[];
+function legacyFeetToInches(feet){
+  // Old saves are real decimal feet. 35.5 ft → 426 in (35 ft 6 in).
+  // 35.12 ft → 421.44 in. Never split those digits into feet and inches.
+  const milli=Math.round(Number(feet)*12000);
+  if(!Number.isFinite(milli)||milli<=0)return null;
+  return milli/1000;
+}
+function migrateHeadWidths(){
+  if(!Array.isArray(S.heads))return;
+  const next=[];
   S.heads.forEach(h=>{
-    if(seen.has(h.w))return;
-    seen.add(h.w);
-    out.push(ld&&ld.w===h.w?ld:h);
+    if(!h||typeof h!=='object')return;
+    const id=typeof h.id==='string'&&h.id?h.id:('h'+next.length);
+    const label=typeof h.label==='string'?h.label:'';
+    let inches=null;
+    if(typeof h.in==='number'&&Number.isFinite(h.in)&&h.in>0)inches=Math.round(h.in*1000)/1000;
+    else if(typeof h.w==='number'&&Number.isFinite(h.w)&&h.w>0)inches=legacyFeetToInches(h.w);
+    if(!inches)return;
+    const copy=Object.assign({},h);
+    delete copy.w;
+    copy.id=id;copy.label=label;copy.in=inches;
+    next.push(copy);
+  });
+  if(!next.length)S.heads=JSON.parse(JSON.stringify(DEF.heads));
+  else S.heads=next;
+  if(!S.heads.some(h=>h.id===S.lead))S.lead=S.heads[0].id;
+}
+function splitInches(total){
+  let t=Number(total);
+  if(!Number.isFinite(t))t=0;
+  const neg=t<0;
+  t=Math.round(Math.abs(t)*1000)/1000;
+  let ft=Math.floor((t+1e-9)/12);
+  let inch=Math.round((t-ft*12)*1000)/1000;
+  if(inch>=11.9995){ft+=1;inch=0;}
+  return {neg,ft,inch};
+}
+function inchStr(inch){
+  if(Math.abs(inch-Math.round(inch))<5e-4)return String(Math.round(inch));
+  return String(Math.round(inch*1000)/1000);
+}
+function fmtWidth(total){
+  const p=splitInches(total);
+  return (p.neg?'−':'')+p.ft+' ft '+inchStr(p.inch)+' in';
+}
+function normName(s){return String(s||'').trim().toLowerCase();}
+function sameIn(a,b){return Math.abs(Number(a)-Number(b))<5e-4;}
+function nameSize(h){
+  const name=String(h&&h.label||'').trim();
+  const size=fmtWidth(h.in);
+  return name?name+' '+size:size;
+}
+function ftInToInches(ft,inch){
+  if(Number.isInteger(ft)&&Number.isInteger(inch))return ft*12+inch;
+  const milli=Math.round((Number(ft)*12+Number(inch))*1000);
+  if(!Number.isFinite(milli))return null;
+  return milli/1000;
+}
+function lead(){return S.heads.find(h=>h.id===S.lead)||S.heads[0];}
+// My header: same name and same width collapse to one. A different name at that width stays.
+function leadChoices(){
+  const ld=lead(),out=[];
+  S.heads.forEach(h=>{
+    const name=normName(h.label);
+    const i=out.findIndex(x=>sameIn(x.in,h.in)&&normName(x.label)===name);
+    if(i<0)out.push(h);
+    else if(ld&&h.id===ld.id)out[i]=h;
   });
   return out;
 }
+function chipHtml(h){
+  const name=String(h.label||'').trim();
+  const size=fmtWidth(h.in);
+  const on=h.id===lead().id;
+  return `<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${on}" aria-label="${esc(name?name+' '+size:size)}">${name?`<span class="cn">${esc(name)}</span>`:''}<span class="cs">${esc(size)}</span></button>`;
+}
+function paintLeadChips(){
+  const lc=$('leadChips');if(lc)lc.innerHTML=leadChoices().map(chipHtml).join('');
+}
 
 function calc(){
-  const ld=lead();const L=ld.w*12;const o=S.overlapIn;
-  const eff=w=>Math.max(0,w*12-o);
+  const ld=lead();const L=ld.in;const o=S.overlapIn;
+  const eff=inches=>Math.max(0,inches-o);
   let folSum=0,folN=0;
-  S.heads.forEach(h=>{const n=S.counts[h.id]||0;folN+=n;folSum+=n*eff(h.w);});
-  const crew=eff(ld.w)+folSum;
+  S.heads.forEach(h=>{const n=S.counts[h.id]||0;folN+=n;folSum+=n*eff(h.in);});
+  const crew=eff(ld.in)+folSum;
   // Following me + Skip: others out + whole crew back.
   // Following me + Outside: only the followers' widths (crop stays outside; e.g. 4×40 → +5).
   // Not following: other combines only (not you).
@@ -875,7 +966,7 @@ function calc(){
     const lc=S.leaveCounts||{};
     S.heads.forEach(h=>{
       const n=clampLeave(lc[h.id]);
-      if(n>0){leaveN+=n;leaveCut+=n*eff(h.w);leaveBits.push(n+' × '+ftTxt(h.w));}
+      if(n>0){leaveN+=n;leaveCut+=n*eff(h.in);leaveBits.push(n+' × '+nameSize(h));}
     });
     if(leaveCut)gap+=leaveCut;
   }
@@ -1266,21 +1357,20 @@ async function resumeAuto(){
   if(!watching)beginWatch(!motionNeedsPrompt());
 }
 
-let leaveOpen=false,ovlOpen=false;
+let leaveOpen=false,ovlOpen=false,leaveScroll=null;
 function renderField(){
   $('turnL').innerHTML=uturnL+'<b>Left</b>';$('turnR').innerHTML='<b>Right</b>'+uturnR;
-  // lead chips
-  const lc=$('leadChips');if(lc)lc.innerHTML=leadSizes().map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}" title="${esc(h.label)}">${ftTxt(h.w)}</button>`).join('');
-  // counters
-  $('counters').innerHTML=S.heads.map(h=>{const n=S.counts[h.id]||0;return `
+  paintLeadChips();
+  const mine=lead();
+  $('counters').innerHTML=S.heads.map(h=>{const n=S.counts[h.id]||0;const label=nameSize(h);return `
     <div class="ctr ${n?'has':''}">
-      <div class="nm"><span class="w">${ftTxt(h.w)}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</div>
-      <button class="step" type="button" data-dec="${h.id}" aria-label="One less ${ftTxt(h.w)} following" ${n?'':'disabled'}>−</button>
+      <button class="nm" type="button" data-lead="${h.id}" aria-pressed="${h.id===mine.id}" aria-label="My header ${esc(label)}"><span class="w">${esc(fmtWidth(h.in))}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</button>
+      <button class="step" type="button" data-dec="${h.id}" aria-label="One less ${esc(label)} following" ${n?'':'disabled'}>−</button>
       <span class="cnt">${n}</span>
-      <button class="step" type="button" data-inc="${h.id}" aria-label="One more ${ftTxt(h.w)} following">+</button>
+      <button class="step" type="button" data-inc="${h.id}" aria-label="One more ${esc(label)} following">+</button>
     </div>`;}).join('');
   const leaveBits=[];
-  S.heads.forEach(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);if(n>0)leaveBits.push(ftTxt(h.w)+'×'+n);});
+  S.heads.forEach(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);if(n>0)leaveBits.push(nameSize(h)+'×'+n);});
   const folOn=S.mode==='double';
   $('leaveBox').classList.toggle('is-open',leaveOpen);
   const leaveTog=$('leaveTog');
@@ -1288,15 +1378,25 @@ function renderField(){
   leaveTog.setAttribute('aria-expanded',leaveOpen?'true':'false');
   leaveTog.classList.toggle('has',leaveBits.length>0);
   $('leaveSum').textContent=leaveBits.length?leaveBits.join(' · '):'0';
-  $('leaveCounters').innerHTML=leaveOpen?S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);const off=folOn?'':'disabled';return `
+  const cap=$('leaveCap');
+  if(cap)cap.hidden=!leaveOpen;
+  $('leaveCounters').innerHTML=leaveOpen?S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);const off=folOn?'':'disabled';const label=nameSize(h);return `
     <div class="ctr ${n?'has':''}">
-      <div class="nm"><span class="w">${ftTxt(h.w)}</span></div>
-      <button class="step" type="button" data-leavedec="${h.id}" aria-label="One less ${ftTxt(h.w)} who didn’t follow" ${n&&folOn?'':'disabled'}>−</button>
+      <div class="nm" aria-hidden="true"><span class="w">${esc(fmtWidth(h.in))}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</div>
+      <button class="step" type="button" data-leavedec="${h.id}" aria-label="One less ${esc(label)} who didn’t follow" ${n&&folOn?'':'disabled'}>−</button>
       <span class="cnt">${n}</span>
-      <button class="step" type="button" data-leaveinc="${h.id}" aria-label="One more ${ftTxt(h.w)} who didn’t follow" ${off}>+</button>
+      <button class="step" type="button" data-leaveinc="${h.id}" aria-label="One more ${esc(label)} who didn’t follow" ${off}>+</button>
     </div>`;}).join(''):'';
+  const slot=$('hdrSlot');
+  if(slot){
+    const want=leaveOpen?1:0;
+    if(leaveScroll!==want){
+      leaveScroll=want;
+      slot.scrollTop=leaveOpen&&cap?cap.offsetTop:0;
+    }
+  }
   const c=calc();
-  $('folTotal').textContent=`me: ${ftTxt(c.ld.w)}`+(c.folN?` + ${c.folN} other${c.folN===1?'':'s'}`:' only');
+  $('folTotal').textContent=`me: ${nameSize(c.ld)}`+(c.folN?` + ${c.folN} other${c.folN===1?'':'s'}`:' only');
   $('ovlVal').innerHTML=`${fmtIn(S.overlapIn)}<small>each head</small>`;
   $('ovlSum').textContent=`${fmtIn(S.overlapIn)} each · ${fmtIn(S.overlapIn*c.heads)} total`;
   $('ovlBox').classList.toggle('is-open',ovlOpen);
@@ -1502,13 +1602,17 @@ $('dimBtn').addEventListener('click',()=>{if(!isNight())return;S.dim=!S.dim;save
 
 // settings
 function renderSettings(){
-  $('leadChips').innerHTML=leadSizes().map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}">${ftTxt(h.w)}</button>`).join('');
-  $('headRows').innerHTML=S.heads.map(h=>`
+  paintLeadChips();
+  $('headRows').innerHTML=S.heads.map(h=>{
+    const p=splitInches(h.in);
+    return `
     <div class="hrow" data-id="${h.id}">
-      <input class="wft" id="w-${h.id}" type="number" inputmode="decimal" min="5" max="80" step="0.5" value="${h.w}" aria-label="Header width in feet">
-      <input id="l-${h.id}" type="text" maxlength="24" placeholder="e.g. MacDon" value="${esc(h.label)}" aria-label="Header name">
+      <input class="wft" id="ft-${h.id}" data-part="ft" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="3" value="${p.ft}" aria-label="Header feet">
+      <input class="wft" id="in-${h.id}" data-part="in" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="6" value="${inchStr(p.inch)}" aria-label="Header inches">
+      <input id="l-${h.id}" type="text" maxlength="24" placeholder="e.g. Joe" value="${esc(h.label)}" aria-label="Header name">
       <button class="del" type="button" data-del="${h.id}" aria-label="Remove this header" ${S.heads.length<2?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   document.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.step===S.stepIn));
   document.querySelectorAll('[data-confirm]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.confirm===S.confirmFt));
   $('wakeBtn').setAttribute('aria-pressed',!!S.wake);
@@ -1525,19 +1629,50 @@ function paintMath(){
       :`gap = Outside: followers only (crop outside)\n    = ${fmtFtIn(gapShown)}`)
     :`gap = other combines only (not you) = ${fmtFtIn(gapShown)}`)+
     (c.leaveN>0?`\ndidn't follow once: ${c.leaveTxt} cut = ${fmtFtIn(c.leaveCut)}\n    gap = ${fmtFtIn(c.gap)}`:'')+
-    `\nlines = gap ÷ your line (${fmtFtIn(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
+    `\nlines = gap ÷ your line (${fmtWidth(c.L)})\n      = ${Math.floor(c.gap/c.L+1e-9)} lines + ${fmtFtIn(c.gap-Math.floor(c.gap/c.L+1e-9)*c.L)} left over → nudge\n`+
     (c.fromNow?`move = that line count, from the pass you're on now`:`move = lines left standing + 1 (your own pass), from the line you're on now`)+
     `\n\nshown: ${signedMove(c.P.move)} lines${c.P.nudge?', nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}\nother way: ${signedMove(c.Alt.move)} lines${c.Alt.nudge?', nudge '+fmtFtIn(c.Alt.nudge)+' '+dirWord(c.Alt.dir):''}`;
   const ml=$('mathLine');
   if(ml)ml.textContent=`${signedMove(c.P.move)} ${Math.abs(c.P.move)===1?'line':'lines'}${c.P.nudge?' · nudge '+fmtFtIn(c.P.nudge)+' '+dirWord(c.P.dir):''}`;
 }
+function parseFtField(s){
+  if(!/^\d{1,3}$/.test(s))return null;
+  const n=parseInt(s,10);
+  if(n<1||n>100)return null;
+  return n;
+}
+function parseInField(s){
+  if(!/^\d{1,2}(\.\d{1,3})?$/.test(s))return null;
+  const n=Number(s);
+  if(!(n>=0&&n<12))return null;
+  return n;
+}
 $('headRows').addEventListener('input',e=>{
   const row=e.target.closest('.hrow');if(!row)return;const h=S.heads.find(x=>x.id===row.dataset.id);if(!h)return;
-  if(e.target.classList.contains('wft')){const v=parseFloat(e.target.value);if(v>0&&v<=100){h.w=v;}}
-  else{h.label=e.target.value;}
+  if(e.target.classList.contains('wft')){
+    if(e.target.dataset.part==='ft'){
+      const cleaned=e.target.value.replace(/\D/g,'').slice(0,3);
+      if(cleaned!==e.target.value)e.target.value=cleaned;
+    }
+    const ft=parseFtField(row.querySelector('[data-part="ft"]').value.trim());
+    const inch=parseInField(row.querySelector('[data-part="in"]').value.trim());
+    if(ft!=null&&inch!=null){
+      const total=ftInToInches(ft,inch);
+      if(total>0){h.in=total;delete h.w;}
+    }
+  }else h.label=e.target.value;
   save();
-  $('leadChips').innerHTML=leadSizes().map(h=>`<button class="chip" type="button" data-lead="${h.id}" aria-pressed="${h.id===lead().id}">${ftTxt(h.w)}</button>`).join('');
+  paintLeadChips();
   paintMath();
+});
+$('headRows').addEventListener('focusout',e=>{
+  const row=e.target.closest('.hrow');if(!row||!e.target.classList.contains('wft'))return;
+  const h=S.heads.find(x=>x.id===row.dataset.id);if(!h)return;
+  const p=splitInches(h.in);
+  const ftEl=row.querySelector('[data-part="ft"]');
+  const inEl=row.querySelector('[data-part="in"]');
+  if(parseFtField(ftEl.value.trim())==null)ftEl.value=String(p.ft);
+  if(parseInField(inEl.value.trim())==null)inEl.value=inchStr(p.inch);
 });
 $('headRows').addEventListener('click',e=>{
   const b=e.target.closest('[data-del]');if(!b||S.heads.length<2)return;
@@ -1548,8 +1683,100 @@ $('headRows').addEventListener('click',e=>{
 });
 $('addHead').addEventListener('click',()=>{
   const last=S.heads[S.heads.length-1];const id='h'+Date.now().toString(36);
-  S.heads.push({id,w:last?last.w+5:35,label:''});save();renderSettings();
-  const inp=$('w-'+id);if(inp){inp.focus();inp.select();}
+  const wIn=last&&Number.isFinite(last.in)?last.in+60:420;
+  S.heads.push({id,in:wIn,label:''});save();renderSettings();
+  const inp=$('ft-'+id);if(inp){inp.focus();inp.select();}
+});
+function setHeadNote(t){const n=$('headFileNote');if(n)n.textContent=t||'';}
+function joinHeadList(arr){
+  if(arr.length<=1)return arr[0]||'';
+  if(arr.length===2)return arr[0]+' and '+arr[1];
+  return arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1];
+}
+function briefHeads(arr,verb){
+  if(!arr.length)return '';
+  if(arr.length<=3)return verb+' '+joinHeadList(arr)+'.';
+  return verb+' '+arr.length+' headers ('+arr.slice(0,2).join(', ')+', …).';
+}
+function headerFileObj(){
+  const headers=[],seen=[];
+  S.heads.forEach(h=>{
+    const name=String(h.label||'').trim();
+    if(seen.some(x=>normName(x.name)===normName(name)&&sameIn(x.in,h.in)))return;
+    const p=splitInches(h.in);
+    seen.push({name,in:h.in});
+    headers.push({name,ft:p.ft,in:p.inch});
+  });
+  return {strikeout:'headers',version:1,headers};
+}
+function rowToHead(row){
+  if(!row||typeof row!=='object')return null;
+  if(row.ft==null||row.in==null||row.ft===''||row.in==='')return null;
+  const name=String(row.name==null?'':row.name).trim().slice(0,24);
+  const ft=typeof row.ft==='number'?row.ft:Number(String(row.ft).trim());
+  const inch=typeof row.in==='number'?row.in:Number(String(row.in).trim());
+  if(!Number.isFinite(ft)||!Number.isFinite(inch))return null;
+  if(ft<0||ft>100||inch<0||inch>=12)return null;
+  const total=ftInToInches(ft,inch);
+  if(!(total>0))return null;
+  return {name,in:total};
+}
+function importHeaderData(data){
+  const added=[],had=[];
+  let bad=0;
+  data.headers.forEach(row=>{
+    const h=rowToHead(row);
+    if(!h){bad++;return;}
+    const shown=h.name?h.name+' '+fmtWidth(h.in):fmtWidth(h.in);
+    if(S.heads.some(x=>normName(x.label)===normName(h.name)&&sameIn(x.in,h.in))){had.push(shown);return;}
+    S.heads.push({id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),in:h.in,label:h.name});
+    added.push(shown);
+  });
+  save();renderSettings();renderField();
+  const bits=[];
+  if(added.length)bits.push(briefHeads(added,'Added'));
+  if(had.length)bits.push(briefHeads(had,'Already had'));
+  if(bad)bits.push('Skipped '+bad+' row'+(bad===1?'':'s')+' that wasn’t a name with feet and inches.');
+  if(!added.length&&!had.length&&!bad)bits.push('No headers in that file.');
+  if(!added.length&&had.length)bits.push('Nothing else was changed.');
+  setHeadNote(bits.join(' '));
+}
+async function shareHeaderFile(){
+  const text=JSON.stringify(headerFileObj(),null,2);
+  const blob=new Blob([text],{type:'application/json'});
+  const file=new File([blob],'strikeout-headers.json',{type:'application/json'});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file],title:'Strikeout headers'});
+      setHeadNote('Header file ready to send. On the other phone, tap Import header file.');
+      return;
+    }catch(e){if(e&&e.name==='AbortError')return;}
+  }
+  const a=document.createElement('a');
+  const url=URL.createObjectURL(blob);
+  a.href=url;a.download='strikeout-headers.json';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  setHeadNote('Header file downloaded. Send strikeout-headers.json, then tap Import header file on the other phone.');
+}
+$('exportHeads').addEventListener('click',()=>{shareHeaderFile();});
+$('importHeads').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',()=>{
+  const f=$('importFile').files&&$('importFile').files[0];
+  $('importFile').value='';
+  if(!f)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    let data=null;
+    try{data=JSON.parse(String(reader.result).replace(/^\uFEFF/,''));}catch(e){data=null;}
+    if(!data||typeof data!=='object'||!Array.isArray(data.headers)||(data.strikeout&&data.strikeout!=='headers')){
+      setHeadNote('That file isn’t a Strikeout header file.');
+      return;
+    }
+    importHeaderData(data);
+  };
+  reader.onerror=()=>setHeadNote('Couldn’t read that file.');
+  reader.readAsText(f);
 });
 $('leadChips').addEventListener('click',e=>{const b=e.target.closest('[data-lead]');if(!b)return;S.lead=b.dataset.lead;save();renderSettings();});
 $('stepSeg').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(!b)return;S.stepIn=+b.dataset.step;save();renderSettings();});
@@ -1574,7 +1801,7 @@ let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;ovlOpen=false;S=JSON.parse(JSON.stringify(DEF));save();b.classList.remove('arm');b.textContent='Reset everything to defaults';
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;ovlOpen=false;S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
   if(S.autoAdv)startAuto();
   renderSettings();
 });
@@ -1913,7 +2140,7 @@ function fitScale(force){
   const root=document.documentElement;
   const set=k=>root.style.setProperty('--ah',(fitBase*k).toFixed(2)+'px');
   const note=$('autoNote');
-  const sig=[ovlOpen,leaveOpen,note&&note.hidden,S.mode,S.heads.length,S.heads.map(h=>h.label||'').join('|')].join(',');
+  const sig=[ovlOpen,note&&note.hidden,S.mode].join(',');
   if(sig!==fitSig){fitSig=sig;force=true;}
   set(fitK);
   if(!force&&fieldOver()<=0)return;
@@ -1959,7 +2186,7 @@ const settingsSheet=makeSheet({
     $('field').removeAttribute('aria-hidden');
     $('field').removeAttribute('inert');
     $('setBtn').classList.remove('is-covered');
-    S.heads.sort((a,b)=>a.w-b.w);save();renderField();
+    S.heads.sort((a,b)=>a.in-b.in||String(a.label||'').localeCompare(String(b.label||'')));save();renderField();
     window.scrollTo(0,0);lockHome(true);wake();
   }
 });
@@ -2070,7 +2297,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.58';
+const APP_VERSION='1.0.59';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
