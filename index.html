@@ -591,9 +591,9 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
   <div class="bar">
     <h1 class="brand">
       <svg viewBox="0 0 48 32" aria-hidden="true" class="combine">
-        <path d="M37 7 47 2.5" stroke="var(--seg-lead)" stroke-width="2.4" stroke-linecap="round"/>
         <path d="M19 11 21 4.5h15l2 6.5z" fill="var(--seg-out)"/>
         <rect x="15" y="10.5" width="27" height="13" rx="2.5" fill="var(--seg-lead)"/>
+        <path d="M23 4.9 H45.2 V7.6" fill="none" stroke="var(--seg-lead)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
         <rect x="8.5" y="5.5" width="9.5" height="11" rx="2" fill="var(--seg-lead)"/>
         <rect x="10.5" y="7.5" width="5.5" height="5.5" rx="1" fill="var(--res-bg)" opacity=".75"/>
         <path d="M4 22.5 15 15.5v8H6z" fill="var(--seg-out)"/>
@@ -2706,7 +2706,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.66';
+const APP_VERSION='1.0.67';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
