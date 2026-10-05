@@ -306,7 +306,6 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .tog.yn b{font-size:clamp(1.05rem,calc(2.5 * var(--ah,1dvh)),1.7rem)}
 #field .step{width:clamp(38px,calc(6 * var(--ah,1dvh)),68px);height:clamp(34px,calc(5.6 * var(--ah,1dvh)),64px);font-size:clamp(1.3rem,calc(3 * var(--ah,1dvh)),2.4rem)}
 #field .cnt{font-size:clamp(1.4rem,calc(3.5 * var(--ah,1dvh)),2.9rem)}
-#field .ovl .big{font-size:clamp(1.3rem,calc(3.2 * var(--ah,1dvh)),2.6rem)}
 #field .leave-tog{min-height:clamp(32px,calc(5 * var(--ah,1dvh)),58px);padding-block:clamp(3px,calc(0.4 * var(--ah,1dvh)),8px)}
 #field .leave-lab{font-size:clamp(1rem,calc(2.3 * var(--ah,1dvh)),1.6rem)}
 #field .leave-sum{font-size:clamp(.95rem,calc(2.1 * var(--ah,1dvh)),1.45rem)}
@@ -343,12 +342,8 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .ph h2{font-size:clamp(.95rem,calc(2.2 * var(--ah,1dvh)),1.55rem);flex:none}
 #field .ph small{font-size:clamp(.8rem,calc(1.7 * var(--ah,1dvh)),1.1rem);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #field .leave-sum{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* Overlap is one row until opened for an adjustment. */
-#field .ovlBox{flex:none;display:flex;flex-direction:column;gap:clamp(3px,calc(0.55 * var(--ah,1dvh)),9px)}
-#field .ovlBox .ovl{display:none}
-#field .ovlBox.is-open .ovl{display:flex}
-#field .ovlBox.is-open .leave-tog{border-color:var(--on)}
-#field .ovlBox.is-open .leave-chev{transform:rotate(90deg)}
+/* Overlap stays one row. − and + are in a sheet, so this never grows. */
+#field .ovlBox{flex:none}
 /* fit-short / fit-tiny are set from the home column height, the same box
    the rules above scale against. */
 html.fit-short .app .iconbtn{height:40px;min-width:40px}
@@ -478,6 +473,10 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 .csheet.didnt .sh-bar{border-bottom-color:var(--seg-out)}
 .csheet.didnt .crow.has{border-color:var(--seg-out)}
 .csheet.didnt .sh-bar h2::before{content:"";display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--seg-out);margin-right:8px;vertical-align:1px}
+/* One overlap row: the value sits between the same 64 px − and +. */
+.ovlrow{justify-content:center}
+.ovlrow .nm{align-items:center;flex:1;padding-left:0}
+.ovlrow .cnt{font-size:3.2rem;line-height:.85}
 </style>
 
 </head>
@@ -575,16 +574,11 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
       </section>
 
       <div class="ovlBox" id="ovlBox">
-        <button class="leave-tog" id="ovlTog" type="button" aria-expanded="false" aria-controls="ovlPanel">
+        <button class="leave-tog" id="ovlTog" type="button" aria-haspopup="dialog" aria-controls="ovlSheet">
           <span class="leave-lab">Overlap</span>
           <span class="leave-sum" id="ovlSum"></span>
           <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
         </button>
-        <div class="ovl" id="ovlPanel">
-          <button class="step" id="ovlMinus" type="button" aria-label="Less overlap">−</button>
-          <div class="big" id="ovlVal"></div>
-          <button class="step" id="ovlPlus" type="button" aria-label="More overlap">+</button>
-        </div>
       </div>
     </div>
   </main>
@@ -738,7 +732,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 
         <section class="panel">
           <div class="ph"><h2>Overlap</h2></div>
-          <p class="note">One row on the field showing each head and the total. Tap it to open the − and + buttons, tap again to fold it away.</p>
+          <p class="note">One row on the field showing each head and the total. Tap it to open the overlap sheet. − and + step by the amount in Settings, and the sheet shows the live +lines. Close it with the <b>X</b>, a tap on the dimmed field, or Back.</p>
         </section>
 
         <section class="panel">
@@ -801,6 +795,20 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
   </div>
   <div class="sh-list" id="didntList"></div>
   <div class="sh-foot"><span>Didn’t follow <b id="didntTot">0</b></span><span class="big" id="didntLines"></span></div>
+</dialog>
+<dialog class="csheet" id="ovlSheet" aria-labelledby="ovlTitle">
+  <div class="sh-bar">
+    <h2 id="ovlTitle">Overlap<small id="ovlNote">Each head.</small></h2>
+    <button class="sh-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="sh-list">
+    <div class="crow ovlrow" id="ovlRow">
+      <button class="step" id="ovlMinus" type="button" aria-label="Less overlap">−</button>
+      <div class="nm"><span class="cnt" id="ovlVal">0"</span><span class="lb">each head</span></div>
+      <button class="step" id="ovlPlus" type="button" aria-label="More overlap">+</button>
+    </div>
+  </div>
+  <div class="sh-foot"><span id="ovlFoot"></span><span class="big" id="ovlLines"></span></div>
 </dialog>
 
 <script>
@@ -1407,7 +1415,6 @@ async function resumeAuto(){
   if(!watching)beginWatch(!motionNeedsPrompt());
 }
 
-let ovlOpen=false;
 // Others and Didn’t follow rows: the total, then each header that is counted.
 function countBits(map){
   const bits=[];let total=0;
@@ -1436,11 +1443,7 @@ function renderField(){
   $('folTotal').textContent=folOn
     ?(c.folN?c.folN+' with me':'nobody with me')+(c.leaveN?' · '+c.leaveN+' didn’t follow':'')
     :(c.folN?c.folN+' other'+plural(c.folN)+' · going out alone':'going out alone');
-  $('ovlVal').innerHTML=`${fmtIn(S.overlapIn)}<small>each head</small>`;
   $('ovlSum').textContent=`${fmtIn(S.overlapIn)} each · ${fmtIn(S.overlapIn*c.heads)} total`;
-  $('ovlBox').classList.toggle('is-open',ovlOpen);
-  $('ovlTog').setAttribute('aria-expanded',ovlOpen?'true':'false');
-  $('ovlMinus').disabled=S.overlapIn<=0;
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   const folOpts=$('folOpts');
   folOpts.hidden=false;
@@ -1462,12 +1465,15 @@ function renderField(){
 // behind is untouched: the dialog lives in the top layer, not in the column.
 const SHEETS={
   others:{el:'othersSheet',list:'othersList',tot:'othersTot',lines:'othersLines',map:()=>S.counts||{},dec:'dec',inc:'inc',less:' following',more:' following'},
-  didnt:{el:'didntSheet',list:'didntList',tot:'didntTot',lines:'didntLines',map:()=>S.leaveCounts||{},dec:'leavedec',inc:'leaveinc',less:' who didn’t follow',more:' who didn’t follow'}
+  didnt:{el:'didntSheet',list:'didntList',tot:'didntTot',lines:'didntLines',map:()=>S.leaveCounts||{},dec:'leavedec',inc:'leaveinc',less:' who didn’t follow',more:' who didn’t follow'},
+  ovl:{el:'ovlSheet',lines:'ovlLines'}
 };
 let sheetHist=false;
 function sheetOpen(k){const d=$(SHEETS[k].el);return !!(d&&d.open);}
 function buildSheet(k){
-  const o=SHEETS[k],map=o.map();
+  const o=SHEETS[k];
+  if(!o.list)return;
+  const map=o.map();
   $(o.list).innerHTML=S.heads.map(h=>{const n=clampLeave(map[h.id]);const label=nameSize(h);return `
     <div class="crow ${n?'has':''}" data-row="${h.id}">
       <div class="nm"><span class="w">${esc(fmtShort(h.in))}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</div>
@@ -1476,9 +1482,21 @@ function buildSheet(k){
       <button class="step" type="button" data-${o.inc}="${h.id}" aria-label="One more ${esc(label)}${o.more}">+</button>
     </div>`;}).join('');
 }
+function paintOvl(){
+  const c=calc();
+  $('ovlVal').textContent=fmtIn(S.overlapIn);
+  $('ovlRow').classList.toggle('has',S.overlapIn>0);
+  $('ovlMinus').disabled=S.overlapIn<=0;
+  $('ovlPlus').disabled=S.overlapIn>=48;
+  $('ovlNote').textContent='Each head. Steps by '+fmtIn(S.stepIn)+'.';
+  $('ovlFoot').textContent=fmtIn(S.overlapIn)+' each · '+fmtIn(S.overlapIn*c.heads)+' total';
+  const move=c.P.move,lines=Math.abs(move)||0;
+  $('ovlLines').textContent=signedMove(move)+' line'+(lines===1?'':'s');
+}
 function paintSheet(k){
   const o=SHEETS[k];
   if(!sheetOpen(k))return;
+  if(!o.list){paintOvl();return;}
   const map=o.map();let total=0;
   $(o.list).querySelectorAll('[data-row]').forEach(row=>{
     const n=clampLeave(map[row.dataset.row]);total+=n;
@@ -1490,7 +1508,7 @@ function paintSheet(k){
   const move=calc().P.move,lines=Math.abs(move)||0;
   $(o.lines).textContent=signedMove(move)+' line'+(lines===1?'':'s');
 }
-function paintSheets(){paintSheet('others');paintSheet('didnt');}
+function paintSheets(){paintSheet('others');paintSheet('didnt');paintSheet('ovl');}
 function openSheet(k){
   const d=$(SHEETS[k].el);
   if(!d||d.open)return;
@@ -1498,7 +1516,7 @@ function openSheet(k){
   if(typeof d.showModal==='function')d.showModal();
   else d.setAttribute('open','');
   paintSheet(k);
-  $(SHEETS[k].list).scrollTop=0;
+  if(SHEETS[k].list)$(SHEETS[k].list).scrollTop=0;
   // One history entry while a sheet is up, so the phone's Back closes it.
   try{history.pushState({soSheet:k},'');sheetHist=true;}catch(e){sheetHist=false;}
 }
@@ -1508,7 +1526,7 @@ function closeSheet(k){
   if(typeof d.close==='function')d.close();
   else d.removeAttribute('open');
 }
-function anySheetOpen(){return sheetOpen('others')||sheetOpen('didnt');}
+function anySheetOpen(){return sheetOpen('others')||sheetOpen('didnt')||sheetOpen('ovl');}
 Object.keys(SHEETS).forEach(k=>{
   const d=$(SHEETS[k].el);
   if(!d)return;
@@ -1527,7 +1545,7 @@ Object.keys(SHEETS).forEach(k=>{
 window.addEventListener('popstate',()=>{
   if(!anySheetOpen())return;
   sheetHist=false;
-  closeSheet('others');closeSheet('didnt');
+  closeSheet('others');closeSheet('didnt');closeSheet('ovl');
 });
 
 // field interactions
@@ -1547,7 +1565,7 @@ function fieldAction(b){
   else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
   else if(b.id==='othersBtn'){openSheet('others');return;}
   else if(b.id==='didntBtn'){if(S.mode!=='double')return;openSheet('didnt');return;}
-  else if(b.id==='ovlTog'){ovlOpen=!ovlOpen;}
+  else if(b.id==='ovlTog'){openSheet('ovl');return;}
   else if(b.dataset.leaveinc){
     if(S.mode!=='double')return;
     const id=b.dataset.leaveinc;
@@ -1915,7 +1933,7 @@ let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();ovlOpen=false;S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
   if(S.autoAdv)startAuto();
   renderSettings();
 });
@@ -2253,7 +2271,7 @@ function fitScale(force){
   if(!fitBase)return;
   const root=document.documentElement;
   const set=k=>root.style.setProperty('--ah',(fitBase*k).toFixed(2)+'px');
-  const sig=[ovlOpen,S.mode].join(',');
+  const sig=S.mode;
   if(sig!==fitSig){fitSig=sig;force=true;}
   set(fitK);
   if(!force&&fieldOver()<=0)return;
@@ -2410,7 +2428,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.60';
+const APP_VERSION='1.0.61';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
