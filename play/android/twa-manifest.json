@@ -1,0 +1,51 @@
+{
+  "packageId": "com.randyscustomapps.strikeout",
+  "host": "randyscustomapps.github.io",
+  "name": "Strikeout",
+  "launcherName": "Strikeout",
+  "display": "standalone",
+  "themeColor": "#2A1D0A",
+  "themeColorDark": "#0C0904",
+  "navigationColor": "#2A1D0A",
+  "navigationColorDark": "#0C0904",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#F2DFA7",
+  "enableNotifications": true,
+  "startUrl": "/strikeout/",
+  "iconUrl": "https://randyscustomapps.github.io/strikeout/icon-512.png",
+  "maskableIconUrl": "https://randyscustomapps.github.io/strikeout/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./signing/upload-keystore.jks",
+    "alias": "upload"
+  },
+  "appVersionName": "1.0.69",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://randyscustomapps.github.io/strikeout/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://randyscustomapps.github.io/strikeout/",
+  "minSdkVersion": 21,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "navigate-existing",
+  "displayOverride": [],
+  "appVersion": "1.0.69"
+}
