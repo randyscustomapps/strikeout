@@ -192,6 +192,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .wide.hact{height:auto;min-height:76px;border:2px solid transparent;border-radius:16px;background:linear-gradient(var(--surface2),var(--surface2)) padding-box,var(--stroke) border-box;font-family:var(--display);font-weight:800;font-size:1.45rem;letter-spacing:.02em;line-height:1.05;padding:12px 16px}
 .wide.hact.pri{background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--stroke-gold) border-box}
 .wide.hact:active{transform:scale(.98)}
+.hshare{display:flex;flex-direction:column;gap:3px}
 .seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .seg3 button{height:60px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1.05rem;cursor:pointer}
 .seg3 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
@@ -731,8 +732,14 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
         <div class="hlabel"><span>Feet</span><span>Inches</span><span>Name (optional)</span><span></span></div>
         <div id="headRows" style="display:flex;flex-direction:column;gap:8px"></div>
         <button class="wide" id="addHead" type="button">+ Add a header size</button>
-        <button class="wide hact pri" id="shareLink" type="button">Share header link</button>
-        <button class="wide hact" id="exportHeads" type="button">Share header file</button>
+        <div class="hshare">
+          <button class="wide hact pri" id="shareLink" type="button" aria-describedby="shareLinkCap">Send to Android phone</button>
+          <p class="note" id="shareLinkCap">They tap the link and Strikeout opens</p>
+        </div>
+        <div class="hshare">
+          <button class="wide hact" id="exportHeads" type="button" aria-describedby="exportHeadsCap">Send to iPhone</button>
+          <p class="note" id="exportHeadsCap">They save the file, then tap Import header file</p>
+        </div>
         <button class="wide hact" id="importHeads" type="button">Import header file</button>
         <input id="importFile" type="file" accept=".json,application/json,text/plain,application/octet-stream,.txt" hidden>
         <p class="note" id="headFileNote" role="status">On iPhone, open the link and use the file if the Home Screen app doesn’t get the headers.</p>
@@ -853,7 +860,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
         <section class="panel">
           <div class="ph"><h2>Headers</h2></div>
           <p class="note">My header is your GPS line width. Pick it under <b>My header</b> in Settings; the field does not change it. The same width with a different name is a different header.</p>
-          <p class="note">Width is feet and inches, such as 35 ft 1 in. Share header link sends every name, feet, and inches. Import asks first: keep yours and add new ones, or replace your headers with the file. Replace drops counts on the headers it removes. Overlap, the current row, and the rest stay. The same name and the same width is not added twice. On iPhone, open the link and use the file if the Home Screen app doesn’t get the headers.</p>
+          <p class="note">Width is feet and inches, such as 35 ft 1 in. Send to Android phone sends every name, feet, and inches. Import asks first: keep yours and add new ones, or replace your headers with the file. Replace drops counts on the headers it removes. Overlap, the current row, and the rest stay. The same name and the same width is not added twice. On iPhone, open the link and use the file if the Home Screen app doesn’t get the headers.</p>
         </section>
 
         <section class="panel">
@@ -2812,7 +2819,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.68';
+const APP_VERSION='1.0.69';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
