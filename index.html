@@ -454,8 +454,8 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 #settings.sheet.sheet-live{clip-path:inset(var(--sheet-y,0px) 0 0 0 round 38px 0 0 0)}
 .sub.sheet.sheet-live{clip-path:inset(var(--sub-y,0px) 0 0 0 round 38px 0 0 0)}
 .set.sheet input,.set.sheet textarea,.set.sheet select{touch-action:pan-y}
-.set.sheet.anim,#sheetEdge.anim,#subEdge.anim{transition:transform .34s cubic-bezier(0,0,.58,1)}
-.set.sheet.anim.spring,#sheetEdge.anim.spring,#subEdge.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1)}
+.set.sheet.anim,#sheetEdge.anim,#subEdge.anim{transition:transform .34s cubic-bezier(0,0,.58,1),opacity .34s cubic-bezier(0,0,.58,1)}
+.set.sheet.anim.spring,#sheetEdge.anim.spring,#subEdge.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1),opacity .34s cubic-bezier(.16,1,.3,1)}
 #sheetEdge,#subEdge{
   position:absolute;z-index:1;top:var(--sheet-y,0px);left:0;right:0;bottom:0;
   border-top-left-radius:38px;box-shadow:-28px 0 64px rgba(0,0,0,.18);
@@ -2361,7 +2361,7 @@ function makeSheet(o){
     o.rest();
     sheetLayer.style.removeProperty(o.yVar);
   }
-  function apply(x){
+  function apply(x,fade){
     const w=Math.max(1,width());
     const nx=x<0?0:x;
     st.x=nx;
@@ -2371,10 +2371,13 @@ function makeSheet(o){
     const tf='translate3d('+nx+'px,0,0)';
     for(const n of movers)n.style.transform=tf;
     scrim.style.opacity=(0.4*(1-p)).toFixed(3);
+    // Page fades with the drag: 1 at rest, about 0.3 fully aside. Open stays solid.
+    if(fade!==false)el.style.opacity=(1-0.7*p).toFixed(3);
     return nx;
   }
   function willChange(on){
-    for(const n of movers)n.style.willChange=on?'transform':'';
+    el.style.willChange=on?'transform, opacity':'';
+    for(const n of movers)if(n!==el)n.style.willChange=on?'transform':'';
     scrim.style.willChange=on?'opacity':'';
   }
   function stopAnim(){
@@ -2393,6 +2396,7 @@ function makeSheet(o){
       st.x=0;
       for(const n of movers)n.style.transform='';
       scrim.style.opacity='';
+      el.style.opacity='';
       rest();
     }
   }
@@ -2407,10 +2411,10 @@ function makeSheet(o){
     anim(false);
     lift();
     willChange(true);
-    apply(now);
+    apply(now,kind!=='in');
     void el.offsetWidth;
     anim(true,kind==='spring');
-    apply(x);
+    apply(x,kind!=='in');
     let fired=false;
     const ms=kind==='spring'?480:450;
     const timer=setTimeout(fire,ms);
@@ -2436,7 +2440,8 @@ function makeSheet(o){
     if(motionOK()){
       lift();
       willChange(true);
-      apply(st.wpx);
+      apply(st.wpx,false);
+      el.style.opacity='1';
       requestAnimationFrame(()=>{
         requestAnimationFrame(()=>{
           if(el.hidden||st.dragging)return;
@@ -2458,6 +2463,7 @@ function makeSheet(o){
     willChange(false);
     for(const n of movers)n.style.transform='';
     el.style.touchAction='';
+    el.style.opacity='';
     scrim.style.opacity='';
     el.classList.remove('sheet');
     rest();
@@ -2807,7 +2813,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.75';
+const APP_VERSION='1.0.76';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
