@@ -105,7 +105,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .chkbtn{height:52px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1rem;cursor:pointer}
 
 /* result */
-.result{background:linear-gradient(180deg,rgba(255,210,110,.13),rgba(255,210,110,0) 34%,rgba(0,0,0,.22)),var(--res-bg);color:var(--res-ink);border-radius:18px;padding:12px 16px 10px;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 1px 0 rgba(255,226,160,.26),inset 0 0 0 1px rgba(224,169,28,.24),0 6px 18px rgba(0,0,0,.18)}
+.result{border:2px solid transparent;background:linear-gradient(180deg,rgba(255,210,110,.13),rgba(255,210,110,0) 34%,rgba(0,0,0,.22)) padding-box,linear-gradient(var(--res-bg),var(--res-bg)) padding-box,var(--stroke) border-box;color:var(--res-ink);border-radius:18px;padding:10px 14px 8px;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 1px 0 rgba(255,226,160,.26),inset 0 0 0 1px rgba(224,169,28,.24),0 6px 18px rgba(0,0,0,.18)}
 .r-main{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
 .r-skip{display:flex;align-items:baseline;gap:6px}
 .r-lbl{font-family:var(--display);font-weight:800;font-size:1.4rem;letter-spacing:.06em;text-transform:uppercase;color:var(--res-muted)}
@@ -206,7 +206,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .brand{font-size:1.65rem}
   .brand svg{width:42px;height:28px}
   .iconbtn{height:46px;min-width:46px}
-  .result{padding:10px 14px 8px;gap:4px}
+  .result{padding:8px 12px 6px;gap:4px}
   .r-num{font-size:4.2rem}
   .r-nval{font-size:2rem}
   .r-gps{gap:6px 8px;padding-top:6px}
@@ -273,7 +273,7 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
   flex:1 1 auto;
   justify-content:space-between;
   gap:clamp(2px,calc(0.6 * var(--ah,1dvh)),10px);
-  padding:clamp(5px,calc(1 * var(--ah,1dvh)),14px) clamp(10px,2vw,16px) clamp(5px,calc(0.8 * var(--ah,1dvh)),12px);
+  padding:clamp(3px,calc(1 * var(--ah,1dvh) - 2px),12px) clamp(8px,calc(2vw - 2px),14px) clamp(3px,calc(0.8 * var(--ah,1dvh) - 2px),10px);
 }
 #field>.ctrls{flex:1.15 1 auto;justify-content:space-between;gap:clamp(3px,calc(0.7 * var(--ah,1dvh)),12px)}
 /* Spare height goes into the cards, not beige gaps between them. */
@@ -350,7 +350,7 @@ html.fit-short .app .iconbtn{height:40px;min-width:40px}
 html.fit-short .app .brand{font-size:1.35rem}
 html.fit-short .app .brand svg{width:34px;height:23px}
 html.fit-tiny #field.layout,html.fit-tiny #field>.ctrls{gap:2px}
-html.fit-tiny #field>.result{padding-block:3px}
+html.fit-tiny #field>.result{padding-block:1px}
 @media (min-width:760px) and (orientation:landscape){
   #field.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:stretch}
   #field>.result,#field>.ctrls{min-height:0;overflow:auto}
@@ -2633,7 +2633,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.64';
+const APP_VERSION='1.0.65';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
