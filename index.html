@@ -866,6 +866,11 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
           <div class="math" id="mathBox"></div>
           <p class="note">The field card shows whichever way needs the smaller nudge. The other way is the last line of the breakdown above. The same result sits under the headers in Settings and updates as you type.</p>
         </section>
+
+        <section class="panel">
+          <a class="chkbtn" id="supportMail" href="mailto:randyscustomapps@gmail.com">Contact support</a>
+          <p class="note">Opens your email app with your app version filled in.</p>
+        </section>
       </div>
   </main>
 
@@ -2813,8 +2818,22 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.76';
+const APP_VERSION='1.0.77';
 $('verNow').textContent='v'+APP_VERSION;
+function supportHref(){
+  let installed=false;
+  try{
+    if(navigator.standalone===true)installed=true;
+    else if(matchMedia('(display-mode: standalone)').matches)installed=true;
+    else if(matchMedia('(display-mode: fullscreen)').matches)installed=true;
+  }catch(e){}
+  const subject='Strikeout Harvest support (v'+APP_VERSION+')';
+  const body='\n\n\n---\nApp version: '+APP_VERSION+'\nDevice: '+(navigator.userAgent||'')+'\nRunning: '+(installed?'installed (standalone)':'in the browser');
+  return 'mailto:randyscustomapps@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+function fillSupportMail(){const a=$('supportMail');if(a)a.href=supportHref();}
+fillSupportMail();
+$('supportMail').addEventListener('click',fillSupportMail);
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
 function showUpdate(v){
