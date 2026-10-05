@@ -19,7 +19,7 @@ It is only a suggestion. Play locks the id at the first upload, and it cannot be
 | Theme | Status and navigation `#2A1D0A` (day chrome) and `#0C0904` (night). Splash background `#F2DFA7`, from the web manifest. |
 | Icon | The live `icon-512.png`: flat-auger combine and the STRIKEOUT / HARVEST lockup. |
 | minSdk / targetSdk | 21 / 36. New Play apps in October 2026 have to target Android 16 (API 36). |
-| Version | `versionName` 1.0.74, `versionCode` 1, matching the current site. Play's versionCode must go up on every upload. It is independent of the website's `APP_VERSION` after this. |
+| Version | `versionName` 1.0.77, `versionCode` 1, matching the current site. Play's versionCode must go up on every upload. It is independent of the website's `APP_VERSION` after this. |
 | Location | Location delegation is on, so GPS uses the Android permission dialog. The manifest requests precise and coarse location, in the foreground. |
 | Name | Application name Strikeout Harvest. Launcher label Strikeout, same as the web manifest `short_name`, so it fits under the icon. |
 | Notifications | DelegationService stays enabled so location delegation can register. Strikeout Harvest never posts a notification. `build-release.sh` strips `POST_NOTIFICATIONS` after a Bubblewrap update rewrites the manifest. |
@@ -131,7 +131,7 @@ Do not block the website. Buyers and demo users load the same origin.
 ## Store listing and privacy
 
 - Listing copy, content rating, data safety, target age, and the graphic file list: `play/listing.md`
-- Privacy policy draft: `play/privacy.html`. Replace `CONTACT_EMAIL` before the URL goes into Play Console. It follows the in-app privacy page and adds the company, the Play purchase, and a contact line.
+- Privacy policy draft: `play/privacy.html`. Contact email is randyscustomapps@gmail.com. It follows the in-app privacy page and adds the company, the Play purchase, and a contact line.
 - Icon, feature graphic, and six phone screenshots: `play/graphics/`
 
 ## Randy's checklist in Play Console
@@ -145,6 +145,6 @@ The developer account does not exist yet. Nothing here was uploaded.
 5. On your machine, run `generate-upload-key.sh`, back up the keystore and `passwords.env` in a password manager, then `build-release.sh`. Upload **that** AAB. Leave Play App Signing on.
 6. Copy the **App signing** SHA-256 into asset links and publish the file at `https://randyscustomapps.github.io/.well-known/assetlinks.json` from a `randyscustomapps.github.io` repo (option A above).
 7. Store listing from `play/listing.md`. Category Tools. Upload the icon, feature graphic, and screenshots in `play/graphics/`.
-8. Privacy policy URL: the hosted `play/privacy.html` after `CONTACT_EMAIL` is a real address.
+8. Privacy policy URL: the hosted `play/privacy.html`. Contact email on that page is randyscustomapps@gmail.com.
 9. App content: content rating (Everyone-level, not a game), target audience 18 and over only, not designed for children, ads No, data safety No collection, location permission foreground and optional, not background.
 10. Ship to an internal test track first and open the app on a phone with Chrome. Confirm the browser bar is gone after asset links propagate, then promote the release.

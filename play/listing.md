@@ -14,6 +14,13 @@ Play allows 30 characters.
 
 The in-app header is heavy STRIKEOUT with small gold HARVEST between thin gold rules. The Android launcher label is Strikeout, the web manifest `short_name`, so the name fits under the icon. The store name is the full Strikeout Harvest.
 
+## Developer and contact
+
+Store settings, not part of the description.
+
+- Developer name: **Randy's Custom Apps**
+- Contact / support email: **randyscustomapps@gmail.com**
+
 ## Short description
 
 80 characters maximum. This draft is 66.
@@ -138,7 +145,7 @@ Do not declare location as collected. Do declare the location **permission** in 
 
 Notifications: the package does not request the notification permission. Strikeout Harvest never posts a notification. See `play/README.md` for why the project file mentions that permission and then removes it.
 
-Privacy policy URL: host `play/privacy.html` after you replace CONTACT_EMAIL. Until that page is on a public URL, Play will not accept a policy that nobody can open. The in-app page already live at `https://randyscustomapps.github.io/strikeout/privacy.html` is the same location and on-device wording, without the company contact line. Use this draft once it is published. A privacy policy URL is required because the app uses location.
+Privacy policy URL: host `play/privacy.html`. The contact email on that page is randyscustomapps@gmail.com. Until that page is on a public URL, Play will not accept a policy that nobody can open. The in-app page already live at `https://randyscustomapps.github.io/strikeout/privacy.html` is the same location and on-device wording, without the company contact line. Use this draft once it is published. A privacy policy URL is required because the app uses location.
 
 ## Store graphics
 
