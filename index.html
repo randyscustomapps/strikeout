@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<script>window.STRIKEOUT_PWA=true;window.__soBIP=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__soBIP=e;try{window.dispatchEvent(new Event('so-bip'));}catch(err){}});</script>
+<script>window.STRIKEOUT_PWA=true;</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <title>Strikeout</title>
 <style>
@@ -465,16 +465,6 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 #sheetScrim.anim,#subScrim.anim{transition:opacity .34s linear}
 #sheetScrim.anim.spring,#subScrim.anim.spring{transition:opacity .34s linear}
 
-/* one-time install hint — overlay, does not reflow the field */
-.install{position:fixed;z-index:30;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(480px,calc(100% - 24px));background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
-.install h2{margin:0;font-family:var(--display);font-weight:800;font-size:1.45rem;letter-spacing:.06em;text-transform:uppercase}
-.install p{margin:0;font-size:1.05rem;font-weight:600;line-height:1.3}
-.install-acts{display:flex;gap:8px}
-.install-acts button{flex:1;min-height:60px;border-radius:14px;cursor:pointer;font-weight:800}
-.install-go{border:0;background:var(--on);color:var(--on-ink);font-family:var(--display);font-size:1.5rem;letter-spacing:.05em;text-transform:uppercase}
-.install-ok{border:2px solid var(--line);background:var(--surface2);font-size:1.15rem}
-.install-go:active,.install-ok:active{transform:scale(.98)}
-
 /* Others and Didn’t follow count sheets. A native dialog in the top layer,
    fixed to the bottom of the glass, outside the fitted field column, so the
    field does not move or re-fit while one is open. Two headers: a short
@@ -541,7 +531,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
   --stroke:linear-gradient(165deg,#f6e4ae 0%,var(--line) 46%,#7a5420 100%);
   --stroke-gold:linear-gradient(165deg,#fff3c8 0%,#e8c15a 46%,#a56e18 100%);
 }
-.app .panel,.seg2,.install{
+.app .panel,.seg2{
   border:2px solid transparent;
   background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--stroke) border-box;
 }
@@ -550,7 +540,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 .chip:not([aria-pressed="true"]),
 .seg3 button:not([aria-pressed="true"]),
 .chkbtn,.hrow input,.sh-x,.crow:not(.has),
-.sh-acts .sh-go:not(.pri),.install-ok{
+.sh-acts .sh-go:not(.pri){
   border:2px solid transparent;
   background:linear-gradient(var(--surface2),var(--surface2)) padding-box,var(--stroke) border-box;
 }
@@ -884,15 +874,6 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
       <div id="privBody" style="display:flex;flex-direction:column;gap:inherit"></div>
     </div>
   </main>
-</div>
-
-<div id="installHint" class="install" hidden role="region" aria-label="Install Strikeout">
-  <h2 id="installTitle">Install app</h2>
-  <p id="installCopy"></p>
-  <div class="install-acts">
-    <button class="install-go" id="installGo" type="button">Install app</button>
-    <button class="install-ok" id="installOk" type="button">Not now</button>
-  </div>
 </div>
 
 <!-- Count sheets. Stay open while you adjust; X, the dimmed field, Escape, or Back closes. -->
@@ -2818,7 +2799,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.71';
+const APP_VERSION='1.0.72';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
@@ -2855,83 +2836,6 @@ if(HOSTED){
   setInterval(checkUpdate,20*60*1000);
   if(location.search)history.replaceState(null,'',location.pathname);
 }else{$('verSt').textContent='Updates work in the installed app';}
-
-// One-time install / Add to Home Screen. Separate from settings (strikeout.v1).
-const INSTALL_KEY='strikeout.installHint.v1';
-function appInstalled(){
-  try{
-    if(navigator.standalone===true)return true;
-    if(window.matchMedia('(display-mode: standalone)').matches)return true;
-    if(window.matchMedia('(display-mode: fullscreen)').matches)return true;
-  }catch(e){}
-  return false;
-}
-function installHintSeen(){
-  try{return localStorage.getItem(INSTALL_KEY)==='1';}catch(e){return true;}
-}
-function rememberInstallHint(){
-  try{localStorage.setItem(INSTALL_KEY,'1');}catch(e){}
-}
-function hideInstallHint(){const el=$('installHint');if(el)el.hidden=true;}
-let deferredPrompt=window.__soBIP||null;
-let installHintDue=false;
-function isIos(){
-  const ua=navigator.userAgent||'';
-  return /iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-}
-function paintInstallBanner(kind){
-  const go=$('installGo'),ok=$('installOk');
-  if(kind==='ios'){
-    $('installTitle').textContent='Add to Home Screen';
-    $('installCopy').textContent='Tap Share, then Add to Home Screen.';
-    go.hidden=true;
-    ok.hidden=false;
-    ok.textContent='OK';
-    return;
-  }
-  $('installTitle').textContent='Install app';
-  if(deferredPrompt){
-    $('installCopy').textContent='Put Strikeout on this phone. It opens like an app, even with no signal.';
-    go.hidden=false;
-    go.textContent='Install app';
-    ok.hidden=false;
-    ok.textContent='Not now';
-  }else{
-    $('installCopy').textContent='Chrome menu (⋮) → Install app or Add to Home screen.';
-    go.hidden=false;
-    go.textContent='Got it';
-    ok.hidden=true;
-  }
-}
-function openInstallHint(kind){
-  // First run only. Already installed or dismissed stays quiet.
-  if(!HOSTED||appInstalled()||installHintSeen())return;
-  const el=$('installHint');if(!el)return;
-  paintInstallBanner(kind);
-  el.hidden=false;
-}
-function maybeInstallHint(){
-  if(!HOSTED||appInstalled()||installHintSeen())return;
-  if(isIos()){openInstallHint('ios');return;}
-  openInstallHint('android');
-}
-$('installOk').addEventListener('click',()=>{rememberInstallHint();hideInstallHint();});
-$('installGo').addEventListener('click',async()=>{
-  const ev=deferredPrompt;
-  if(!ev){rememberInstallHint();hideInstallHint();return;}
-  deferredPrompt=null;window.__soBIP=null;
-  rememberInstallHint();hideInstallHint();
-  try{await ev.prompt();await ev.userChoice;}catch(e){}
-});
-window.addEventListener('appinstalled',()=>{deferredPrompt=null;window.__soBIP=null;rememberInstallHint();hideInstallHint();});
-window.addEventListener('so-bip',()=>{
-  deferredPrompt=window.__soBIP||deferredPrompt;
-  if(!installHintDue||isIos()||!deferredPrompt)return;
-  const el=$('installHint');
-  if(el&&!el.hidden){paintInstallBanner('android');return;}
-  openInstallHint('android');
-});
-if(HOSTED)setTimeout(()=>{installHintDue=true;maybeInstallHint();},900);
 })();
 </script>
 
