@@ -653,7 +653,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
           <button class="tog yn" type="button" data-mode="single"><b>Not following</b></button>
         </div>
         <button class="leave-tog cntrow" id="othersBtn" type="button" aria-haspopup="dialog" aria-controls="othersSheet">
-          <span class="leave-lab">Others</span>
+          <span class="leave-lab">Following</span>
           <span class="leave-sum"><span id="othersN">0</span><small id="othersBits">none</small></span>
           <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
         </button>
@@ -815,8 +815,8 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
           <div class="ph"><h2>Following / Not following</h2></div>
           <p class="note"><b>Other combines</b> are everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
           <p class="note"><b>Following me</b> — they are out with you. <b>Following on</b> is their side (usually Right).</p>
-          <p class="note"><b>Not following</b> — you go out alone. Count the others in the <b>Others</b> sheet. <b>Didn’t follow</b>, <b>Following on</b>, and <b>Skip / Outside</b> stay in place but grayed out. They are not used until <b>Following me</b> is on again, and Didn’t follow counts are not added again.</p>
-          <p class="note"><b>Others</b> shows the total and who is counted. Tap it to open the count sheet: one row per header, with − and + for each. It stays open while you adjust. Close it with the <b>X</b>, a tap on the dimmed field, or Back.</p>
+          <p class="note"><b>Not following</b> — you go out alone. Count the others in the <b>Following</b> sheet. <b>Didn’t follow</b>, <b>Following on</b>, and <b>Skip / Outside</b> stay in place but grayed out. They are not used until <b>Following me</b> is on again, and Didn’t follow counts are not added again.</p>
+          <p class="note"><b>Following</b> shows the total and who is counted. Tap it to open the count sheet: one row per header, with − and + for each. It stays open while you adjust. Close it with the <b>X</b>, a tap on the dimmed field, or Back.</p>
         </section>
 
         <section class="panel">
@@ -887,7 +887,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 <!-- Count sheets. Stay open while you adjust; X, the dimmed field, Escape, or Back closes. -->
 <dialog class="csheet" id="othersSheet" aria-labelledby="othersTitle">
   <div class="sh-bar">
-    <h2 id="othersTitle">Others<small>Following me out. Not counting me.</small></h2>
+    <h2 id="othersTitle">Following<small>Following me out. Not counting me.</small></h2>
     <button class="sh-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <div class="sh-list" id="othersList"></div>
@@ -2807,7 +2807,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.74';
+const APP_VERSION='1.0.75';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
