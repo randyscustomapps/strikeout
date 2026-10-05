@@ -477,6 +477,13 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 .ovlrow{justify-content:center}
 .ovlrow .nm{align-items:center;flex:1;padding-left:0}
 .ovlrow .cnt{font-size:3.2rem;line-height:.85}
+/* Import asks before it changes headers. Same sheet, full-width choices. */
+#impPrev{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh-acts{flex:none;display:flex;flex-direction:column;gap:8px;padding:8px 8px calc(12px + env(safe-area-inset-bottom,0px))}
+.sh-acts .sh-go{min-height:64px;width:100%;border-radius:14px;border:2px solid var(--line);background:var(--surface2);color:inherit;font-family:var(--display);font-weight:800;font-size:1.28rem;letter-spacing:.02em;line-height:1.05;padding:8px 14px;cursor:pointer;text-align:center}
+.sh-acts .sh-go:active{transform:scale(.98)}
+.sh-acts .sh-go.pri{background:var(--on);color:var(--on-ink);border-color:var(--on)}
+.imp-warn{margin:0;padding:0 6px;font-weight:700;font-size:1rem;line-height:1.25;color:var(--danger);text-align:center}
 </style>
 
 </head>
@@ -625,7 +632,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
         <button class="wide" id="exportHeads" type="button">Share header file</button>
         <button class="wide" id="importHeads" type="button">Import header file</button>
         <input id="importFile" type="file" accept="application/json,.json" hidden>
-        <p class="note" id="headFileNote" role="status">Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.</p>
+        <p class="note" id="headFileNote" role="status">Share header file sends each name with feet and inches. Import header file asks before it changes your headers.</p>
         <div class="mline" id="mathLine" aria-live="polite"></div>
       </section>
 
@@ -743,7 +750,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
         <section class="panel">
           <div class="ph"><h2>Headers</h2></div>
           <p class="note">My header is your GPS line width. Pick it under <b>My header</b> in Settings; the field does not change it. The same width with a different name is a different header.</p>
-          <p class="note">Width is feet and inches, such as 35 ft 1 in. Share header file sends every name, feet, and inches. Import header file adds those headers and leaves counts, overlap, and the rest alone. The same name and the same width is not added twice.</p>
+          <p class="note">Width is feet and inches, such as 35 ft 1 in. Share header file sends every name, feet, and inches. Import header file asks first: keep yours and add new ones, or replace your headers with the file. Replace drops counts on the headers it removes. Overlap, the current row, and the rest stay. The same name and the same width is not added twice.</p>
         </section>
 
         <section class="panel">
@@ -809,6 +816,18 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
     </div>
   </div>
   <div class="sh-foot"><span id="ovlFoot"></span><span class="big" id="ovlLines"></span></div>
+</dialog>
+<dialog class="csheet" id="impSheet" aria-labelledby="impTitle">
+  <div class="sh-bar">
+    <h2 id="impTitle">Import headers<small id="impPrev"></small></h2>
+    <button class="sh-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="sh-acts">
+    <button class="sh-go pri" type="button" data-import="merge">Keep my headers and add new ones</button>
+    <p class="imp-warn" id="impWarn" hidden></p>
+    <button class="sh-go" type="button" data-import="replace">Replace my headers with this file</button>
+    <button class="sh-go" type="button" data-close>Cancel</button>
+  </div>
 </dialog>
 
 <script>
@@ -1526,7 +1545,8 @@ function closeSheet(k){
   if(typeof d.close==='function')d.close();
   else d.removeAttribute('open');
 }
-function anySheetOpen(){return sheetOpen('others')||sheetOpen('didnt')||sheetOpen('ovl');}
+function importSheetOpen(){const d=$('impSheet');return !!(d&&d.open);}
+function anySheetOpen(){return sheetOpen('others')||sheetOpen('didnt')||sheetOpen('ovl')||importSheetOpen();}
 Object.keys(SHEETS).forEach(k=>{
   const d=$(SHEETS[k].el);
   if(!d)return;
@@ -1546,6 +1566,7 @@ window.addEventListener('popstate',()=>{
   if(!anySheetOpen())return;
   sheetHist=false;
   closeSheet('others');closeSheet('didnt');closeSheet('ovl');
+  if(typeof closeImport==='function')closeImport();
 });
 
 // field interactions
@@ -1853,26 +1874,112 @@ function rowToHead(row){
   if(!(total>0))return null;
   return {name,in:total};
 }
-function importHeaderData(data){
-  const added=[],had=[];
-  let bad=0;
+function newHeadId(){return 'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function headShown(h){return h.name?h.name+' '+fmtWidth(h.in):fmtWidth(h.in);}
+function takeHeaderRows(data){
+  const rows=[];let bad=0;
   data.headers.forEach(row=>{
     const h=rowToHead(row);
     if(!h){bad++;return;}
-    const shown=h.name?h.name+' '+fmtWidth(h.in):fmtWidth(h.in);
+    if(rows.some(x=>normName(x.name)===normName(h.name)&&sameIn(x.in,h.in)))return;
+    rows.push(h);
+  });
+  return {rows,bad};
+}
+function badRowNote(bad){
+  return bad?('Skipped '+bad+' row'+(bad===1?'':'s')+' that wasn’t a name with feet and inches.'):'';
+}
+function mergeHeaderFile(pending){
+  const added=[],had=[];
+  pending.rows.forEach(h=>{
+    const shown=headShown(h);
     if(S.heads.some(x=>normName(x.label)===normName(h.name)&&sameIn(x.in,h.in))){had.push(shown);return;}
-    S.heads.push({id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),in:h.in,label:h.name});
+    S.heads.push({id:newHeadId(),in:h.in,label:h.name});
     added.push(shown);
   });
   save();renderSettings();renderField();
   const bits=[];
   if(added.length)bits.push(briefHeads(added,'Added'));
   if(had.length)bits.push(briefHeads(had,'Already had'));
-  if(bad)bits.push('Skipped '+bad+' row'+(bad===1?'':'s')+' that wasn’t a name with feet and inches.');
-  if(!added.length&&!had.length&&!bad)bits.push('No headers in that file.');
+  const bad=badRowNote(pending.bad);if(bad)bits.push(bad);
   if(!added.length&&had.length)bits.push('Nothing else was changed.');
+  setHeadNote(bits.join(' ')||'Nothing was changed.');
+}
+function replaceHeaderFile(pending){
+  const old=S.heads.find(h=>h.id===S.lead)||S.heads[0]||null;
+  const oldName=old?String(old.label||'').trim():'';
+  const oldIn=old?old.in:null;
+  const next=[];
+  pending.rows.forEach(h=>{
+    if(next.some(x=>normName(x.label)===normName(h.name)&&sameIn(x.in,h.in)))return;
+    next.push({id:newHeadId(),in:h.in,label:h.name});
+  });
+  if(!next.length){setHeadNote('That file has no headers to import.');return;}
+  S.heads.forEach(h=>{
+    if(S.counts)delete S.counts[h.id];
+    if(S.leaveCounts)delete S.leaveCounts[h.id];
+  });
+  S.heads=next;
+  let pick=next.find(h=>oldIn!=null&&sameIn(h.in,oldIn)&&normName(h.label)===normName(oldName));
+  if(!pick&&oldIn!=null)pick=next.find(h=>sameIn(h.in,oldIn));
+  if(!pick)pick=next[0];
+  S.lead=pick.id;
+  save();renderSettings();renderField();
+  const bits=['Replaced your headers with '+next.length+' from the file.','My header is now '+nameSize(pick)+'.'];
+  const bad=badRowNote(pending.bad);if(bad)bits.push(bad);
   setHeadNote(bits.join(' '));
 }
+let importPending=null;
+function closeImport(){
+  const d=$('impSheet');
+  if(!d||!d.open){importPending=null;return;}
+  if(typeof d.close==='function')d.close();
+  else d.removeAttribute('open');
+}
+function openImport(rows,bad){
+  importPending={rows,bad};
+  const label=h=>h.name?h.name+' '+fmtShort(h.in):fmtShort(h.in);
+  const n=rows.length;
+  $('impPrev').textContent='This file has '+n+' header'+(n===1?'':'s')+': '+rows.map(label).join(', ');
+  let hit=0;
+  S.heads.forEach(h=>{
+    const o=(S.counts&&S.counts[h.id])||0;
+    const l=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);
+    if(o>0||l>0)hit++;
+  });
+  const warn=$('impWarn');
+  if(hit){warn.hidden=false;warn.textContent='Replace will clear counts on '+hit+' header'+(hit===1?'':'s')+'.';}
+  else warn.hidden=true;
+  const d=$('impSheet');
+  if(d.open)return;
+  if(typeof d.showModal==='function')d.showModal();
+  else d.setAttribute('open','');
+  try{history.pushState({soSheet:'imp'},'');sheetHist=true;}catch(e){sheetHist=false;}
+}
+function finishImport(mode){
+  const pending=importPending;
+  importPending=null;
+  closeImport();
+  if(!pending||(mode!=='merge'&&mode!=='replace'))return;
+  if(mode==='replace')replaceHeaderFile(pending);
+  else mergeHeaderFile(pending);
+}
+(function(){
+  const d=$('impSheet');
+  if(!d)return;
+  d.addEventListener('click',e=>{
+    if(e.target===d){closeImport();return;}
+    const b=e.target.closest('button');
+    if(!b)return;
+    if(b.dataset.import){finishImport(b.dataset.import);return;}
+    if(b.hasAttribute('data-close'))closeImport();
+  });
+  d.addEventListener('cancel',e=>{e.preventDefault();closeImport();});
+  d.addEventListener('close',()=>{
+    importPending=null;
+    if(sheetHist&&!anySheetOpen()){sheetHist=false;try{history.back();}catch(e){}}
+  });
+})();
 async function shareHeaderFile(){
   const text=JSON.stringify(headerFileObj(),null,2);
   const blob=new Blob([text],{type:'application/json'});
@@ -1905,7 +2012,9 @@ $('importFile').addEventListener('change',()=>{
       setHeadNote('That file isn’t a Strikeout header file.');
       return;
     }
-    importHeaderData(data);
+    const got=takeHeaderRows(data);
+    if(!got.rows.length){setHeadNote('That file has no headers to import.');return;}
+    openImport(got.rows,got.bad);
   };
   reader.onerror=()=>setHeadNote('Couldn’t read that file.');
   reader.readAsText(f);
@@ -1933,7 +2042,7 @@ let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file asks before it changes your headers.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
   if(S.autoAdv)startAuto();
   renderSettings();
 });
@@ -2428,7 +2537,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.61';
+const APP_VERSION='1.0.62';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
