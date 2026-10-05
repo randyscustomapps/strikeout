@@ -26,7 +26,7 @@
 <style>
 :root{
   color-scheme:light;
-  --bg:#F2DFA7; --surface:#FFF4D2; --surface2:#E9CB78; --line:#C9A75A;
+  --bg:#F2DFA7; --surface:#F8E8B8; --surface2:#E9CB78; --line:#C9A75A;
   --ink:#2A1D0A; --muted:#6E5731;
   --on:#2A1D0A; --on-ink:#FFD968;
   --res-bg:#2A1D0A; --res-ink:#FFD968; --res-muted:#CDB27A;
@@ -58,7 +58,7 @@
 /* app's own Day / Night switch wins over everything above */
 :root.force-day{
   color-scheme:light;
-  --bg:#F2DFA7; --surface:#FFF4D2; --surface2:#E9CB78; --line:#C9A75A;
+  --bg:#F2DFA7; --surface:#F8E8B8; --surface2:#E9CB78; --line:#C9A75A;
   --ink:#2A1D0A; --muted:#6E5731;
   --on:#2A1D0A; --on-ink:#FFD968;
   --res-bg:#2A1D0A; --res-ink:#FFD968; --res-muted:#CDB27A;
@@ -2818,7 +2818,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.70';
+const APP_VERSION='1.0.71';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
