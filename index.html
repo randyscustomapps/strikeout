@@ -105,7 +105,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .chkbtn{height:52px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1rem;cursor:pointer}
 
 /* result */
-.result{background:var(--res-bg);color:var(--res-ink);border-radius:18px;padding:12px 16px 10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.result{background:linear-gradient(180deg,rgba(255,210,110,.13),rgba(255,210,110,0) 34%,rgba(0,0,0,.22)),var(--res-bg);color:var(--res-ink);border-radius:18px;padding:12px 16px 10px;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 1px 0 rgba(255,226,160,.26),inset 0 0 0 1px rgba(224,169,28,.24),0 6px 18px rgba(0,0,0,.18)}
 .r-main{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
 .r-skip{display:flex;align-items:baseline;gap:6px}
 .r-lbl{font-family:var(--display);font-weight:800;font-size:1.4rem;letter-spacing:.06em;text-transform:uppercase;color:var(--res-muted)}
@@ -361,10 +361,11 @@ html.fit-tiny #field>.result{padding-block:3px}
    sheet is not a position:fixed 100dvh box. That viewport is short by the
    top inset on an iPhone Home Screen app and left a dead band at the bottom
    of the glass. --glass-h is the measured glass (screen height when iOS reports a
-   short innerHeight). The title bar is a flex row outside the scroller, so
-   a rubber-band or a fast fling cannot translate it. The body scrolls
-   underneath. The inset lives in the bar's padding, painted with the page
-   background. The title and back arrow stay centered on the row. */
+   short innerHeight). The title bar is position:absolute over the scroller,
+   so a rubber-band or a fast fling cannot translate it. The body scrolls
+   underneath the frost. The bar starts at the top of the sheet, so its fill
+   covers the safe-area inset. The scroller's top padding equals that bar
+   height plus the old gap, so the first line rests just below the title. */
 .stage{position:relative;min-width:0}
 #setBtn.is-covered{visibility:hidden}
 #sheetLayer{
@@ -377,22 +378,51 @@ html.fit-tiny #field>.result{padding-block:3px}
   min-height:0;
   display:flex;flex-direction:column;gap:8px;
   --bar-top:calc(8px + env(safe-area-inset-top,0px));
+  --bar-row:50px;
+  --bar-gap:8px;
   padding-bottom:0;
   overflow:hidden;
   background:var(--bg);
   touch-action:pan-y;
   overscroll-behavior:none;
 }
-@media (max-width:560px){.set.sheet{gap:6px;--bar-top:calc(6px + env(safe-area-inset-top,0px))}}
-.set.sheet .sheet-bar{position:relative;z-index:5;flex:none;min-height:50px;padding-top:var(--bar-top);padding-inline:max(12px,calc((100% - 1100px) / 2));background:var(--bg)}
-.set.sheet .sheet-bar .brand{position:absolute;left:50%;top:var(--bar-top);bottom:0;transform:translateX(-50%);white-space:nowrap;pointer-events:none}
-@media (max-width:560px){.set.sheet .sheet-bar{min-height:46px}}
+@media (max-width:560px){.set.sheet{gap:6px;--bar-top:calc(6px + env(safe-area-inset-top,0px));--bar-row:46px;--bar-gap:6px}}
+.set.sheet .sheet-bar{
+  position:absolute;top:0;left:0;right:0;z-index:8;
+  height:calc(var(--bar-top) + var(--bar-row));min-height:0;flex:none;
+  padding-top:var(--bar-top);padding-inline:max(12px,calc((100% - 1100px) / 2));
+  background:rgba(242,223,167,.52);
+  background:color-mix(in srgb, var(--bg) 52%, transparent);
+  -webkit-backdrop-filter:saturate(1.6) blur(14px);
+  backdrop-filter:saturate(1.6) blur(14px);
+  box-shadow:inset 0 -1px 0 rgba(42,29,10,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .set.sheet .sheet-bar{
+    background:rgba(12,9,4,.54);
+    background:color-mix(in srgb, var(--bg) 54%, transparent);
+    box-shadow:inset 0 -1px 0 rgba(217,190,133,.28);
+  }
+}
+:root[data-theme="dark"] .set.sheet .sheet-bar,
+:root.force-night .set.sheet .sheet-bar{
+  background:rgba(12,9,4,.54);
+  background:color-mix(in srgb, var(--bg) 54%, transparent);
+  box-shadow:inset 0 -1px 0 rgba(217,190,133,.28);
+}
+:root.force-day .set.sheet .sheet-bar{
+  background:rgba(242,223,167,.52);
+  background:color-mix(in srgb, var(--bg) 52%, transparent);
+  box-shadow:inset 0 -1px 0 rgba(42,29,10,.22);
+}
+.set.sheet .sheet-bar .brand{position:absolute;left:50%;top:var(--bar-top);bottom:0;transform:translateX(-50%);white-space:nowrap;pointer-events:none;text-shadow:0 0 8px var(--bg),0 0 2px var(--bg)}
+.set.sheet .sheet-bar .iconbtn{text-shadow:0 0 8px var(--bg),0 0 2px var(--bg)}
 .set.sheet > .ctrls,
 #settings.sheet #setView > .ctrls{
   flex:1 1 auto;min-height:0;min-width:0;width:100%;max-width:none;
   overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;
   -webkit-overflow-scrolling:touch;touch-action:pan-y;
-  padding:0 max(12px,calc((100% - 1100px) / 2)) calc(24px + env(safe-area-inset-bottom,0px));
+  padding:calc(var(--bar-top) + var(--bar-row) + var(--bar-gap)) max(12px,calc((100% - 1100px) / 2)) calc(24px + env(safe-area-inset-bottom,0px));
 }
 .set.sheet > .ctrls > *,
 #settings.sheet #setView > .ctrls > *{flex-shrink:0}
@@ -2537,7 +2567,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.62';
+const APP_VERSION='1.0.63';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
