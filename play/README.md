@@ -1,4 +1,4 @@
-# Strikeout on Google Play
+# Strikeout Harvest on Google Play
 
 Draft launch assets for the paid Android app. The website at `https://randyscustomapps.github.io/strikeout/` stays the free demo. Nothing in this folder changes `index.html`, `sw.js`, or `version.json`.
 
@@ -17,11 +17,12 @@ It is only a suggestion. Play locks the id at the first upload, and it cannot be
 | Start URL | `https://randyscustomapps.github.io/strikeout/` |
 | Orientation | Portrait. The website manifest still allows any orientation. The Play app does not. |
 | Theme | Status and navigation `#2A1D0A` (day chrome) and `#0C0904` (night). Splash background `#F2DFA7`, from the web manifest. |
-| Icon | The live `icon-512.png`, the flat-auger combine. |
+| Icon | The live `icon-512.png`: flat-auger combine and the STRIKEOUT / HARVEST lockup. |
 | minSdk / targetSdk | 21 / 36. New Play apps in October 2026 have to target Android 16 (API 36). |
-| Version | `versionName` 1.0.69, `versionCode` 1, matching the current site. Play's versionCode must go up on every upload. It is independent of the website's `APP_VERSION` after this. |
+| Version | `versionName` 1.0.74, `versionCode` 1, matching the current site. Play's versionCode must go up on every upload. It is independent of the website's `APP_VERSION` after this. |
 | Location | Location delegation is on, so GPS uses the Android permission dialog. The manifest requests precise and coarse location, in the foreground. |
-| Notifications | DelegationService has to be enabled for that location bridge, which is Bubblewrap's notification flag. Strikeout never posts a notification. `build-release.sh` strips `POST_NOTIFICATIONS` after a Bubblewrap update rewrites the manifest. |
+| Name | Application name Strikeout Harvest. Launcher label Strikeout, same as the web manifest `short_name`, so it fits under the icon. |
+| Notifications | DelegationService stays enabled so location delegation can register. Strikeout Harvest never posts a notification. `build-release.sh` strips `POST_NOTIFICATIONS` after a Bubblewrap update rewrites the manifest. |
 | Fallback | Custom Tabs, if the device has no Trusted Web Activity browser. Not a bundled WebView. |
 | Offline | The site's service worker. Open the app once with a connection so Chrome can cache it. After that it runs with no cell service, same as the home-screen install. Offline fullscreen mode also needs the asset links file below. Until that file is live, Chrome may show a browser bar, and the cached pages still load. |
 
@@ -122,7 +123,7 @@ Play Billing and the Digital Goods API sell in-app products and subscriptions: S
 
 Two mechanisms exist. Neither is required to ship.
 
-- **Play Integrity API**, `appLicensingVerdict`: `LICENSED`, `UNLICENSED`, or `UNEVALUATED`. This is the current way to ask Play whether the install came from a purchase. The standard API wants a small backend to check the token. Strikeout has no backend. Skip it until there is one.
+- **Play Integrity API**, `appLicensingVerdict`: `LICENSED`, `UNLICENSED`, or `UNEVALUATED`. This is the current way to ask Play whether the install came from a purchase. The standard API wants a small backend to check the token. Strikeout Harvest has no backend. Skip it until there is one.
 - **Licensing Verification Library (LVL)**, the older paid-app check. It can run in the Android wrapper, before the Trusted Web Activity opens, and it talks to Play from the device with the app's license key. It fits a no-server app better than Play Integrity. It is still extra code, obfuscation, and a failure mode in the cab when Play is unreachable. Add it only if copied APKs become a real problem.
 
 Do not block the website. Buyers and demo users load the same origin.

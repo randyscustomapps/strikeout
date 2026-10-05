@@ -23,17 +23,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.randyscustomapps.strikeout">
 
-    <!-- Strikeout never posts notifications. android-browser-helper adds
+    <!-- Strikeout Harvest never posts notifications. android-browser-helper adds
          POST_NOTIFICATIONS because location delegation uses DelegationService.
          Drop the permission so Play does not treat this as a notification app.
          bubblewrap update rewrites this file; build-release.sh puts the line back. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:node="remove" />
-
-    
-
-    
-
-    
 
     <application
         android:name="Application"

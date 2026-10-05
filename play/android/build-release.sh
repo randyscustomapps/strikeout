@@ -16,7 +16,7 @@ fi
 
 # bubblewrap update rewrites AndroidManifest.xml and, when notification delegation
 # is on, inserts POST_NOTIFICATIONS. Location delegation needs that service enabled,
-# but Strikeout never posts a notification. Strip the permission before compiling.
+# but Strikeout Harvest never posts a notification. Strip the permission before compiling.
 python3 - << 'PY'
 from pathlib import Path
 import re

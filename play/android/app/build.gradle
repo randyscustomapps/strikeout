@@ -24,7 +24,7 @@ def twaManifest = [
     applicationId: 'com.randyscustomapps.strikeout',
     hostName: 'randyscustomapps.github.io', // The domain being opened in the TWA.
     launchUrl: '/strikeout/', // The start path for the TWA. Must be relative to the domain.
-    name: 'Strikeout', // The application name.
+    name: 'Strikeout Harvest', // The application name.
     launcherName: 'Strikeout', // The name shown on the Android Launcher.
     themeColor: '#2A1D0A', // The color used for the status bar.
     themeColorDark: '#0C0904', // The color used for the dark status bar.
@@ -58,7 +58,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 36
         versionCode 1
-        versionName "1.0.69"
+        versionName "1.0.74"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name

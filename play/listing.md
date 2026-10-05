@@ -1,4 +1,4 @@
-# Strikeout — Play Store listing draft
+# Strikeout Harvest — Play Store listing draft
 
 Paste the blocks below into Play Console. Limits are Google's. The price is a console setting, not part of the description, because Play localizes prices.
 
@@ -8,11 +8,11 @@ Graphics to upload are in `play/graphics/`. See the file list at the end.
 
 Play allows 30 characters.
 
-**Use:** Strikeout
+**Use:** Strikeout Harvest
 
-**Alternative, if you want the harvest in the name:** Strikeout Harvest
+17 characters. The limit is 30.
 
-The launcher icon already says the word through the combine mark. The in-app title is Strikeout. The alternative is only for the store name.
+The in-app header is heavy STRIKEOUT with small gold HARVEST between thin gold rules. The Android launcher label is Strikeout, the web manifest `short_name`, so the name fits under the icon. The store name is the full Strikeout Harvest.
 
 ## Short description
 
@@ -27,9 +27,9 @@ Skip GPS lines and nudge so the crew's return pass finishes flush.
 4000 characters maximum. Paste as plain text. This draft is the block between the fences.
 
 ```
-Strikeout tells the lead combine how many GPS lines to skip, and how far to nudge, so the crew's return pass finishes the land flush.
+Strikeout Harvest tells the lead combine how many GPS lines to skip, and how far to nudge, so the crew's return pass finishes the land flush.
 
-You are on a line. The others are out with you, or they are not. Strikeout turns header widths, overlap, and who is actually in the pass into one card: the line to go to, and a nudge left or right after the turn.
+You are on a line. The others are out with you, or they are not. Strikeout Harvest turns header widths, overlap, and who is actually in the pass into one card: the line to go to, and a nudge left or right after the turn.
 
 On the pass
 Enter the GPS line you are on now, including the first pass. Count up or count down. Go to is that line plus or minus the move. On 78 with +6, count up, you go to 84.
@@ -92,7 +92,7 @@ App type: **not a game**. In the IARC questionnaire, choose the utility / all-ot
 | User-generated content that other people can browse or that is shared publicly | No |
 | Unrestricted internet, social, or chat | No |
 
-Header share: Settings can hand header names and widths to the phone's share sheet, or to a file the operator sends. Strikeout does not host that message, does not have profiles, and does not show anyone else's content. If a question's wording says that any sharing at all counts, answer Yes only to that narrow item, then No to public posting, in-app chat, and moderation. Nothing is posted to Strikeout, so there is nothing to moderate.
+Header share: Settings can hand header names and widths to the phone's share sheet, or to a file the operator sends. Strikeout Harvest does not host that message, does not have profiles, and does not show anyone else's content. If a question's wording says that any sharing at all counts, answer Yes only to that narrow item, then No to public posting, in-app chat, and moderation. Nothing is posted to Strikeout Harvest, so there is nothing to moderate.
 
 Expected certificate: Everyone / PEGI 3 / low maturity. That is the content rating. It is separate from target age. Do not raise the content rating just because the operators are adults.
 
@@ -103,7 +103,7 @@ Expected certificate: Everyone / PEGI 3 / low maturity. That is the content rati
 - Designed for children / Families program: **No.**
 - Ads: **No.** The app does not contain ads.
 
-Strikeout is a field tool for people running combines and harvest crews.
+Strikeout Harvest is a field tool for people running combines and harvest crews.
 
 ## Ads and the other App content declarations
 
@@ -136,7 +136,7 @@ Do not declare location as collected. Do declare the location **permission** in 
 - Background location: **no.** The manifest does not request background location. There is no foreground service.
 - Is location required for the app to function? **No.** The line card works with a typed row if location is denied.
 
-Notifications: the package does not request the notification permission. Strikeout never posts a notification. See `play/README.md` for why the project file mentions that permission and then removes it.
+Notifications: the package does not request the notification permission. Strikeout Harvest never posts a notification. See `play/README.md` for why the project file mentions that permission and then removes it.
 
 Privacy policy URL: host `play/privacy.html` after you replace CONTACT_EMAIL. Until that page is on a public URL, Play will not accept a policy that nobody can open. The in-app page already live at `https://randyscustomapps.github.io/strikeout/privacy.html` is the same location and on-device wording, without the company contact line. Use this draft once it is published. A privacy policy URL is required because the app uses location.
 
@@ -144,7 +144,7 @@ Privacy policy URL: host `play/privacy.html` after you replace CONTACT_EMAIL. Un
 
 | File | Size | Use |
 | --- | --- | --- |
-| `play/graphics/icon-512.png` | 512×512 PNG | High-res icon. The flat-auger combine, on the app's dark brown. |
+| `play/graphics/icon-512.png` | 512×512 PNG | High-res icon. Flat-auger combine and the STRIKEOUT / HARVEST lockup, on the app's dark brown. |
 | `play/graphics/feature-graphic.png` | 1024×500 PNG | Feature graphic. |
 | `play/graphics/screenshots/01-home-day.png` | 1200×2460 | Field, day. |
 | `play/graphics/screenshots/02-home-night.png` | 1200×2460 | Field, night. |
