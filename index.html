@@ -76,10 +76,10 @@
 }
 [hidden]{display:none!important}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;touch-action:manipulation}
+html,body{height:100%;touch-action:pan-y;overscroll-behavior-x:none}
 html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:17px;line-height:1.35;padding-inline:12px;user-select:none;-webkit-user-select:none;overscroll-behavior-y:contain}
-button{font-family:var(--ui);color:inherit;touch-action:manipulation}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:17px;line-height:1.35;padding-inline:12px;user-select:none;-webkit-user-select:none;overscroll-behavior-y:contain;overscroll-behavior-x:none}
+button{font-family:var(--ui);color:inherit;touch-action:pan-y}
 button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outline-offset:2px}
 
 .app{max-width:1100px;margin:0 auto;padding-block:8px 24px;display:flex;flex-direction:column;gap:8px}
@@ -374,6 +374,8 @@ html.fit-tiny #field>.result{padding-block:1px}
 #sheetLayer{
   position:absolute;z-index:40;top:0;left:0;width:100%;
   overflow-x:clip;overflow-y:visible;
+  touch-action:pan-y;
+  overscroll-behavior-x:none;
 }
 .set.sheet{
   position:relative;z-index:2;margin:0;
@@ -388,6 +390,7 @@ html.fit-tiny #field>.result{padding-block:1px}
   background:var(--bg);
   touch-action:pan-y;
   overscroll-behavior:none;
+  overscroll-behavior-x:none;
 }
 @media (max-width:560px){.set.sheet{gap:6px;--bar-top:calc(6px + env(safe-area-inset-top,0px));--bar-row:46px;--bar-gap:6px}}
 .set.sheet .sheet-bar{
@@ -423,7 +426,7 @@ html.fit-tiny #field>.result{padding-block:1px}
 .set.sheet > .ctrls,
 #settings.sheet #setView > .ctrls{
   flex:1 1 auto;min-height:0;min-width:0;width:100%;max-width:none;
-  overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;
+  overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;overscroll-behavior-x:none;
   -webkit-overflow-scrolling:touch;touch-action:pan-y;
   padding:calc(var(--bar-top) + var(--bar-row) + var(--bar-gap)) max(12px,calc((100% - 1100px) / 2)) calc(24px + env(safe-area-inset-bottom,0px));
 }
@@ -445,7 +448,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
    of the page. */
 #settings.sheet.sheet-live{clip-path:inset(var(--sheet-y,0px) 0 0 0 round 38px 0 0 0)}
 .sub.sheet.sheet-live{clip-path:inset(var(--sub-y,0px) 0 0 0 round 38px 0 0 0)}
-.set.sheet input,.set.sheet textarea,.set.sheet select{touch-action:auto}
+.set.sheet input,.set.sheet textarea,.set.sheet select{touch-action:pan-y}
 .set.sheet.anim,#sheetEdge.anim,#subEdge.anim{transition:transform .34s cubic-bezier(0,0,.58,1)}
 .set.sheet.anim.spring,#sheetEdge.anim.spring,#subEdge.anim.spring{transition:transform .34s cubic-bezier(.16,1,.3,1)}
 #sheetEdge,#subEdge{
@@ -1588,6 +1591,66 @@ const SHEETS={
   ovl:{el:'ovlSheet',lines:'ovlLines'}
 };
 let sheetHist=false;
+// A dialog pushState that is later dropped with history.back() stays in the
+// forward list. iOS then treats a right-to-left swipe as Forward and slides
+// this same page in again — a second Settings, Help, or Privacy. Keep one
+// guard entry at the tip instead, and never leave that dialog state forward.
+let histGuard=false;
+let sheetSeal=false;
+let forwardMaybe=false;
+let pagePushed=false;
+function pushSheetHist(kind){
+  try{
+    if(histGuard)history.replaceState({soSheet:kind},'');
+    else{history.pushState({soSheet:kind},'');histGuard=true;}
+    sheetHist=true;
+    forwardMaybe=false;
+  }catch(e){sheetHist=false;}
+}
+function eatForwardEntry(){
+  try{history.pushState({soGuard:1},'');histGuard=true;forwardMaybe=false;}
+  catch(e){histGuard=false;}
+}
+function sealSheetHist(){
+  if(!(sheetHist&&!anySheetOpen()))return;
+  sheetHist=false;
+  if(!histGuard)return;
+  sheetSeal=true;
+  try{history.back();}
+  catch(e){
+    sheetSeal=false;
+    try{history.replaceState({soGuard:1},'');histGuard=true;}catch(err){}
+  }
+}
+function pageSheetOpen(){
+  return ['settings','helpSheet','privSheet'].some(id=>{
+    const el=document.getElementById(id);
+    return el&&!el.hidden;
+  });
+}
+// Opening Settings drops a stale forward entry left by a dialog, then closing
+// Settings gives that entry back. Only do it when a forward entry may exist.
+function holdTip(){
+  const stale=!!(history.state&&history.state.soSheet&&!anySheetOpen());
+  if(!forwardMaybe&&!stale)return;
+  forwardMaybe=false;
+  try{
+    history.pushState({soPage:1},'');
+    histGuard=true;
+    pagePushed=true;
+  }catch(e){pagePushed=false;}
+}
+function releasePageHold(){
+  if(!pagePushed)return;
+  pagePushed=false;
+  if(!histGuard)return;
+  sheetSeal=true;
+  try{history.back();}
+  catch(e){
+    sheetSeal=false;
+    try{history.replaceState({soGuard:1},'');histGuard=true;}catch(err){}
+  }
+}
 function sheetOpen(k){const d=$(SHEETS[k].el);return !!(d&&d.open);}
 function buildSheet(k){
   const o=SHEETS[k];
@@ -1637,7 +1700,7 @@ function openSheet(k){
   paintSheet(k);
   if(SHEETS[k].list)$(SHEETS[k].list).scrollTop=0;
   // One history entry while a sheet is up, so the phone's Back closes it.
-  try{history.pushState({soSheet:k},'');sheetHist=true;}catch(e){sheetHist=false;}
+  pushSheetHist(k);
 }
 function closeSheet(k){
   const d=$(SHEETS[k].el);
@@ -1658,16 +1721,57 @@ Object.keys(SHEETS).forEach(k=>{
     fieldAction(b);
   });
   d.addEventListener('cancel',e=>{e.preventDefault();closeSheet(k);});
-  d.addEventListener('close',()=>{
-    if(sheetHist&&!anySheetOpen()){sheetHist=false;try{history.back();}catch(e){}}
-  });
+  d.addEventListener('close',()=>{sealSheetHist();});
 });
 window.addEventListener('popstate',()=>{
-  if(!anySheetOpen())return;
+  if(sheetSeal){
+    sheetSeal=false;
+    histGuard=false;
+    eatForwardEntry();
+    return;
+  }
+  if(!anySheetOpen()){
+    const st=history.state;
+    if(pageSheetOpen()){
+      // A back/forward swipe while a page is up would slide a second copy.
+      if(st&&st.soSheet){try{history.back();}catch(e){}return;}
+      if(histGuard&&!(st&&(st.soGuard||st.soPage))){try{history.forward();}catch(e){}return;}
+      histGuard=!!(st&&(st.soGuard||st.soPage));
+      return;
+    }
+    if(histGuard&&!(st&&st.soGuard))forwardMaybe=true;
+    histGuard=!!(st&&st.soGuard);
+    return;
+  }
   sheetHist=false;
+  histGuard=false;
   closeSheet('others');closeSheet('didnt');closeSheet('ovl');
   if(typeof closeImport==='function')closeImport();
+  eatForwardEntry();
 });
+// A horizontal swipe must not pan the page or trip iOS edge navigation
+// while Settings, Help, or Privacy is the screen. Taps on buttons still land.
+(function(){
+  let x0=0,y0=0,watch=false;
+  document.addEventListener('touchstart',e=>{
+    watch=false;
+    if(!pageSheetOpen()||e.touches.length!==1)return;
+    const t=e.touches[0];
+    x0=t.clientX;y0=t.clientY;watch=true;
+    if(anySheetOpen())return;
+    const edge=t.clientX<28||t.clientX>window.innerWidth-28;
+    if(!edge)return;
+    if(e.target.closest('button,a,input,textarea,select,label'))return;
+    if(e.cancelable)e.preventDefault();
+  },{passive:false});
+  document.addEventListener('touchmove',e=>{
+    if(!watch||!pageSheetOpen()||anySheetOpen()||e.touches.length!==1)return;
+    const t=e.touches[0];
+    const dx=t.clientX-x0,dy=t.clientY-y0;
+    if(Math.abs(dx)<12||Math.abs(dx)<Math.abs(dy))return;
+    if(e.cancelable)e.preventDefault();
+  },{passive:false});
+})();
 
 // field interactions
 function fieldAction(b){
@@ -2055,7 +2159,7 @@ function openImport(rows,bad,kind){
   if(d.open)return;
   if(typeof d.showModal==='function')d.showModal();
   else d.setAttribute('open','');
-  try{history.pushState({soSheet:'imp'},'');sheetHist=true;}catch(e){sheetHist=false;}
+  pushSheetHist('imp');
 }
 function finishImport(mode){
   const pending=importPending;
@@ -2078,7 +2182,7 @@ function finishImport(mode){
   d.addEventListener('cancel',e=>{e.preventDefault();closeImport();});
   d.addEventListener('close',()=>{
     importPending=null;
-    if(sheetHist&&!anySheetOpen()){sheetHist=false;try{history.back();}catch(e){}}
+    sealSheetHist();
   });
 })();
 function bytesToB64url(bytes){
@@ -2578,6 +2682,7 @@ const settingsSheet=makeSheet({
   lift(y){fieldCol.style.transform=y?'translate3d(0,'+y+'px,0)':'';},
   rest(){fieldCol.style.transform='';},
   beforeOpen(){
+    holdTip();
     window.scrollTo(0,0);
     topScroll(sheetEl);
     renderSettings();
@@ -2597,6 +2702,7 @@ const settingsSheet=makeSheet({
     $('setBtn').classList.remove('is-covered');
     S.heads.sort((a,b)=>a.in-b.in||String(a.label||'').localeCompare(String(b.label||'')));save();renderField();
     window.scrollTo(0,0);lockHome(true);wake();
+    releasePageHold();
   }
 });
 // Help and Privacy slide over Settings the way Settings slides over the
@@ -2706,7 +2812,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.67';
+const APP_VERSION='1.0.68';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
