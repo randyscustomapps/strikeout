@@ -189,6 +189,9 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .del{height:56px;border-radius:12px;border:2px solid var(--line);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .del svg{width:22px;height:22px}
 .wide{height:60px;border-radius:14px;border:2px dashed var(--line);background:transparent;font-weight:700;font-size:1.05rem;cursor:pointer}
+.wide.hact{height:auto;min-height:76px;border:2px solid transparent;border-radius:16px;background:linear-gradient(var(--surface2),var(--surface2)) padding-box,var(--stroke) border-box;font-family:var(--display);font-weight:800;font-size:1.45rem;letter-spacing:.02em;line-height:1.05;padding:12px 16px}
+.wide.hact.pri{background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--stroke-gold) border-box}
+.wide.hact:active{transform:scale(.98)}
 .seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .seg3 button{height:60px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1.05rem;cursor:pointer}
 .seg3 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
@@ -369,7 +372,7 @@ html.fit-tiny #field>.result{padding-block:1px}
 .stage{position:relative;min-width:0}
 #setBtn.is-covered{visibility:hidden}
 #sheetLayer{
-  position:absolute;z-index:20;top:0;left:0;width:100%;
+  position:absolute;z-index:40;top:0;left:0;width:100%;
   overflow-x:clip;overflow-y:visible;
 }
 .set.sheet{
@@ -516,7 +519,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 .imp-warn{margin:0;padding:0 6px;font-weight:700;font-size:1rem;line-height:1.25;color:var(--danger);text-align:center}
 
 /* Tan outlines are a 2px diagonal stroke: light gold, the current tan, darker at the bottom.
-   Fills stay the flat colour. Dashed header-file buttons stay a flat dashed line. */
+   Fills stay the flat colour. Add-a-header stays a flat dashed line. */
 :root{
   --stroke:linear-gradient(165deg,#f6e4ae 0%,var(--line) 46%,#7a5420 100%);
   --stroke-gold:linear-gradient(165deg,#fff3c8 0%,#e8c15a 46%,#a56e18 100%);
@@ -725,10 +728,11 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
         <div class="hlabel"><span>Feet</span><span>Inches</span><span>Name (optional)</span><span></span></div>
         <div id="headRows" style="display:flex;flex-direction:column;gap:8px"></div>
         <button class="wide" id="addHead" type="button">+ Add a header size</button>
-        <button class="wide" id="exportHeads" type="button">Share header file</button>
-        <button class="wide" id="importHeads" type="button">Import header file</button>
-        <input id="importFile" type="file" accept="application/json,.json" hidden>
-        <p class="note" id="headFileNote" role="status">Share header file sends each name with feet and inches. Import header file asks before it changes your headers.</p>
+        <button class="wide hact pri" id="shareLink" type="button">Share header link</button>
+        <button class="wide hact" id="exportHeads" type="button">Share header file</button>
+        <button class="wide hact" id="importHeads" type="button">Import header file</button>
+        <input id="importFile" type="file" accept=".json,application/json,text/plain,application/octet-stream,.txt" hidden>
+        <p class="note" id="headFileNote" role="status">On iPhone, open the link and use the file if the Home Screen app doesn’t get the headers.</p>
         <div class="mline" id="mathLine" aria-live="polite"></div>
       </section>
 
@@ -846,7 +850,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
         <section class="panel">
           <div class="ph"><h2>Headers</h2></div>
           <p class="note">My header is your GPS line width. Pick it under <b>My header</b> in Settings; the field does not change it. The same width with a different name is a different header.</p>
-          <p class="note">Width is feet and inches, such as 35 ft 1 in. Share header file sends every name, feet, and inches. Import header file asks first: keep yours and add new ones, or replace your headers with the file. Replace drops counts on the headers it removes. Overlap, the current row, and the rest stay. The same name and the same width is not added twice.</p>
+          <p class="note">Width is feet and inches, such as 35 ft 1 in. Share header link sends every name, feet, and inches. Import asks first: keep yours and add new ones, or replace your headers with the file. Replace drops counts on the headers it removes. Overlap, the current row, and the rest stay. The same name and the same width is not added twice. On iPhone, open the link and use the file if the Home Screen app doesn’t get the headers.</p>
         </section>
 
         <section class="panel">
@@ -2032,11 +2036,12 @@ function closeImport(){
   if(typeof d.close==='function')d.close();
   else d.removeAttribute('open');
 }
-function openImport(rows,bad){
+function openImport(rows,bad,kind){
   importPending={rows,bad};
   const label=h=>h.name?h.name+' '+fmtShort(h.in):fmtShort(h.in);
   const n=rows.length;
-  $('impPrev').textContent='This file has '+n+' header'+(n===1?'':'s')+': '+rows.map(label).join(', ');
+  const word=kind==='link'?'link':'file';
+  $('impPrev').textContent='This '+word+' has '+n+' header'+(n===1?'':'s')+': '+rows.map(label).join(', ');
   let hit=0;
   S.heads.forEach(h=>{
     const o=(S.counts&&S.counts[h.id])||0;
@@ -2076,13 +2081,80 @@ function finishImport(mode){
     if(sheetHist&&!anySheetOpen()){sheetHist=false;try{history.back();}catch(e){}}
   });
 })();
+function bytesToB64url(bytes){
+  let s='';
+  for(let i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlToBytes(s){
+  s=String(s).replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  const bin=atob(s);
+  const out=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);
+  return out;
+}
+function headerShareUrl(){
+  const rows=headerFileObj().headers.map(h=>[h.name,h.ft,h.in]);
+  const u=new URL(location.href);
+  let path=u.pathname;
+  if(path.endsWith('/index.html'))path=path.slice(0,-'index.html'.length);
+  if(!path.endsWith('/'))path+='/';
+  u.pathname=path;
+  u.search='';
+  u.hash='h='+bytesToB64url(new TextEncoder().encode(JSON.stringify(rows)));
+  return u.href;
+}
+function decodeHeaderHash(hash){
+  const m=/^#h=([A-Za-z0-9_-]+)$/.exec(String(hash||'').replace(/\s+/g,''));
+  if(!m)return null;
+  const arr=JSON.parse(new TextDecoder().decode(b64urlToBytes(m[1])));
+  if(!Array.isArray(arr))return null;
+  const headers=[];
+  arr.forEach(row=>{
+    if(!Array.isArray(row)||row.length<3)return;
+    headers.push({name:row[0],ft:row[1],in:row[2]});
+  });
+  return {strikeout:'headers',version:1,headers};
+}
+function consumeHeaderHash(){
+  if(!location.hash||location.hash.indexOf('#h=')!==0)return;
+  let data=null;
+  try{data=decodeHeaderHash(location.hash);}catch(e){data=null;}
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  if(!data){setHeadNote('That link isn’t a Strikeout header link.');try{openSettings();}catch(err){}return;}
+  const got=takeHeaderRows(data);
+  if(!got.rows.length){setHeadNote('That link has no headers to import.');try{openSettings();}catch(err){}return;}
+  openImport(got.rows,got.bad,'link');
+}
+async function copyHeaderLink(url){
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(url);
+      setHeadNote('Header link copied. Paste it into a message.');
+      return;
+    }
+  }catch(e){}
+  setHeadNote('Copy this link: '+url);
+}
+async function shareHeaderLink(){
+  const url=headerShareUrl();
+  if(navigator.share){
+    try{
+      await navigator.share({url});
+      setHeadNote('Header link ready to send. The other phone opens it and picks Keep or Replace.');
+      return;
+    }catch(e){if(e&&e.name==='AbortError')return;}
+  }
+  await copyHeaderLink(url);
+}
 async function shareHeaderFile(){
   const text=JSON.stringify(headerFileObj(),null,2);
   const blob=new Blob([text],{type:'application/json'});
   const file=new File([blob],'strikeout-headers.json',{type:'application/json'});
   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
     try{
-      await navigator.share({files:[file],title:'Strikeout headers'});
+      await navigator.share({files:[file]});
       setHeadNote('Header file ready to send. On the other phone, tap Import header file.');
       return;
     }catch(e){if(e&&e.name==='AbortError')return;}
@@ -2094,6 +2166,7 @@ async function shareHeaderFile(){
   setTimeout(()=>URL.revokeObjectURL(url),2000);
   setHeadNote('Header file downloaded. Send strikeout-headers.json, then tap Import header file on the other phone.');
 }
+$('shareLink').addEventListener('click',()=>{shareHeaderLink();});
 $('exportHeads').addEventListener('click',()=>{shareHeaderFile();});
 $('importHeads').addEventListener('click',()=>$('importFile').click());
 $('importFile').addEventListener('change',()=>{
@@ -2138,7 +2211,7 @@ let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file asks before it changes your headers.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('On iPhone, open the link and use the file if the Home Screen app doesn’t get the headers.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
   if(S.autoAdv)startAuto();
   renderSettings();
 });
@@ -2633,7 +2706,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.65';
+const APP_VERSION='1.0.66';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
@@ -2662,6 +2735,7 @@ async function updateNow(){
 }
 $('updBtn').addEventListener('click',updateNow);
 $('chkBtn').addEventListener('click',()=>{$('verSt').classList.remove('new');$('verSt').textContent='Checking…';checkUpdate();});
+consumeHeaderHash();
 if(HOSTED){
   try{if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
   checkUpdate();
