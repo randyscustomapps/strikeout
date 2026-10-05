@@ -149,17 +149,10 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .chip .cs{font-family:var(--display);font-weight:800;font-size:1.2rem;font-variant-numeric:tabular-nums}
 .chip[aria-pressed="true"]{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .chip:active{transform:scale(.97)}
-.counters{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}
-.ctr{display:flex;align-items:center;gap:6px;background:var(--surface2);border-radius:12px;padding:4px}
-.ctr .nm{flex:1;display:flex;flex-direction:column;padding:0 0 0 8px;min-width:0;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
-.ctr .nm[aria-pressed="true"]{box-shadow:inset 4px 0 0 var(--on)}
-.ctr .w{font-family:var(--display);font-weight:800;font-size:1.8rem;line-height:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ctr .lb{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .step{width:56px;height:52px;border-radius:10px;border:2px solid var(--line);background:var(--surface);font-size:2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
 .step:active{transform:scale(.95);background:var(--on);color:var(--on-ink)}
 .step:disabled{opacity:.35}
 .cnt{min-width:44px;text-align:center;font-family:var(--display);font-weight:900;font-size:2.4rem;font-variant-numeric:tabular-nums}
-.ctr.has{outline:3px solid var(--on);outline-offset:-3px}
 .ovl{display:flex;align-items:center;gap:10px}
 .ovl .big{flex:1;text-align:center;font-family:var(--display);font-weight:900;font-size:2.3rem;font-variant-numeric:tabular-nums;line-height:1}
 .ovl .big small{display:inline;font-family:var(--ui);font-weight:600;font-size:.85rem;color:var(--muted);margin-left:8px}
@@ -231,7 +224,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
   .tog.yn{min-height:48px}
   .step{width:52px;height:48px;font-size:1.85rem}
   .cnt{font-size:2.15rem;min-width:40px}
-  .ctr .w{font-size:1.65rem}
   .ovl .big{font-size:2.05rem}
   .leave-lab{font-size:1.02rem}
   .leave-sum{font-size:.95rem}
@@ -245,16 +237,17 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .seg2 button{height:30px;min-width:3.2rem;padding:0 .55rem;border:0;border-radius:6px;background:transparent;font-family:var(--ui);font-weight:700;font-size:.82rem;color:var(--muted);cursor:pointer;line-height:1;white-space:nowrap}
 .seg2 button[aria-pressed="true"]{background:var(--on);color:var(--on-ink)}
 .seg2 button:active{transform:scale(.98)}
-.leave{display:flex;flex-direction:column;gap:6px;margin-top:2px}
 .leave-tog{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:6px 8px 6px 10px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);color:inherit;cursor:pointer;text-align:left}
-.leave-tog.has,.leave.is-open .leave-tog{border-color:var(--on)}
+.leave-tog.has{border-color:var(--on)}
 .leave-tog:active{transform:scale(.98)}
 .leave-lab{flex:none;font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
 .leave-sum{margin-left:auto;font-family:var(--display);font-weight:800;font-size:1.05rem;line-height:1.15;text-align:right;font-variant-numeric:tabular-nums}
 .leave-chev{width:26px;height:26px;flex:none}
-.leave.is-open .leave-chev{transform:rotate(90deg)}
-.leave-panel{display:none !important}
-.leave.is-open .leave-panel{display:flex !important;flex-direction:column;gap:6px}
+/* Others and Didn’t follow: one fixed-height row each. The big number is the
+   total; the small line is the breakdown, cut with an ellipsis. Tapping opens
+   a count sheet over the field. */
+.cntrow .leave-sum{display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1}
+.cntrow .leave-sum small{display:block;font-family:var(--ui);font-weight:600;font-size:.78rem;color:var(--muted);letter-spacing:0;text-transform:none;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:380px){.r-num{font-size:5rem}.r-nval{font-size:2.3rem}}
 
@@ -298,6 +291,9 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .r-gps{gap:clamp(2px,calc(0.45 * var(--ah,1dvh)),10px) 8px;padding-top:clamp(2px,calc(0.45 * var(--ah,1dvh)),10px);margin-top:0}
 #field .r-now{gap:2px}
 #field .r-ref,#field .r-ndir,#field .r-nsub{line-height:1.05}
+/* Two lines of room: a wide nudge next to a two-digit move wraps this line,
+   and the card must not grow and re-fit the field when a count changes. */
+#field .r-nsub{min-height:2.1em}
 #field .r-autonote{font-size:clamp(.76rem,calc(1.5 * var(--ah,1dvh)),1rem)}
 #field .r-stepper button,#field .r-stepper input{height:clamp(34px,calc(5.6 * var(--ah,1dvh)),60px)}
 #field .r-stepper button{width:clamp(34px,calc(5.6 * var(--ah,1dvh)),60px)}
@@ -310,47 +306,40 @@ html.home-lock{overflow:hidden;overscroll-behavior:none}
 #field .tog.yn b{font-size:clamp(1.05rem,calc(2.5 * var(--ah,1dvh)),1.7rem)}
 #field .step{width:clamp(38px,calc(6 * var(--ah,1dvh)),68px);height:clamp(34px,calc(5.6 * var(--ah,1dvh)),64px);font-size:clamp(1.3rem,calc(3 * var(--ah,1dvh)),2.4rem)}
 #field .cnt{font-size:clamp(1.4rem,calc(3.5 * var(--ah,1dvh)),2.9rem)}
-#field .ctr{padding:2px}
-#field .counters{gap:clamp(3px,calc(0.5 * var(--ah,1dvh)),8px)}
-/* Names, following counts, and didn’t-follow counts scroll in this window.
-   Height is two rows, so a long list does not move Turn, Following, or Overlap. */
-#field .hdr-slot{
-  flex:0 0 auto;
-  height:calc(2 * (clamp(34px, calc(5.6 * var(--ah, 1dvh)), 64px) + 4px) + clamp(3px, calc(0.5 * var(--ah, 1dvh)), 8px));
-  min-height:0;
-  overflow-x:hidden;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  touch-action:pan-y;
-}
-#field #leavePanel{display:none !important}
-#field .hdr-sub{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:4px 4px 0}
-#field .ctr .w{font-size:clamp(1.1rem,calc(2.8 * var(--ah,1dvh)),2.2rem)}
 #field .ovl .big{font-size:clamp(1.3rem,calc(3.2 * var(--ah,1dvh)),2.6rem)}
-#field .leave{gap:clamp(2px,calc(0.4 * var(--ah,1dvh)),8px);margin-top:0}
 #field .leave-tog{min-height:clamp(32px,calc(5 * var(--ah,1dvh)),58px);padding-block:clamp(3px,calc(0.4 * var(--ah,1dvh)),8px)}
 #field .leave-lab{font-size:clamp(1rem,calc(2.3 * var(--ah,1dvh)),1.6rem)}
 #field .leave-sum{font-size:clamp(.95rem,calc(2.1 * var(--ah,1dvh)),1.45rem)}
 #field .leave-chev{width:clamp(22px,calc(3 * var(--ah,1dvh)),32px);height:clamp(22px,calc(3 * var(--ah,1dvh)),32px)}
-/* Not following: Didn't follow stays in this slot, gray and not tappable. */
-#field .leave.is-off{opacity:.5;filter:grayscale(1);pointer-events:none}
-#field .leave.is-off .leave-tog{cursor:default}
-/* Same slot for Following on and Strike out Skip|Outside. */
+/* Fixed height, so a count change or a long list never moves Turn,
+   Following on, Skip / Outside, or Overlap. */
+#field .cntrow{flex:none;height:clamp(44px,calc(6.8 * var(--ah,1dvh)),68px);padding-block:0;padding-left:12px}
+#field .cntrow .leave-sum{font-size:clamp(1.15rem,calc(2.7 * var(--ah,1dvh)),1.9rem)}
+#field .cntrow .leave-sum small{font-size:clamp(.7rem,calc(1.45 * var(--ah,1dvh)),.95rem)}
+/* Not following: Didn't follow stays in its row, gray and not tappable. */
+#field .cntrow.is-off{opacity:.5;filter:grayscale(1);pointer-events:none;cursor:default}
+/* Same for Following on and Strike out Skip|Outside. */
 #field .folOpts.is-off{opacity:.5;filter:grayscale(1);pointer-events:none}
 #field .folOpts.is-off button{cursor:default}
 /* Night gray-out stays in the warm palette. grayscale() reads as blue here. */
-:root.force-night #field .leave.is-off,
+:root.force-night #field .cntrow.is-off,
 :root.force-night #field .folOpts.is-off{opacity:1;filter:none}
-:root.force-night #field .leave.is-off,
-:root.force-night #field .leave.is-off .leave-tog,
+:root.force-night #field .cntrow.is-off,
+:root.force-night #field .cntrow.is-off .leave-sum small,
 :root.force-night #field .folOpts.is-off button{color:var(--muted)}
-:root.force-night #field .leave.is-off .leave-tog{background:var(--surface2);border-color:var(--line)}
+:root.force-night #field .cntrow.is-off{background:var(--surface2);border-color:var(--line)}
 :root.force-night #field .folOpts.is-off button[aria-pressed="true"]{background:var(--surface2);color:var(--muted)}
 :root.force-night #field button:disabled{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:.72}
-#field .folOpts{margin-top:0;gap:6px}
-#field .folOpts .frow{gap:2px}
-#field .folOpts .flab{font-size:clamp(.66rem,calc(1.3 * var(--ah,1dvh)),.95rem)}
-#field .folOpts .seg2 button{height:clamp(24px,calc(3.6 * var(--ah,1dvh)),42px);font-size:clamp(.8rem,calc(1.8 * var(--ah,1dvh)),1.2rem)}
+/* Following on and Strike out: two full-width columns, thumb-size buttons. */
+#field .folOpts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-top:0;gap:8px}
+#field .folOpts .frow{gap:3px}
+#field .folOpts .flab{font-size:clamp(.7rem,calc(1.4 * var(--ah,1dvh)),.95rem);padding-left:2px}
+#field .folOpts .seg2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:auto;max-width:none}
+#field .folOpts .seg2 button{height:clamp(36px,calc(5.2 * var(--ah,1dvh)),48px);min-width:0;padding:0 .4rem;font-size:clamp(.95rem,calc(2 * var(--ah,1dvh)),1.2rem);overflow:hidden;text-overflow:ellipsis}
+/* The Auto status line keeps its one line of room, so turning Auto on or off
+   does not re-fit the field. */
+#field .r-autonote{min-height:1.25em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#field .r-autonote[hidden]{display:block!important;visibility:hidden}
 #field .ph h2{font-size:clamp(.95rem,calc(2.2 * var(--ah,1dvh)),1.55rem);flex:none}
 #field .ph small{font-size:clamp(.8rem,calc(1.7 * var(--ah,1dvh)),1.1rem);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #field .leave-sum{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -454,6 +443,41 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 .install-go{border:0;background:var(--on);color:var(--on-ink);font-family:var(--display);font-size:1.5rem;letter-spacing:.05em;text-transform:uppercase}
 .install-ok{border:2px solid var(--line);background:var(--surface2);font-size:1.15rem}
 .install-go:active,.install-ok:active{transform:scale(.98)}
+
+/* Others and Didn’t follow count sheets. A native dialog in the top layer,
+   fixed to the bottom of the glass, outside the fitted field column, so the
+   field does not move or re-fit while one is open. Two headers: a short
+   sheet. Twenty: it stops at the max height and the list scrolls inside. */
+dialog.csheet{
+  position:fixed;inset:auto 0 0 0;margin:0 auto;width:100%;max-width:640px;
+  max-height:min(70dvh,calc(100% - 72px));padding:0;border:0;border-radius:22px 22px 0 0;
+  background:var(--surface);color:var(--ink);font-family:var(--ui);
+  box-shadow:0 -10px 40px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+dialog.csheet:not([open]){display:none}
+dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
+.sh-bar{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 16px;border-bottom:2px solid var(--line);flex:none}
+.sh-bar h2{font-family:var(--display);font-weight:800;font-size:1.5rem;letter-spacing:.06em;text-transform:uppercase;margin:0;line-height:1;min-width:0}
+.sh-bar h2 small{display:block;font-family:var(--ui);font-weight:600;font-size:.85rem;line-height:1.25;color:var(--muted);text-transform:none;letter-spacing:0;margin-top:4px}
+.sh-x{margin-left:auto;width:60px;height:60px;border-radius:14px;border:2px solid var(--line);background:var(--surface2);color:inherit;display:grid;place-items:center;flex:none;cursor:pointer;padding:0}
+.sh-x svg{width:28px;height:28px}
+.sh-x:active{transform:scale(.96)}
+.sh-list{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;padding:8px;display:flex;flex-direction:column;gap:8px}
+.crow{display:flex;align-items:center;gap:8px;flex:none;min-height:72px;padding:4px;border-radius:14px;background:var(--surface2);border:2px solid var(--line)}
+.crow.has{border-color:var(--on)}
+.crow .nm{flex:1;min-width:0;padding-left:10px;display:flex;flex-direction:column;gap:2px}
+.crow .w{font-family:var(--display);font-weight:800;font-size:1.7rem;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.crow .lb{font-size:.9rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.csheet .step{width:64px;height:64px;border-radius:12px;font-size:2.2rem}
+.csheet .cnt{min-width:48px;font-size:2.6rem}
+.sh-foot{flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:2px solid var(--line);font-weight:700;color:var(--muted)}
+.sh-foot b{font-family:var(--display);font-weight:900;font-size:1.6rem;color:var(--ink);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.sh-foot .big{margin-left:auto;font-family:var(--display);font-weight:900;font-size:1.9rem;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* Didn’t follow carries the amber accent. */
+.csheet.didnt .sh-bar{border-bottom-color:var(--seg-out)}
+.csheet.didnt .crow.has{border-color:var(--seg-out)}
+.csheet.didnt .sh-bar h2::before{content:"";display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--seg-out);margin-right:8px;vertical-align:1px}
 </style>
 
 </head>
@@ -522,14 +546,16 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <button class="tog yn" type="button" data-mode="double"><b>Following me</b></button>
           <button class="tog yn" type="button" data-mode="single"><b>Not following</b></button>
         </div>
-        <div class="leave" id="leaveBox">
-          <button class="leave-tog" id="leaveTog" type="button" aria-expanded="false" aria-controls="leavePanel">
-            <span class="leave-lab">Didn’t follow</span>
-            <span class="leave-sum" id="leaveSum">0</span>
-            <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-          <div class="leave-panel" id="leavePanel"></div>
-        </div>
+        <button class="leave-tog cntrow" id="othersBtn" type="button" aria-haspopup="dialog" aria-controls="othersSheet">
+          <span class="leave-lab">Others</span>
+          <span class="leave-sum"><span id="othersN">0</span><small id="othersBits">none</small></span>
+          <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="leave-tog cntrow didnt" id="didntBtn" type="button" aria-haspopup="dialog" aria-controls="didntSheet">
+          <span class="leave-lab">Didn’t follow</span>
+          <span class="leave-sum"><span id="didntN">0</span><small id="didntBits">none</small></span>
+          <svg class="leave-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
         <div id="folOpts" class="folOpts">
           <div class="frow">
             <div class="flab">Following on</div>
@@ -545,11 +571,6 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
               <button type="button" data-folskip="0">Outside</button>
             </div>
           </div>
-        </div>
-        <div class="hdr-slot" id="hdrSlot">
-          <div class="counters" id="counters"></div>
-          <div class="hdr-sub" id="leaveCap" hidden>Didn’t follow</div>
-          <div class="counters" id="leaveCounters"></div>
         </div>
       </section>
 
@@ -686,12 +707,13 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
           <div class="ph"><h2>Following / Not following</h2></div>
           <p class="note"><b>Other combines</b> are everyone besides you on this land: out with you now, or the ones who didn’t follow.</p>
           <p class="note"><b>Following me</b> — they are out with you. <b>Following on</b> is their side (usually Right).</p>
-          <p class="note"><b>Not following</b> — you go out alone. Count the others on the rows below. <b>Didn’t follow</b>, <b>Following on</b>, and <b>Skip / Outside</b> stay in place but grayed out. They are not used until <b>Following me</b> is on again, and Didn’t follow counts are not added again.</p>
+          <p class="note"><b>Not following</b> — you go out alone. Count the others in the <b>Others</b> sheet. <b>Didn’t follow</b>, <b>Following on</b>, and <b>Skip / Outside</b> stay in place but grayed out. They are not used until <b>Following me</b> is on again, and Didn’t follow counts are not added again.</p>
+          <p class="note"><b>Others</b> shows the total and who is counted. Tap it to open the count sheet: one row per header, with − and + for each. It stays open while you adjust. Close it with the <b>X</b>, a tap on the dimmed field, or Back.</p>
         </section>
 
         <section class="panel">
           <div class="ph"><h2>Didn’t follow</h2></div>
-          <p class="note">While <b>Following me</b>, for the ones who peeled off. Tap the row to open it, then set each header (Joe at 35 ft 1 in and a 40 ft header can both be on). Those counts stay in the header box, so the rest of the screen does not jump. Tap the row again to close it.</p>
+          <p class="note">While <b>Following me</b>, for the ones who peeled off. Tap the row to open its sheet, then set each header (Joe at 35 ft 1 in and a 40 ft header can both be on). The sheet shows the live <b>+lines</b> as you count. The row behind keeps its size, so the rest of the screen does not jump.</p>
           <p class="note">Each size’s cut is added once, like Outside, not as a full Skip pack jump. Under <b>Not following</b> that row is still there, just not tappable.</p>
         </section>
 
@@ -726,7 +748,7 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
 
         <section class="panel">
           <div class="ph"><h2>Headers</h2></div>
-          <p class="note">My header is your GPS line width. On the field, tap the name and size. The same width with a different name is a different header.</p>
+          <p class="note">My header is your GPS line width. Pick it under <b>My header</b> in Settings; the field does not change it. The same width with a different name is a different header.</p>
           <p class="note">Width is feet and inches, such as 35 ft 1 in. Share header file sends every name, feet, and inches. Import header file adds those headers and leaves counts, overlap, and the rest alone. The same name and the same width is not added twice.</p>
         </section>
 
@@ -762,6 +784,24 @@ a.chkbtn{display:flex;align-items:center;justify-content:center;text-decoration:
     <button class="install-ok" id="installOk" type="button">Not now</button>
   </div>
 </div>
+
+<!-- Count sheets. Stay open while you adjust; X, the dimmed field, Escape, or Back closes. -->
+<dialog class="csheet" id="othersSheet" aria-labelledby="othersTitle">
+  <div class="sh-bar">
+    <h2 id="othersTitle">Others<small>Following me out. Not counting me.</small></h2>
+    <button class="sh-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="sh-list" id="othersList"></div>
+  <div class="sh-foot"><span>Total <b id="othersTot">0</b></span><span class="big" id="othersLines"></span></div>
+</dialog>
+<dialog class="csheet didnt" id="didntSheet" aria-labelledby="didntTitle">
+  <div class="sh-bar">
+    <h2 id="didntTitle">Didn’t follow<small>On this land, but not out with me. Each one adds its own cut once.</small></h2>
+    <button class="sh-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="sh-list" id="didntList"></div>
+  <div class="sh-foot"><span>Didn’t follow <b id="didntTot">0</b></span><span class="big" id="didntLines"></span></div>
+</dialog>
 
 <script>
 (function(){
@@ -907,6 +947,16 @@ function sameIn(a,b){return Math.abs(Number(a)-Number(b))<5e-4;}
 function nameSize(h){
   const name=String(h&&h.label||'').trim();
   const size=fmtWidth(h.in);
+  return name?name+' '+size:size;
+}
+// Short width for the field rows and count sheets: 40' or 35' 1".
+function fmtShort(total){
+  const p=splitInches(total);
+  return (p.neg?'−':'')+p.ft+"'"+(p.inch?' '+inchStr(p.inch)+'"':'');
+}
+function nameShort(h){
+  const name=String(h&&h.label||'').trim();
+  const size=fmtShort(h.in);
   return name?name+' '+size:size;
 }
 function ftInToInches(ft,inch){
@@ -1357,46 +1407,35 @@ async function resumeAuto(){
   if(!watching)beginWatch(!motionNeedsPrompt());
 }
 
-let leaveOpen=false,ovlOpen=false,leaveScroll=null;
+let ovlOpen=false;
+// Others and Didn’t follow rows: the total, then each header that is counted.
+function countBits(map){
+  const bits=[];let total=0;
+  S.heads.forEach(h=>{const n=clampLeave(map&&map[h.id]);if(n>0){total+=n;bits.push(n+' × '+nameShort(h));}});
+  return {total,text:bits.length?bits.join(' · '):'none'};
+}
+function paintCountRow(btn,nEl,bitsEl,bits){
+  nEl.textContent=String(bits.total);
+  bitsEl.textContent=bits.text;
+  btn.classList.toggle('has',bits.total>0);
+}
 function renderField(){
   $('turnL').innerHTML=uturnL+'<b>Left</b>';$('turnR').innerHTML='<b>Right</b>'+uturnR;
   paintLeadChips();
-  const mine=lead();
-  $('counters').innerHTML=S.heads.map(h=>{const n=S.counts[h.id]||0;const label=nameSize(h);return `
-    <div class="ctr ${n?'has':''}">
-      <button class="nm" type="button" data-lead="${h.id}" aria-pressed="${h.id===mine.id}" aria-label="My header ${esc(label)}"><span class="w">${esc(fmtWidth(h.in))}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</button>
-      <button class="step" type="button" data-dec="${h.id}" aria-label="One less ${esc(label)} following" ${n?'':'disabled'}>−</button>
-      <span class="cnt">${n}</span>
-      <button class="step" type="button" data-inc="${h.id}" aria-label="One more ${esc(label)} following">+</button>
-    </div>`;}).join('');
-  const leaveBits=[];
-  S.heads.forEach(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);if(n>0)leaveBits.push(nameSize(h)+'×'+n);});
   const folOn=S.mode==='double';
-  $('leaveBox').classList.toggle('is-open',leaveOpen);
-  const leaveTog=$('leaveTog');
-  leaveTog.disabled=!folOn;
-  leaveTog.setAttribute('aria-expanded',leaveOpen?'true':'false');
-  leaveTog.classList.toggle('has',leaveBits.length>0);
-  $('leaveSum').textContent=leaveBits.length?leaveBits.join(' · '):'0';
-  const cap=$('leaveCap');
-  if(cap)cap.hidden=!leaveOpen;
-  $('leaveCounters').innerHTML=leaveOpen?S.heads.map(h=>{const n=clampLeave(S.leaveCounts&&S.leaveCounts[h.id]);const off=folOn?'':'disabled';const label=nameSize(h);return `
-    <div class="ctr ${n?'has':''}">
-      <div class="nm" aria-hidden="true"><span class="w">${esc(fmtWidth(h.in))}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</div>
-      <button class="step" type="button" data-leavedec="${h.id}" aria-label="One less ${esc(label)} who didn’t follow" ${n&&folOn?'':'disabled'}>−</button>
-      <span class="cnt">${n}</span>
-      <button class="step" type="button" data-leaveinc="${h.id}" aria-label="One more ${esc(label)} who didn’t follow" ${off}>+</button>
-    </div>`;}).join(''):'';
-  const slot=$('hdrSlot');
-  if(slot){
-    const want=leaveOpen?1:0;
-    if(leaveScroll!==want){
-      leaveScroll=want;
-      slot.scrollTop=leaveOpen&&cap?cap.offsetTop:0;
-    }
-  }
+  const others=countBits(S.counts),didnt=countBits(S.leaveCounts);
+  paintCountRow($('othersBtn'),$('othersN'),$('othersBits'),others);
+  const didntBtn=$('didntBtn');
+  paintCountRow(didntBtn,$('didntN'),$('didntBits'),didnt);
+  didntBtn.disabled=!folOn;
+  didntBtn.classList.toggle('is-off',!folOn);
+  if(folOn)didntBtn.removeAttribute('aria-disabled');
+  else didntBtn.setAttribute('aria-disabled','true');
   const c=calc();
-  $('folTotal').textContent=`me: ${nameSize(c.ld)}`+(c.folN?` + ${c.folN} other${c.folN===1?'':'s'}`:' only');
+  const plural=n=>n===1?'':'s';
+  $('folTotal').textContent=folOn
+    ?(c.folN?c.folN+' with me':'nobody with me')+(c.leaveN?' · '+c.leaveN+' didn’t follow':'')
+    :(c.folN?c.folN+' other'+plural(c.folN)+' · going out alone':'going out alone');
   $('ovlVal').innerHTML=`${fmtIn(S.overlapIn)}<small>each head</small>`;
   $('ovlSum').textContent=`${fmtIn(S.overlapIn)} each · ${fmtIn(S.overlapIn*c.heads)} total`;
   $('ovlBox').classList.toggle('is-open',ovlOpen);
@@ -1408,24 +1447,92 @@ function renderField(){
   folOpts.classList.toggle('is-off',!folOn);
   if(folOn)folOpts.removeAttribute('aria-disabled');
   else folOpts.setAttribute('aria-disabled','true');
-  const leaveBox=$('leaveBox');
-  leaveBox.classList.toggle('is-off',!folOn);
-  if(folOn)leaveBox.removeAttribute('aria-disabled');
-  else leaveBox.setAttribute('aria-disabled','true');
   if(S.folSkip===undefined)S.folSkip=true;
   document.querySelectorAll('[data-folside]').forEach(b=>{b.disabled=!folOn;b.setAttribute('aria-pressed',b.dataset.folside===(S.folSide||'right'));});
   document.querySelectorAll('[data-folskip]').forEach(b=>{b.disabled=!folOn;b.setAttribute('aria-pressed',(b.dataset.folskip==='1')===!!S.folSkip);});
   document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===S.cut));
   renderResult();
   renderAutoUi();
+  paintSheets();
   fitScale();
 }
 
+// Count sheets. Rows are built when a sheet opens and only their numbers
+// change after that, so a tapped button stays under the thumb. The field
+// behind is untouched: the dialog lives in the top layer, not in the column.
+const SHEETS={
+  others:{el:'othersSheet',list:'othersList',tot:'othersTot',lines:'othersLines',map:()=>S.counts||{},dec:'dec',inc:'inc',less:' following',more:' following'},
+  didnt:{el:'didntSheet',list:'didntList',tot:'didntTot',lines:'didntLines',map:()=>S.leaveCounts||{},dec:'leavedec',inc:'leaveinc',less:' who didn’t follow',more:' who didn’t follow'}
+};
+let sheetHist=false;
+function sheetOpen(k){const d=$(SHEETS[k].el);return !!(d&&d.open);}
+function buildSheet(k){
+  const o=SHEETS[k],map=o.map();
+  $(o.list).innerHTML=S.heads.map(h=>{const n=clampLeave(map[h.id]);const label=nameSize(h);return `
+    <div class="crow ${n?'has':''}" data-row="${h.id}">
+      <div class="nm"><span class="w">${esc(fmtShort(h.in))}</span>${h.label?`<span class="lb">${esc(h.label)}</span>`:''}</div>
+      <button class="step" type="button" data-${o.dec}="${h.id}" aria-label="One less ${esc(label)}${o.less}" ${n?'':'disabled'}>−</button>
+      <span class="cnt">${n}</span>
+      <button class="step" type="button" data-${o.inc}="${h.id}" aria-label="One more ${esc(label)}${o.more}">+</button>
+    </div>`;}).join('');
+}
+function paintSheet(k){
+  const o=SHEETS[k];
+  if(!sheetOpen(k))return;
+  const map=o.map();let total=0;
+  $(o.list).querySelectorAll('[data-row]').forEach(row=>{
+    const n=clampLeave(map[row.dataset.row]);total+=n;
+    row.classList.toggle('has',n>0);
+    row.querySelector('.cnt').textContent=String(n);
+    row.querySelector('[data-'+o.dec+']').disabled=!n;
+  });
+  $(o.tot).textContent=String(total);
+  const move=calc().P.move,lines=Math.abs(move)||0;
+  $(o.lines).textContent=signedMove(move)+' line'+(lines===1?'':'s');
+}
+function paintSheets(){paintSheet('others');paintSheet('didnt');}
+function openSheet(k){
+  const d=$(SHEETS[k].el);
+  if(!d||d.open)return;
+  buildSheet(k);
+  if(typeof d.showModal==='function')d.showModal();
+  else d.setAttribute('open','');
+  paintSheet(k);
+  $(SHEETS[k].list).scrollTop=0;
+  // One history entry while a sheet is up, so the phone's Back closes it.
+  try{history.pushState({soSheet:k},'');sheetHist=true;}catch(e){sheetHist=false;}
+}
+function closeSheet(k){
+  const d=$(SHEETS[k].el);
+  if(!d||!d.open)return;
+  if(typeof d.close==='function')d.close();
+  else d.removeAttribute('open');
+}
+function anySheetOpen(){return sheetOpen('others')||sheetOpen('didnt');}
+Object.keys(SHEETS).forEach(k=>{
+  const d=$(SHEETS[k].el);
+  if(!d)return;
+  d.addEventListener('click',e=>{
+    if(e.target===d){closeSheet(k);return;}
+    const b=e.target.closest('button');
+    if(!b)return;
+    if(b.hasAttribute('data-close')){closeSheet(k);return;}
+    fieldAction(b);
+  });
+  d.addEventListener('cancel',e=>{e.preventDefault();closeSheet(k);});
+  d.addEventListener('close',()=>{
+    if(sheetHist&&!anySheetOpen()){sheetHist=false;try{history.back();}catch(e){}}
+  });
+});
+window.addEventListener('popstate',()=>{
+  if(!anySheetOpen())return;
+  sheetHist=false;
+  closeSheet('others');closeSheet('didnt');
+});
+
 // field interactions
-document.getElementById('field').addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.lead){S.lead=b.dataset.lead;}
-  else if(b.dataset.inc){S.counts[b.dataset.inc]=(S.counts[b.dataset.inc]||0)+1;}
+function fieldAction(b){
+  if(b.dataset.inc){S.counts[b.dataset.inc]=(S.counts[b.dataset.inc]||0)+1;}
   else if(b.dataset.dec){S.counts[b.dataset.dec]=Math.max(0,(S.counts[b.dataset.dec]||0)-1);}
   else if(b.dataset.mode){S.mode=b.dataset.mode;}
   else if(b.dataset.folside){if(S.mode!=='double')return;S.folSide=b.dataset.folside;}
@@ -1438,7 +1545,8 @@ document.getElementById('field').addEventListener('click',e=>{
     resetTrack();
   }
   else if(b.dataset.linedir){S.lineDir=b.dataset.linedir==='down'?'down':'up';}
-  else if(b.id==='leaveTog'){if(S.mode!=='double')return;leaveOpen=!leaveOpen;}
+  else if(b.id==='othersBtn'){openSheet('others');return;}
+  else if(b.id==='didntBtn'){if(S.mode!=='double')return;openSheet('didnt');return;}
   else if(b.id==='ovlTog'){ovlOpen=!ovlOpen;}
   else if(b.dataset.leaveinc){
     if(S.mode!=='double')return;
@@ -1458,6 +1566,10 @@ document.getElementById('field').addEventListener('click',e=>{
   else return;
   if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
   save();renderField();
+}
+document.getElementById('field').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  fieldAction(b);
 });
 $('lineNowIn').addEventListener('input',()=>{
   const el=$('lineNowIn');
@@ -1575,6 +1687,8 @@ function applyTheme(){
   r.classList.toggle('force-day',known&&!night);
   r.classList.toggle('force-night',known&&night);
   document.body.style.filter=(night&&S.dim)?'brightness(.6)':'';
+  // The count sheets paint in the top layer, outside body's filter.
+  document.querySelectorAll('dialog.csheet').forEach(d=>{d.style.filter=(night&&S.dim)?'brightness(.6)':'';});
   document.querySelectorAll('[data-theme-pick]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themePick===S.theme));
   const dim=$('dimBtn');
   dim.disabled=!night;
@@ -1801,7 +1915,7 @@ let armT=null;
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
   if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Tap again to reset. Your headers will be erased';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Reset everything to defaults';},4000);return;}
-  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();leaveOpen=false;ovlOpen=false;S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
+  clearTimeout(armT);autoGen++;autoMsg='';stopSensors();ovlOpen=false;S=JSON.parse(JSON.stringify(DEF));save();setHeadNote('Share header file sends each name with feet and inches. Import header file adds them here and leaves the rest of Settings alone.');b.classList.remove('arm');b.textContent='Reset everything to defaults';
   if(S.autoAdv)startAuto();
   renderSettings();
 });
@@ -2139,8 +2253,7 @@ function fitScale(force){
   if(!fitBase)return;
   const root=document.documentElement;
   const set=k=>root.style.setProperty('--ah',(fitBase*k).toFixed(2)+'px');
-  const note=$('autoNote');
-  const sig=[ovlOpen,note&&note.hidden,S.mode].join(',');
+  const sig=[ovlOpen,S.mode].join(',');
   if(sig!==fitSig){fitSig=sig;force=true;}
   set(fitK);
   if(!force&&fieldOver()<=0)return;
@@ -2297,7 +2410,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.59';
+const APP_VERSION='1.0.60';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
