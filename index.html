@@ -514,6 +514,72 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 .sh-acts .sh-go:active{transform:scale(.98)}
 .sh-acts .sh-go.pri{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .imp-warn{margin:0;padding:0 6px;font-weight:700;font-size:1rem;line-height:1.25;color:var(--danger);text-align:center}
+
+/* Tan outlines are a 2px diagonal stroke: light gold, the current tan, darker at the bottom.
+   Fills stay the flat colour. Dashed header-file buttons stay a flat dashed line. */
+:root{
+  --stroke:linear-gradient(165deg,#f6e4ae 0%,var(--line) 46%,#7a5420 100%);
+  --stroke-gold:linear-gradient(165deg,#fff3c8 0%,#e8c15a 46%,#a56e18 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --stroke:linear-gradient(165deg,#c6a15c 0%,var(--line) 52%,#120c06 100%);
+    --stroke-gold:linear-gradient(165deg,#ffe9b0 0%,#e0a91c 48%,#8a6412 100%);
+  }
+}
+:root[data-theme="dark"],:root.force-night{
+  --stroke:linear-gradient(165deg,#c6a15c 0%,var(--line) 52%,#120c06 100%);
+  --stroke-gold:linear-gradient(165deg,#ffe9b0 0%,#e0a91c 48%,#8a6412 100%);
+}
+:root.force-day{
+  --stroke:linear-gradient(165deg,#f6e4ae 0%,var(--line) 46%,#7a5420 100%);
+  --stroke-gold:linear-gradient(165deg,#fff3c8 0%,#e8c15a 46%,#a56e18 100%);
+}
+.app .panel,.seg2,.install{
+  border:2px solid transparent;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--stroke) border-box;
+}
+.tog:not([aria-pressed="true"]),
+.leave-tog:not(.has),
+.chip:not([aria-pressed="true"]),
+.seg3 button:not([aria-pressed="true"]),
+.chkbtn,.hrow input,.sh-x,.crow:not(.has),
+.sh-acts .sh-go:not(.pri),.install-ok{
+  border:2px solid transparent;
+  background:linear-gradient(var(--surface2),var(--surface2)) padding-box,var(--stroke) border-box;
+}
+.step{
+  border:2px solid transparent;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--stroke) border-box;
+}
+.del{
+  border:2px solid transparent;
+  background:linear-gradient(transparent,transparent) padding-box,var(--stroke) border-box;
+}
+.leave-tog.has,.crow.has{
+  border:2px solid transparent;
+  background:linear-gradient(var(--surface2),var(--surface2)) padding-box,linear-gradient(165deg,color-mix(in srgb,var(--on) 42%,#f3e0a8),var(--on) 58%,color-mix(in srgb,var(--on) 82%,#000)) border-box;
+}
+.csheet.didnt .crow.has{
+  background:linear-gradient(var(--surface2),var(--surface2)) padding-box,linear-gradient(165deg,color-mix(in srgb,var(--seg-out) 40%,#f3e0a8),var(--seg-out) 58%,color-mix(in srgb,var(--seg-out) 78%,#000)) border-box;
+}
+.csheet:not(.didnt) .sh-bar,.sh-foot{
+  border-color:transparent;
+  background-image:var(--stroke);
+  background-repeat:no-repeat;
+  background-size:100% 2px;
+  background-position:bottom;
+  background-origin:border-box;
+  background-clip:border-box;
+}
+.sh-foot{background-position:top}
+.r-dir button:not([aria-pressed="true"]),.r-stepper button{position:relative;border:2px solid transparent;background:transparent;isolation:isolate}
+.r-dir button:not([aria-pressed="true"])::before,.r-stepper button::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;background:var(--stroke-gold);pointer-events:none;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+}
+.r-stepper input{border:2px solid transparent;background:linear-gradient(var(--res-bg),var(--res-bg)) padding-box,var(--stroke-gold) border-box;color:var(--res-ink)}
 </style>
 
 </head>
@@ -2567,7 +2633,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.63';
+const APP_VERSION='1.0.64';
 $('verNow').textContent='v'+APP_VERSION;
 const HOSTED=!!window.STRIKEOUT_PWA&&(location.protocol==='https:'||location.hostname==='localhost');
 let latest=null;
