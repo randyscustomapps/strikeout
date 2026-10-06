@@ -132,7 +132,7 @@ Do not block the website. Buyers and demo users load the same origin.
 
 - Listing copy, content rating, data safety, target age, and the graphic file list: `play/listing.md`
 - Privacy policy draft: `play/privacy.html`. Contact email is randyscustomapps@gmail.com. It follows the in-app privacy page and adds the company, the Play purchase, and a contact line.
-- Icon, feature graphic, and six phone screenshots: `play/graphics/`
+- Icon, feature graphic, and phone screenshots: `play/graphics/`
 
 ## Randy's checklist in Play Console
 

@@ -155,10 +155,11 @@ Privacy policy URL: host `play/privacy.html`. The contact email on that page is 
 | `play/graphics/feature-graphic.png` | 1024×500 PNG | Feature graphic. |
 | `play/graphics/screenshots/01-home-day.png` | 1200×2460 | Field, day. |
 | `play/graphics/screenshots/02-home-night.png` | 1200×2460 | Field, night. |
-| `play/graphics/screenshots/03-others.png` | 1200×2460 | Others sheet. |
+| `play/graphics/screenshots/03-following.png` | 1200×2460 | Following sheet. |
 | `play/graphics/screenshots/04-didnt-follow.png` | 1200×2460 | Didn't follow sheet. |
 | `play/graphics/screenshots/05-settings.png` | 1200×2460 | Settings, headers. |
 | `play/graphics/screenshots/06-settings-screen.png` | 1200×2220 | Settings, screen and Auto. |
+| `play/graphics/screenshots/07-help.png` | 1200×2460 | Help, scrolled to Contact support. |
 
 Phone screenshots are 24-bit PNG, no alpha. The feature graphic is 24-bit PNG, no alpha. The icon is 32-bit PNG.
 
