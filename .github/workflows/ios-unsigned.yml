@@ -1,0 +1,65 @@
+# Unsigned compile of the iOS app. No secrets, no signing, no upload.
+# A Mac is not required to read the result: this job runs on GitHub's macOS runner.
+name: iOS unsigned
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  unsigned:
+    name: Compile unsigned
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Xcode
+        run: xcodebuild -version
+
+      - name: Bundle the web app
+        run: bash ios/scripts/sync-web.sh
+
+      - name: Build for iOS Simulator
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/Strikeout.xcodeproj \
+            -scheme Strikeout \
+            -configuration Release \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedDataSim" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+          APP="$(find "$RUNNER_TEMP/DerivedDataSim" -name 'Strikeout.app' -type d | head -1)"
+          test -n "$APP"
+          test -f "$APP/Info.plist"
+          test -f "$APP/Web/index.html"
+          test -f "$APP/Web/native.js"
+          test -f "$APP/Web/privacy.html"
+          test ! -e "$APP/Web/version.json"
+          test ! -e "$APP/Web/sw.js"
+          plutil -lint "$APP/Info.plist"
+          echo "Simulator app: $APP"
+
+      - name: Build for iOS device, unsigned
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/Strikeout.xcodeproj \
+            -scheme Strikeout \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedDataDevice" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+          APP="$(find "$RUNNER_TEMP/DerivedDataDevice" -name 'Strikeout.app' -type d | head -1)"
+          test -n "$APP"
+          test -f "$APP/Web/index.html"
+          echo "Device app: $APP"
