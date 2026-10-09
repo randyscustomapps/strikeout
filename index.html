@@ -110,7 +110,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--seg-lead);outli
 .chkbtn{height:52px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);font-weight:700;font-size:1rem;cursor:pointer}
 
 /* result */
-.result{border:2px solid transparent;background:linear-gradient(180deg,rgba(255,210,110,.13),rgba(255,210,110,0) 34%,rgba(0,0,0,.22)) padding-box,linear-gradient(var(--res-bg),var(--res-bg)) padding-box,var(--stroke) border-box;color:var(--res-ink);border-radius:18px;padding:10px 14px 8px;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 1px 0 rgba(255,226,160,.26),inset 0 0 0 1px rgba(224,169,28,.24),0 6px 18px rgba(0,0,0,.18)}
+.result{border:2px solid transparent;background:linear-gradient(180deg,rgba(255,210,110,.13),rgba(255,210,110,0) 34%,rgba(0,0,0,.22)) padding-box,linear-gradient(var(--res-bg),var(--res-bg)) padding-box,var(--stroke) border-box;color:var(--res-ink);border-radius:18px;padding:10px 14px 8px;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 1px 0 rgba(255,226,160,.26),inset 0 0 0 1px rgba(224,169,28,.24)}
 .r-main{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
 .r-skip{display:flex;align-items:baseline;gap:6px}
 .r-lbl{font-family:var(--display);font-weight:800;font-size:1.4rem;letter-spacing:.06em;text-transform:uppercase;color:var(--res-muted)}
@@ -2818,7 +2818,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.77';
+const APP_VERSION='1.0.78';
 $('verNow').textContent='v'+APP_VERSION;
 function supportHref(){
   let installed=false;
