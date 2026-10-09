@@ -623,7 +623,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
   mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
 }
 .r-stepper input{border:2px solid transparent;background:linear-gradient(var(--res-bg),var(--res-bg)) padding-box,var(--stroke-gold) border-box;color:var(--res-ink)}
-/* Cold-open lockup: hide the field, transform the real header brand, then fade the field in. */
+/* Cold-open lockup: keep the field and gear hidden on the page background, glide the real header brand home, then fade the field in once the lockup has cleared the cards. */
 html.intro .app>.bar{position:relative;z-index:4}
 html.intro .app>.stage,
 html.intro .app>.bar>.sp,
@@ -632,7 +632,7 @@ html.intro .app>.bar>.brand{visibility:hidden;position:relative;z-index:1;will-c
 html.intro.intro-on .app>.bar>.brand{visibility:visible}
 html.intro-play .app>.stage,
 html.intro-play .app>.bar>.sp,
-html.intro-play .app>.bar>.iconbtn{opacity:1;transition:opacity var(--intro-ms,.48s) var(--intro-ease,cubic-bezier(.4,0,.2,1))}
+html.intro-play .app>.bar>.iconbtn{opacity:1;transition:opacity var(--intro-fade,.12s) linear var(--intro-delay,.36s)}
 @media (prefers-reduced-motion: reduce){
   html.intro .app>.stage,
   html.intro .app>.bar>.sp,
@@ -2747,6 +2747,39 @@ function runIntro(){
   if(!brand){root.classList.remove('intro');return;}
   const HOLD=640,MOVE=480,CAP=1200;
   const EASE='cubic-bezier(.4,0,.2,1)';
+  // CSS cubic-bezier(.4,0,.2,1): time (0–1) at which the glide has covered `progress`.
+  function easeTime(progress){
+    function bez(u,p1,p2){const c=3*p1,b=3*(p2-p1)-c,a=1-c-b;return ((a*u+b)*u+c)*u;}
+    let lo=0,hi=1;
+    for(let i=0;i<22;i++){const m=(lo+hi)/2;if(bez(m,0,1)<progress)lo=m;else hi=m;}
+    return bez((lo+hi)/2,.4,.2);
+  }
+  // Field stays hidden until the lockup has cleared the result card, then fades
+  // in over the rest of the glide so it is fully up as the lockup lands.
+  function fadePlan(dur,spot){
+    brand.style.transition='none';
+    brand.style.transform='none';
+    const b=brand.getBoundingClientRect();
+    const card=document.querySelector('#result');
+    let progress=.9;
+    if(card&&b.height>8&&spot.scale>1){
+      const top=card.getBoundingClientRect().top,H=b.height,cy=b.top+H/2;
+      const A=cy+spot.dy+H*spot.scale/2;
+      const B=-spot.dy+H*(1-spot.scale)/2;
+      if(B<-1){
+        let p=(top-6-A)/B;
+        if(!Number.isFinite(p))p=.9;
+        if(p<.82)p=.82;
+        if(p>.98)p=.98;
+        progress=p;
+      }
+    }
+    brand.style.transform='translate3d('+spot.dx+'px,'+spot.dy+'px,0) scale('+spot.scale+')';
+    let delay=Math.round(easeTime(progress)*dur);
+    if(delay<0)delay=0;
+    if(delay>dur-70)delay=Math.max(0,dur-70);
+    return {delay:delay,fade:dur-delay};
+  }
   const t0=performance.now();
   let ended=false,moving=false,holdT=0,endT=0,safety=0;
   function finish(){
@@ -2766,8 +2799,8 @@ function runIntro(){
     brand.style.transform='';
     brand.style.transformOrigin='';
     brand.style.transition='';
-    root.style.removeProperty('--intro-ms');
-    root.style.removeProperty('--intro-ease');
+    root.style.removeProperty('--intro-delay');
+    root.style.removeProperty('--intro-fade');
     root.classList.remove('intro','intro-on','intro-play');
     requestAnimationFrame(()=>{fading.forEach(el=>{el.style.transition='';el.style.opacity='';});});
   }
@@ -2802,9 +2835,10 @@ function runIntro(){
     if(r.width*scale>maxW)scale=maxW/r.width;
     if(scale>2.2)scale=2.2;
     if(scale<1)scale=1;
+    const dx=Math.round(tx-cx),dy=Math.round(ty-cy),sc=+scale.toFixed(4);
     brand.style.transformOrigin='50% 50%';
-    brand.style.transform='translate3d('+Math.round(tx-cx)+'px,'+Math.round(ty-cy)+'px,0) scale('+scale.toFixed(4)+')';
-    return true;
+    brand.style.transform='translate3d('+dx+'px,'+dy+'px,0) scale('+sc+')';
+    return {dx:dx,dy:dy,scale:sc};
   }
   safety=setTimeout(finish,CAP+80);
   try{if(!place()){finish();return;}}catch(e){finish();return;}
@@ -2820,10 +2854,12 @@ function runIntro(){
     if(ended)return;
     const dur=Math.max(0,Math.min(MOVE,CAP-(performance.now()-t0)));
     moving=true;
-    if(dur<40||!place()){finish();return;}
+    const spot=place();
+    if(dur<40||!spot){finish();return;}
+    const fade=fadePlan(dur,spot);
     void brand.offsetWidth;
-    root.style.setProperty('--intro-ms',dur+'ms');
-    root.style.setProperty('--intro-ease',EASE);
+    root.style.setProperty('--intro-delay',fade.delay+'ms');
+    root.style.setProperty('--intro-fade',fade.fade+'ms');
     root.classList.add('intro-play');
     brand.style.transition='transform '+dur+'ms '+EASE;
     brand.style.transform='translate3d(0px,0px,0) scale(1)';
