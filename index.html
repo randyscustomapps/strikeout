@@ -13,6 +13,47 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script>window.STRIKEOUT_PWA=true;</script>
+<script>
+/* Paint the saved day/night before the first frame, and arm the cold-open lockup.
+   Sheets, Update now (?v=), back/forward, and a second load this visit do not replay it. */
+(function(){
+  var root=document.documentElement;
+  var theme='day',dim=false;
+  try{
+    var raw=localStorage.getItem('strikeout.v1');
+    if(raw){
+      var o=JSON.parse(raw);
+      if(o){
+        if(typeof o.theme==='string'&&o.theme)theme=o.theme;
+        dim=o.dim===true;
+      }
+    }
+  }catch(e){}
+  var mode=theme==='night'?'night':theme==='day'?'day':'auto';
+  var dark=mode==='night';
+  if(mode==='auto'){try{dark=matchMedia('(prefers-color-scheme: dark)').matches;}catch(e){}}
+  if(mode==='day'){root.classList.add('force-day');root.setAttribute('data-theme','light');}
+  else if(mode==='night'){root.classList.add('force-night');root.setAttribute('data-theme','dark');}
+  if(dark&&dim)root.classList.add('night-dim');
+  var meta=document.querySelector('meta[name="theme-color"]');
+  if(meta)meta.setAttribute('content',dark?'#0C0904':'#F2DFA7');
+  var reduce=false,seen=false,update=false,nav='navigate',hashImport=false;
+  try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  try{seen=sessionStorage.getItem('strikeout.intro')==='1';}catch(e){}
+  try{update=/(?:^|[?&])v=/.test(location.search);}catch(e){}
+  try{hashImport=location.hash.indexOf('#h=')===0;}catch(e){}
+  try{var n=performance.getEntriesByType('navigation')[0];if(n&&n.type)nav=n.type;}catch(e){}
+  var play=!reduce&&!seen&&!update&&!hashImport&&nav!=='back_forward'&&nav!=='prerender';
+  if(play||update){try{sessionStorage.setItem('strikeout.intro','1');}catch(e){}}
+  if(!play)return;
+  root.classList.add('intro');
+  window.__soIntroKill=setTimeout(function(){
+    root.classList.remove('intro','intro-on','intro-play');
+    var b=document.querySelector('.app>.bar>.brand');
+    if(b){b.style.transform='';b.style.transition='';b.style.transformOrigin='';}
+  },1200);
+})();
+</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <title>Strikeout Harvest</title>
 <style>
@@ -74,6 +115,7 @@
   --seg-lead:#C9930F; --seg-out:#8C611D; --harvest:#E0A91C;
   --danger:#C0583A;
 }
+html.night-dim body{filter:brightness(.6)}
 [hidden]{display:none!important}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;touch-action:pan-y;overscroll-behavior-x:none}
@@ -581,6 +623,22 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
   mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
 }
 .r-stepper input{border:2px solid transparent;background:linear-gradient(var(--res-bg),var(--res-bg)) padding-box,var(--stroke-gold) border-box;color:var(--res-ink)}
+/* Cold-open lockup: keep the field and gear hidden on the page background, glide the real header brand home, then fade the field in once the lockup has cleared the cards. */
+html.intro .app>.bar{position:relative;z-index:4}
+html.intro .app>.stage,
+html.intro .app>.bar>.sp,
+html.intro .app>.bar>.iconbtn{opacity:0;will-change:opacity}
+html.intro .app>.bar>.brand{visibility:hidden;position:relative;z-index:1;will-change:transform}
+html.intro.intro-on .app>.bar>.brand{visibility:visible}
+html.intro-play .app>.stage,
+html.intro-play .app>.bar>.sp,
+html.intro-play .app>.bar>.iconbtn{opacity:1;transition:opacity var(--intro-fade,.12s) linear var(--intro-delay,.36s)}
+@media (prefers-reduced-motion: reduce){
+  html.intro .app>.stage,
+  html.intro .app>.bar>.sp,
+  html.intro .app>.bar>.iconbtn{opacity:1}
+  html.intro .app>.bar>.brand{visibility:visible}
+}
 </style>
 
 </head>
@@ -1921,6 +1979,7 @@ function isNight(){
 }
 function applyTheme(){
   const r=document.documentElement;
+  r.classList.remove('night-dim');
   const auto=S.theme!=='day'&&S.theme!=='night';
   const known=!auto||sunNight===true||sunNight===false;
   const night=isNight();
@@ -2677,6 +2736,137 @@ window.addEventListener('orientationchange',()=>{fitHome();setTimeout(fitHome,30
 if(window.visualViewport)window.visualViewport.addEventListener('resize',fitHome);
 window.addEventListener('pageshow',fitHome);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitScale(true));
+// Cold open: hold the real header lockup centred, then glide it to this bar.
+// Tap or a key skips. Update now, back/forward, and any later load this visit do not replay.
+function runIntro(){
+  if(window.__soIntroKill){clearTimeout(window.__soIntroKill);window.__soIntroKill=0;}
+  const root=document.documentElement;
+  if(!root.classList.contains('intro'))return;
+  try{if(matchMedia('(prefers-reduced-motion: reduce)').matches){root.classList.remove('intro');return;}}catch(e){}
+  const brand=document.querySelector('.app>.bar>.brand');
+  if(!brand){root.classList.remove('intro');return;}
+  const HOLD=640,MOVE=480,CAP=1200;
+  const EASE='cubic-bezier(.4,0,.2,1)';
+  // CSS cubic-bezier(.4,0,.2,1): time (0–1) at which the glide has covered `progress`.
+  function easeTime(progress){
+    function bez(u,p1,p2){const c=3*p1,b=3*(p2-p1)-c,a=1-c-b;return ((a*u+b)*u+c)*u;}
+    let lo=0,hi=1;
+    for(let i=0;i<22;i++){const m=(lo+hi)/2;if(bez(m,0,1)<progress)lo=m;else hi=m;}
+    return bez((lo+hi)/2,.4,.2);
+  }
+  // Field stays hidden until the lockup has cleared the result card, then fades
+  // in over the rest of the glide so it is fully up as the lockup lands.
+  function fadePlan(dur,spot){
+    brand.style.transition='none';
+    brand.style.transform='none';
+    const b=brand.getBoundingClientRect();
+    const card=document.querySelector('#result');
+    let progress=.9;
+    if(card&&b.height>8&&spot.scale>1){
+      const top=card.getBoundingClientRect().top,H=b.height,cy=b.top+H/2;
+      const A=cy+spot.dy+H*spot.scale/2;
+      const B=-spot.dy+H*(1-spot.scale)/2;
+      if(B<-1){
+        let p=(top-6-A)/B;
+        if(!Number.isFinite(p))p=.9;
+        if(p<.82)p=.82;
+        if(p>.98)p=.98;
+        progress=p;
+      }
+    }
+    brand.style.transform='translate3d('+spot.dx+'px,'+spot.dy+'px,0) scale('+spot.scale+')';
+    let delay=Math.round(easeTime(progress)*dur);
+    if(delay<0)delay=0;
+    if(delay>dur-70)delay=Math.max(0,dur-70);
+    return {delay:delay,fade:dur-delay};
+  }
+  const t0=performance.now();
+  let ended=false,moving=false,holdT=0,endT=0,safety=0;
+  function finish(){
+    if(ended)return;
+    ended=true;
+    clearTimeout(holdT);clearTimeout(endT);clearTimeout(safety);
+    root.removeEventListener('pointerdown',onPointer,true);
+    window.removeEventListener('keydown',finish,true);
+    window.removeEventListener('pagehide',finish);
+    window.removeEventListener('resize',onResize);
+    window.removeEventListener('pageshow',onShow);
+    brand.removeEventListener('transitionend',onEnd);
+    // Drop any in-flight fade so a tap shows the field at once.
+    const fading=document.querySelectorAll('.app>.stage,.app>.bar>.sp,.app>.bar>.iconbtn');
+    fading.forEach(el=>{el.style.transition='none';el.style.opacity='1';});
+    brand.style.transition='none';
+    brand.style.transform='';
+    brand.style.transformOrigin='';
+    brand.style.transition='';
+    root.style.removeProperty('--intro-delay');
+    root.style.removeProperty('--intro-fade');
+    root.classList.remove('intro','intro-on','intro-play');
+    requestAnimationFrame(()=>{fading.forEach(el=>{el.style.transition='';el.style.opacity='';});});
+  }
+  function onPointer(e){
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    finish();
+  }
+  function onEnd(e){
+    if(e.target!==brand||e.propertyName!=='transform')return;
+    finish();
+  }
+  function onResize(){if(!ended&&!moving)place();}
+  function onShow(e){
+    if(e.persisted){finish();return;}
+    if(!ended&&!moving)place();
+  }
+  function place(){
+    brand.style.transition='none';
+    brand.style.transform='none';
+    const r=brand.getBoundingClientRect();
+    if(!(r.width>8&&r.height>8))return false;
+    const cs=getComputedStyle(insetProbe);
+    const top=parseFloat(cs.paddingTop)||0,bottom=parseFloat(cs.paddingBottom)||0;
+    const vw=window.innerWidth||root.clientWidth||0;
+    const vh=window.innerHeight||root.clientHeight||0;
+    const visH=Math.max(1,vh-top-bottom);
+    const cx=r.left+r.width/2,cy=r.top+r.height/2;
+    const tx=vw/2,ty=top+visH/2;
+    let scale=Math.min(vw*0.78,520)/r.width;
+    const maxH=visH*0.46,maxW=Math.max(40,vw-32);
+    if(r.height*scale>maxH)scale=maxH/r.height;
+    if(r.width*scale>maxW)scale=maxW/r.width;
+    if(scale>2.2)scale=2.2;
+    if(scale<1)scale=1;
+    const dx=Math.round(tx-cx),dy=Math.round(ty-cy),sc=+scale.toFixed(4);
+    brand.style.transformOrigin='50% 50%';
+    brand.style.transform='translate3d('+dx+'px,'+dy+'px,0) scale('+sc+')';
+    return {dx:dx,dy:dy,scale:sc};
+  }
+  safety=setTimeout(finish,CAP+80);
+  try{if(!place()){finish();return;}}catch(e){finish();return;}
+  root.classList.add('intro-on');
+  root.addEventListener('pointerdown',onPointer,true);
+  window.addEventListener('keydown',finish,true);
+  window.addEventListener('pagehide',finish);
+  window.addEventListener('resize',onResize);
+  window.addEventListener('pageshow',onShow);
+  brand.addEventListener('transitionend',onEnd);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(!ended&&!moving)place();});
+  holdT=setTimeout(function(){
+    if(ended)return;
+    const dur=Math.max(0,Math.min(MOVE,CAP-(performance.now()-t0)));
+    moving=true;
+    const spot=place();
+    if(dur<40||!spot){finish();return;}
+    const fade=fadePlan(dur,spot);
+    void brand.offsetWidth;
+    root.style.setProperty('--intro-delay',fade.delay+'ms');
+    root.style.setProperty('--intro-fade',fade.fade+'ms');
+    root.classList.add('intro-play');
+    brand.style.transition='transform '+dur+'ms '+EASE;
+    brand.style.transform='translate3d(0px,0px,0) scale(1)';
+    endT=setTimeout(finish,dur+90);
+  },HOLD);
+}
+runIntro();
 const sheetEl=$('settings');
 function topScroll(el){
   const sc=el.querySelector(':scope > .ctrls')||el.querySelector(':scope > #setView > .ctrls');
@@ -2818,7 +3008,7 @@ void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.78';
+const APP_VERSION='1.0.79';
 $('verNow').textContent='v'+APP_VERSION;
 function supportHref(){
   let installed=false;
