@@ -581,10 +581,51 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
   mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
 }
 .r-stepper input{border:2px solid transparent;background:linear-gradient(var(--res-bg),var(--res-bg)) padding-box,var(--stroke-gold) border-box;color:var(--res-ink)}
+#playGate{position:fixed;inset:0;z-index:80;background:var(--bg);color:var(--ink);display:flex;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));overflow:auto}
+.play-gate{width:min(100%,520px);display:flex;flex-direction:column;gap:16px}
+.play-kicker{font-family:var(--display);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:1.3rem;margin:0;color:var(--harvest)}
+.play-gate h2{font-family:var(--display);font-weight:900;font-size:clamp(3.2rem,14vw,4.6rem);line-height:.88;letter-spacing:.02em;text-transform:uppercase;margin:0}
+.play-price{font-size:1.55rem;font-weight:700;margin:0}
+.play-note{font-size:1.15rem;line-height:1.35;margin:0}
+.play-status{font-size:1.2rem;font-weight:700;margin:0;min-height:1.4em}
+.play-go,.play-restore{width:100%;min-height:76px;border-radius:14px;font-family:var(--display);font-weight:800;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.play-go{border:0;background:var(--ink);color:var(--bg);font-size:2.1rem}
+.play-restore{border:3px solid var(--ink);background:transparent;color:var(--ink);font-size:1.6rem}
+.play-go:disabled,.play-restore:disabled{opacity:.45}
+.play-go:active:not(:disabled),.play-restore:active:not(:disabled){transform:scale(.98)}
 </style>
 
 </head>
 <body>
+<!-- Play TWA paywall. Shown only for android-app://com.randyscustomapps.strikeout. Keep that id equal to PLAY.packageId below. -->
+<div id="playGate" hidden>
+  <div class="play-gate">
+    <p class="play-kicker">Strikeout Harvest</p>
+    <h2 id="playTitle">7-day free trial</h2>
+    <p class="play-price" id="playPrice">Then $24.99 CAD a year.</p>
+    <p class="play-note" id="playNote">Renews automatically through Google Play until you cancel. Cancel in the Play Store before the trial ends and you are not charged. Google Play shows the trial and the price before you confirm.</p>
+    <p class="play-status" id="playStatus" role="status">Checking…</p>
+    <button class="play-go" id="playSub" type="button" disabled>Subscribe</button>
+    <button class="play-restore" id="playRestore" type="button" disabled>Restore</button>
+  </div>
+</div>
+<script>
+(function(){
+  var ref=document.referrer||'';
+  var twa=ref.indexOf('android-app://com.randyscustomapps.strikeout')===0;
+  if(!twa){try{twa=sessionStorage.getItem('strikeout.playtwa')==='1';}catch(e){}}
+  if(!twa)return;
+  window.__playTwa=1;
+  try{sessionStorage.setItem('strikeout.playtwa','1');}catch(e){}
+  var g=document.getElementById('playGate');
+  if(g)g.hidden=false;
+  setTimeout(function(){
+    if(window.__playGateArmed)return;
+    var el=document.getElementById('playGate');
+    if(el)el.hidden=true;
+  },8000);
+})();
+</script>
 <div class="app">
   <div class="bar">
     <h1 class="brand">
@@ -2814,11 +2855,12 @@ sheetEl.addEventListener('focusin',e=>{
 applyTheme();renderField();
 if(S.wake)wake();
 requestSunFix();
-void resumeAuto();
+if(window.__playTwa){/* Play check below starts GPS once the gate is done. */}
+else void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.77';
+const APP_VERSION='1.0.80';
 $('verNow').textContent='v'+APP_VERSION;
 function supportHref(){
   let installed=false;
@@ -2869,6 +2911,177 @@ if(HOSTED){
   setInterval(checkUpdate,20*60*1000);
   if(location.search)history.replaceState(null,'',location.pathname);
 }else{$('verSt').textContent='Updates work in the installed app';}
+
+// Play subscription. The website and the iPhone install never call this.
+// Change the ids here when the Play Console product exists. Nothing else
+// in the file names them.
+const PLAY={
+  packageId:'com.randyscustomapps.strikeout',
+  service:'https://play.google.com/billing',
+  productId:'strikeout_yearly',
+  basePlanId:'yearly',
+  offerId:'trial7',
+  price:'$24.99',
+  currency:'CAD',
+  trialDays:7
+};
+let playSvc=null;
+let playUnlock=null;
+function playIsTwa(){
+  const ref=document.referrer||'';
+  if(ref.indexOf('android-app://'+PLAY.packageId)===0){
+    try{sessionStorage.setItem('strikeout.playtwa','1');}catch(e){}
+    return true;
+  }
+  try{return sessionStorage.getItem('strikeout.playtwa')==='1';}catch(e){return false;}
+}
+function playMoney(currency,value){
+  const n=Number(value);
+  if(!currency||!isFinite(n))return '';
+  try{return new Intl.NumberFormat(undefined,{style:'currency',currency:currency}).format(n);}
+  catch(e){return PLAY.price+' '+PLAY.currency;}
+}
+function playPeriod(iso){
+  const m=/^P(\d+)([DWMY])$/.exec(iso||'');
+  if(!m)return '';
+  const n=Number(m[1]);
+  const unit={D:'day',W:'week',M:'month',Y:'year'}[m[2]];
+  if(!unit)return '';
+  if(n===1)return unit;
+  return n+' '+unit+'s';
+}
+function playOwns(list){
+  if(!list)return false;
+  for(let i=0;i<list.length;i++){
+    const p=list[i];
+    if(p&&p.itemId===PLAY.productId)return true;
+  }
+  return false;
+}
+function playAllow(){
+  const g=$('playGate');
+  if(g)g.hidden=true;
+  const app=document.querySelector('.app');
+  if(app)app.removeAttribute('inert');
+  if(playUnlock){const go=playUnlock;playUnlock=null;go();}
+}
+function playHold(){
+  const g=$('playGate');
+  if(g)g.hidden=false;
+  const app=document.querySelector('.app');
+  if(app)app.setAttribute('inert','');
+}
+function playStatus(text){
+  const s=$('playStatus');
+  if(s)s.textContent=text||'';
+}
+function playButtons(on){
+  const sub=$('playSub'),rest=$('playRestore');
+  if(sub)sub.disabled=!on;
+  if(rest)rest.disabled=!on;
+}
+function playApplyDetails(item){
+  if(!item||!item.price)return;
+  const shown=playMoney(item.price.currency,item.price.value);
+  if(!shown)return;
+  const every=playPeriod(item.subscriptionPeriod)||'year';
+  const trial=playPeriod(item.freeTrialPeriod);
+  if(trial){
+    const title=$('playTitle');
+    if(title)title.textContent=trial+' free';
+  }
+  const price=$('playPrice');
+  if(price)price.textContent='Then '+shown+' a '+every+'.';
+}
+function playWithin(promise,ms){
+  return new Promise(function(resolve,reject){
+    const t=setTimeout(function(){reject(new Error('timeout'));},ms);
+    promise.then(function(v){clearTimeout(t);resolve(v);},function(e){clearTimeout(t);reject(e);});
+  });
+}
+function playCanceled(e){
+  if(!e)return false;
+  if(e.name==='AbortError')return true;
+  return /cancel/i.test(String(e.message||''));
+}
+async function playService(){
+  if(playSvc)return playSvc;
+  if(!('getDigitalGoodsService' in window))throw new Error('no digital goods');
+  playSvc=await window.getDigitalGoodsService(PLAY.service);
+  return playSvc;
+}
+async function playCheck(){
+  window.__playGateArmed=1;
+  playHold();
+  playButtons(false);
+  playStatus('Checking…');
+  try{
+    const service=await playWithin(playService(),12000);
+    const details=await playWithin(service.getDetails([PLAY.productId]),12000);
+    if(!details||!details.length)throw new Error('no product');
+    playApplyDetails(details[0]);
+    const purchases=await playWithin(service.listPurchases(),12000);
+    if(playOwns(purchases)){playAllow();return;}
+    playButtons(true);
+    playStatus('');
+    const btn=$('playSub');
+    if(btn)btn.focus();
+  }catch(e){
+    playAllow();
+  }
+}
+async function playSubscribe(){
+  playButtons(false);
+  playStatus('Opening Google Play…');
+  let response=null;
+  try{
+    const data={sku:PLAY.productId};
+    if(PLAY.offerId)data.offerId=PLAY.offerId;
+    if(PLAY.basePlanId)data.basePlanId=PLAY.basePlanId;
+    const request=new PaymentRequest([{
+      supportedMethods:PLAY.service,
+      data:data
+    }],{
+      total:{label:'Total',amount:{currency:PLAY.currency,value:'24.99'}}
+    });
+    response=await request.show();
+    await response.complete('success');
+    playAllow();
+  }catch(e){
+    if(response){try{await response.complete('fail');}catch(err){}}
+    if(playCanceled(e)){
+      playButtons(true);
+      playStatus('');
+      return;
+    }
+    playAllow();
+  }
+}
+async function playRestore(){
+  playButtons(false);
+  playStatus('Checking Google Play…');
+  try{
+    const service=await playWithin(playService(),12000);
+    const purchases=await playWithin(service.listPurchases(),12000);
+    if(playOwns(purchases)){playAllow();return;}
+    playButtons(true);
+    playStatus('No active subscription on this Google account.');
+  }catch(e){
+    playAllow();
+  }
+}
+function playBoot(){
+  window.__playGateArmed=1;
+  if(!$('playGate')||!$('playSub')||!$('playRestore'))return Promise.resolve();
+  $('playSub').addEventListener('click',function(){void playSubscribe();});
+  $('playRestore').addEventListener('click',function(){void playRestore();});
+  return new Promise(function(resolve){
+    playUnlock=resolve;
+    void playCheck();
+  });
+}
+if(window.__playTwa)playBoot().then(function(){void resumeAuto();});
+else if(playIsTwa())playBoot();
 })();
 </script>
 

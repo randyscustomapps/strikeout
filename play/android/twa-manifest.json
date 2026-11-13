@@ -20,7 +20,7 @@
     "path": "./signing/upload-keystore.jks",
     "alias": "upload"
   },
-  "appVersionName": "1.0.77",
+  "appVersionName": "1.0.80",
   "appVersionCode": 1,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
@@ -28,6 +28,9 @@
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": {
+      "enabled": true
+    },
+    "playBilling": {
       "enabled": true
     }
   },
@@ -47,5 +50,5 @@
   "fileHandlers": [],
   "launchHandlerClientMode": "navigate-existing",
   "displayOverride": [],
-  "appVersion": "1.0.77"
+  "appVersion": "1.0.80"
 }

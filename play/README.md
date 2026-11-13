@@ -1,6 +1,6 @@
 # Strikeout Harvest on Google Play
 
-Draft launch assets for the paid Android app. The website at `https://randyscustomapps.github.io/strikeout/` stays the free demo. Nothing in this folder changes `index.html`, `sw.js`, or `version.json`.
+Draft launch assets for the Android app. The Play app is free to install and sells a yearly subscription through Google Play Billing. The website at `https://randyscustomapps.github.io/strikeout/` stays free, and so does a home-screen install that is not the Play app. The subscription gate lives in `index.html` and runs only inside this Trusted Web Activity.
 
 The Android package is a Trusted Web Activity: a thin app that opens that URL in Chrome, fullscreen, once Digital Asset Links check out. Bubblewrap 1.25.0 generated `play/android/` from the live web manifest.
 
@@ -19,7 +19,8 @@ It is only a suggestion. Play locks the id at the first upload, and it cannot be
 | Theme | Status and navigation `#2A1D0A` (day chrome) and `#0C0904` (night). Splash background `#F2DFA7`, from the web manifest. |
 | Icon | The live `icon-512.png`: flat-auger combine and the STRIKEOUT / HARVEST lockup. |
 | minSdk / targetSdk | 21 / 36. New Play apps in October 2026 have to target Android 16 (API 36). |
-| Version | `versionName` 1.0.77, `versionCode` 1, matching the current site. Play's versionCode must go up on every upload. It is independent of the website's `APP_VERSION` after this. |
+| Version | `versionName` 1.0.80, `versionCode` 1. Nothing has been uploaded, so the first upload is still versionCode 1. After that, versionCode must go up on every upload. It is independent of the website's `APP_VERSION`. |
+| Play Billing | On. `features.playBilling` in `twa-manifest.json`. The wrapper uses `com.google.androidbrowserhelper:billing:1.2.0` (Play Billing Library 8.3.0). |
 | Location | Location delegation is on, so GPS uses the Android permission dialog. The manifest requests precise and coarse location, in the foreground. |
 | Name | Application name Strikeout Harvest. Launcher label Strikeout, same as the web manifest `short_name`, so it fits under the icon. |
 | Notifications | DelegationService stays enabled so location delegation can register. Strikeout Harvest never posts a notification. `build-release.sh` strips `POST_NOTIFICATIONS` after a Bubblewrap update rewrites the manifest. |
@@ -105,28 +106,71 @@ If you change the package id, change `package_name` in the same file. Update the
 
 Check the live file with Google's statement list generator, and in Play Console under the app's deep links / app links, before you expect the browser bar to disappear.
 
-## Purchase check
+## Subscription
 
-Recommended for this app: **do not add a license check in the first version.** Sell it as a paid app. Play will not install it for an account that has not paid. The website stays free on purpose, as a demo. There is no account system and no server, and a check that needs either one fights that.
+The app on Play is **free to install**. The charge is an auto-renewing subscription, not a paid download. A paid download cannot offer a 7-day trial, and Play Billing is how a Trusted Web Activity is allowed to sell a digital subscription.
 
-Details, and why Play Billing and the Digital Goods API are the wrong tool for an upfront price:
+| | Plug this into Play Console |
+| --- | --- |
+| Product id | `strikeout_yearly` |
+| Base plan id | `yearly` |
+| Offer id | `trial7` |
+| Price | $24.99 CAD a year, auto-renewing |
+| Trial | 7 days, free, on the `yearly` base plan |
+| Package id | `com.randyscustomapps.strikeout` |
 
-### Paid app (do this)
+Those three ids are the only store strings in the web app. They sit in the `PLAY` object near the bottom of `index.html`. The same package id is repeated in the small script just inside `<body>`, so the paywall can show before the rest of the script runs. Change both if you change the package.
 
-In Play Console the app is Paid, one-time, about $24.99 CAD. Google gates the download. Anyone who did not buy it does not get the AAB. Sideloading a copied APK is the hole this leaves open. For a $25 field tool that is an acceptable hole. The pages inside are the same pages as the free site, so a sideload does not unlock private content.
+The page uses the Digital Goods API (`getDigitalGoodsService('https://play.google.com/billing')`) to read the product and `listPurchases()`, and the Payment Request API with method `https://play.google.com/billing` to start the purchase. The request sends `sku`, `offerId`, and `basePlanId`. Play's own sheet is the price the farmer confirms. The $24.99 line on our screen is the fallback until `getDetails` returns Play's price.
 
-### Play Billing and the Digital Goods API (do not use these for the sticker price)
+The gate runs only when the page was opened as this Play app. Chrome sets `document.referrer` to `android-app://com.randyscustomapps.strikeout` on that launch. A reload in the same tab keeps a `sessionStorage` flag named `strikeout.playtwa` so the gate can come back after the referrer is gone. That flag is not the settings key `strikeout.v1`, and it is not written for a normal browser tab. The website, an iPhone home-screen icon, and an Android install from Chrome's menu never take this path.
 
-Play Billing and the Digital Goods API sell in-app products and subscriptions: SKUs the app requests after it is installed. They do not answer "did this user pay the store price?" A paid upfront listing is not an in-app product. Adding a "full version" SKU would be a second way to charge, or a free app with a paywall, which is a different product than the one described here. The web app would also need Play Billing wired through the TWA, and this project does not enable that feature.
+Inside the Play app, with no active subscription, the farmer gets one full-screen page: 7-day free trial, then $24.99 CAD a year, a Subscribe button, and a Restore button. The buttons are tall, flat, and use the same day and night colors as the field.
 
-### If you later want to refuse a sideload
+**Fail open.** If Play Billing is missing, the product id is not live yet, `getDetails` or `listPurchases` throws or times out (12 seconds), or Subscribe fails for a reason other than the farmer closing the sheet, the gate goes away and the calculator works. A farmer is not locked out by a glitch. Closing the Play sheet on purpose leaves the gate up. Restore with no subscription stays on the gate and says no active subscription was found on this Google account.
 
-Two mechanisms exist. Neither is required to ship.
+Until the subscription exists on an internal test track, `getDetails` comes back empty and the gate does not stay up. That is the fail-open rule, not a sign that the check was skipped.
 
-- **Play Integrity API**, `appLicensingVerdict`: `LICENSED`, `UNLICENSED`, or `UNEVALUATED`. This is the current way to ask Play whether the install came from a purchase. The standard API wants a small backend to check the token. Strikeout Harvest has no backend. Skip it until there is one.
-- **Licensing Verification Library (LVL)**, the older paid-app check. It can run in the Android wrapper, before the Trusted Web Activity opens, and it talks to Play from the device with the app's license key. It fits a no-server app better than Play Integrity. It is still extra code, obfuscation, and a failure mode in the cab when Play is unreachable. Add it only if copied APKs become a real problem.
+`listPurchaseHistory()` is empty with billing 1.2.0 (Play Billing Library 8 removed it). Restore uses `listPurchases()` only, which is the active subscription, including one still in the free trial.
 
-Do not block the website. Buyers and demo users load the same origin.
+### The helper may ignore the trial offer
+
+`com.google.androidbrowserhelper:billing:1.2.0` buys `subscriptionOfferDetails.get(0)` and does not read `offerId`. Play does not promise which offer is first. The page still sends `offerId: "trial7"` so a helper that learns that field (the unmerged android-browser-helper change is pull request 645) selects the trial without a web edit.
+
+On the first internal test, read the Play sheet before you confirm. It has to say 7 days free, then $24.99 a year. If it charges immediately, this build bought the bare base plan. Do not ship that build.
+
+### Acknowledging the purchase
+
+Play refunds a subscription that is still unacknowledged after three days. The current Digital Goods API has no `acknowledge()` method, and this app has no server. `PlaySubscriptionAck` in the Android wrapper acknowledges an unacknowledged subscription on the device, when the process starts and again when Play's payment activity closes. It does not store the purchase token. `build-release.sh` puts the `Application.onCreate` call back if `bubblewrap update` rewrites that file. Do not delete `PlaySubscriptionAck.java`.
+
+### The free website is a bypass
+
+Anyone who opens `https://randyscustomapps.github.io/strikeout/` in a browser, or who uses Add to Home Screen, gets the calculator with no subscription. The Play app loads that same URL. The gate can only appear after this version of `index.html` is what that URL serves. This branch does not publish the site.
+
+Ways to close the hole, for you to pick. None of them is built here.
+
+1. Leave it. The website is the demo. The Play app is the paid one. A person who already has the URL does not pay. This is the current behavior.
+2. Publish the gate on the website too, and point the planned iPhone build at a different check (App Store) later. The website would stop being a free tool the day that page ships.
+3. Move the Play app to its own origin (a domain you control) and keep GitHub Pages as the free demo. The gate stays on the Play origin only. Asset links and the TWA host have to move with it.
+4. Add a server that Play and the page both trust. That is the only way to make a copied APK or a browser tab fail closed. This app has no server today.
+
+Sideloading the APK is the same hole as the website, because the pages are the public site. Play Integrity and the old Licensing Verification Library are not wired up. Play Integrity wants a server. The Licensing library answers "did they pay to download," which is the wrong question for a free app with a subscription.
+
+## Create the subscription in Play Console
+
+The developer account does not exist yet. Nothing was created in Play, and nothing here was tested against a live product. Do these in order. Ids cannot be renamed after you activate them.
+
+1. Create the app. App name Strikeout Harvest. Set the app to **Free**. Do not set a download price. Package id `com.randyscustomapps.strikeout`, unless you change it in `twa-manifest.json` before the first upload.
+2. Finish the payments profile and tax for Randy's Canadian Ltd. Subscriptions will not activate without it. The one-time Play registration fee is separate from the $24.99.
+3. Open **Monetize with Play → Products → Subscriptions → Create subscription**.
+4. Product id: `strikeout_yearly`. Name: Strikeout Harvest yearly. Description, plain text: Yearly subscription for Strikeout Harvest, with a 7-day free trial. Create it. You cannot change the product id later.
+5. **Add base plan**. Base plan id: `yearly`. Type: **Auto-renewing**. Billing period: **1 year** (every 12 months). Set the price for **Canada** to **$24.99 CAD**. Let Play derive other countries, or turn those countries off. Do not add a second base plan. If the page still shows "Backwards compatible" or "Use for deprecated billing methods," turn it on for this base plan. Billing Library 8 does not use that flag; it is there for any older path.
+6. On that base plan, turn on a **7-day grace period** so a failed renewal does not drop the farmer off the calculator the same day. Leave account hold off unless you want the gate to come back while a card is declined.
+7. **Add offer**. Offer id: `trial7`. Base plan: `yearly`. Eligibility: new customer (never had this subscription). Add one phase: **Free trial, 7 days**. No introductory price after it. The next phase is the base plan, $24.99 CAD a year. Offer the same countries as the base plan, including Canada. A customer who already used `trial7` pays the yearly price if they subscribe again.
+8. Activate the base plan, activate the offer, then activate the subscription. An inactive product makes `getDetails` return nothing, and the app then fails open.
+9. **Settings → License testing**. Add the Gmail accounts that will install the test build. Those accounts can subscribe without being charged. The sheet still has to show the trial.
+10. Upload the AAB to an **internal testing** track and install from that track's opt-in link, with one of those Google accounts, on a phone with Chrome. Billing does not return products to a build that is not on a track. Open the app. You should see the trial screen, then Play's sheet. Confirm the sheet says 7 days free, then $24.99 a year, before anyone pays.
+11. After a test purchase, force-close the app and open it again. The calculator should open with no gate. On a second phone with the same Google account, Restore should do the same. A brand-new Google account should still see the gate.
 
 ## Store listing and privacy
 
@@ -140,11 +184,11 @@ The developer account does not exist yet. Nothing here was uploaded.
 
 1. Create an **organization** Play Console account for Randy's Canadian Ltd, not a personal account. Organization accounts need a D-U-N-S number for the company. Account type cannot be switched after verification. The one-time Play registration fee is separate from the app price.
 2. Confirm the account shows you can publish to production. Google's 12-tester, 14-day closed test is written for personal accounts created after 13 November 2023. The help page does not put organization accounts under that rule. Look at your own console after verification rather than assuming the button is there.
-3. Payments profile and tax for the Canadian company. Set the app to Paid, about **$24.99 CAD**, no in-app products. The website is not part of that price.
-4. Create the app. Decide the package id first (`com.randyscustomapps.strikeout` unless you change it). You cannot change it later.
+3. Create the app. Set it to **Free**. Decide the package id first (`com.randyscustomapps.strikeout` unless you change it). You cannot change it later. Do not set a download price.
+4. Payments profile and tax for the Canadian company, then the subscription in the section above: product `strikeout_yearly`, base plan `yearly`, offer `trial7`, **$24.99 CAD** a year, 7-day free trial.
 5. On your machine, run `generate-upload-key.sh`, back up the keystore and `passwords.env` in a password manager, then `build-release.sh`. Upload **that** AAB. Leave Play App Signing on.
 6. Copy the **App signing** SHA-256 into asset links and publish the file at `https://randyscustomapps.github.io/.well-known/assetlinks.json` from a `randyscustomapps.github.io` repo (option A above).
 7. Store listing from `play/listing.md`. Category Tools. Upload the icon, feature graphic, and screenshots in `play/graphics/`.
 8. Privacy policy URL: the hosted `play/privacy.html`. Contact email on that page is randyscustomapps@gmail.com.
-9. App content: content rating (Everyone-level, not a game), target audience 18 and over only, not designed for children, ads No, data safety No collection, location permission foreground and optional, not background.
-10. Ship to an internal test track first and open the app on a phone with Chrome. Confirm the browser bar is gone after asset links propagate, then promote the release.
+9. App content: content rating (Everyone-level, not a game; yes, users can purchase a subscription), target audience 18 and over only, not designed for children, ads No, data safety No collection, location permission foreground and optional, not background.
+10. Ship to an internal test track first and open the app on a phone with Chrome. Confirm the Play sheet says 7 days free, then $24.99 a year. Confirm the browser bar is gone after asset links propagate, then promote the release.

@@ -41,6 +41,18 @@ if needle not in text:
 if 'xmlns:tools=' not in text:
     raise SystemExit('AndroidManifest.xml is missing the tools namespace; patch it by hand.')
 p.write_text(text)
+
+# bubblewrap update rewrites Application.java. Play refunds a subscription that
+# stays unacknowledged for three days, and this app has no server, so the
+# on-device ack has to survive that rewrite.
+app = Path("app/src/main/java/com/randyscustomapps/strikeout/Application.java")
+java = app.read_text()
+hook = "PlaySubscriptionAck.start(this);"
+if hook not in java:
+    if "super.onCreate();" not in java:
+        raise SystemExit('Application.java has no onCreate hook; add PlaySubscriptionAck.start(this) by hand.')
+    java = java.replace("super.onCreate();", "super.onCreate();\n      " + hook, 1)
+    app.write_text(java)
 PY
 
 set -a

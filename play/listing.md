@@ -67,7 +67,7 @@ Day, Night, or Auto. Auto follows sunrise and sunset from your location. It does
 On the phone
 Open it once with signal. After that it runs with no cell service. Header sizes, crew counts, and the current row stay on this phone. They are not uploaded. There is no account, and there are no ads.
 
-The website is free to try in a browser. The Play Store app is a one-time purchase of the same calculator, installed like any other app.
+The website is free to try in a browser. The Play Store app is free to install and is a yearly subscription of the same calculator, with a 7-day free trial, billed by Google Play.
 ```
 
 ## Category
@@ -78,9 +78,10 @@ Productivity is the other listing that fits a field calculator. Tools matches a 
 
 ## Pricing
 
-- App type: **Paid** (one-time). Not free, not a subscription, no in-app products.
-- Price: **about $24.99 CAD** in Canada. Set the Canada price explicitly. Let Play derive other countries, or turn off countries you do not want.
-- The public site stays free. Do not put the price in the description.
+- App type: **Free** to install. Not a paid download.
+- One subscription. Product id `strikeout_yearly`. Base plan id `yearly`, auto-renewing, every year. Price **$24.99 CAD** in Canada. Set the Canada price explicitly. Let Play derive other countries, or turn off countries you do not want.
+- One offer. Offer id `trial7`, a 7-day free trial for a new customer, then the yearly price. Do not add a second base plan.
+- The public site stays free. Do not put the price in the description. The steps are in `play/README.md`.
 
 ## Content rating
 
@@ -94,7 +95,7 @@ App type: **not a game**. In the IARC questionnaire, choose the utility / all-ot
 | Controlled substances (alcohol, tobacco, drugs) | No |
 | Users interact or exchange content inside the app | No. See the note under the table. |
 | Shares the user's location with other users | No |
-| Users can purchase digital goods inside the app | No. The store price is not an in-app product. |
+| Users can purchase digital goods inside the app | Yes. One auto-renewing subscription, sold by Google Play, with a 7-day free trial. No other digital goods. |
 | Web browser or search engine | No. The app opens one site. It is not a general browser. |
 | User-generated content that other people can browse or that is shared publicly | No |
 | Unrestricted internet, social, or chat | No |
@@ -118,7 +119,7 @@ Strikeout Harvest is a field tool for people running combines and harvest crews.
 - News app: No.
 - COVID-19 contact tracing or status: No.
 - Government app: No.
-- Financial features: No. Google Play bills the one-time price. The app does not move money, offer loans, or show crypto.
+- Financial features: No. Google Play bills the subscription. The app does not move money, offer loans, or show crypto.
 - Health: No.
 
 ## Data safety
@@ -130,7 +131,7 @@ Play's definition of collected is data transmitted off the device. Processed on 
 - Precise location is used only while Auto line advance is on. The watch reads GPS position and heading so the current row can advance after a real turnaround. Coordinates stay in memory. They are not written into the saved setup (`strikeout.v1`) and they are not sent anywhere.
 - Approximate location is used only when Screen is Auto, to compute sunrise and sunset. It does not use the light sensor. Same rule: memory only, not saved, not sent.
 - If Auto is off and Screen is Day or Night, the app does not ask for location.
-- There is no account, no analytics, no advertising ID, no crash vendor, and no payment form. Purchases are Google Play's, and the app does not receive card data.
+- There is no account, no analytics, no advertising ID, no crash vendor, and no payment form. Google Play bills the subscription. The app does not receive card data, and it does not upload the purchase token.
 - The app fetches its own pages, `version.json`, and the privacy text. Those requests carry no field numbers and no coordinates.
 - Header names (optional, such as a first name on a machine) stay on the phone unless the operator uses the phone's share sheet or a file.
 
