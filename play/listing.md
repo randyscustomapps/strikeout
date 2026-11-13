@@ -67,7 +67,7 @@ Day, Night, or Auto. Auto follows sunrise and sunset from your location. It does
 On the phone
 Open it once with signal. After that it runs with no cell service. Header sizes, crew counts, and the current row stay on this phone. They are not uploaded. There is no account, and there are no ads.
 
-The website is free to try in a browser. The Play Store app is free to install and is a yearly subscription of the same calculator, with a 7-day free trial, billed by Google Play.
+The website is free to try in a browser. The Play Store app is free to install and is a yearly subscription of the same calculator, with a 3-day free trial, billed by Google Play.
 ```
 
 ## Category
@@ -80,7 +80,7 @@ Productivity is the other listing that fits a field calculator. Tools matches a 
 
 - App type: **Free** to install. Not a paid download.
 - One subscription. Product id `strikeout_yearly`. Base plan id `yearly`, auto-renewing, every year. Price **$24.99 CAD** in Canada. Set the Canada price explicitly. Let Play derive other countries, or turn off countries you do not want.
-- One offer. Offer id `trial7`, a 7-day free trial for a new customer, then the yearly price. Do not add a second base plan.
+- One offer. Offer id `trial3`, a 3-day free trial for a new customer, then the yearly price. Do not add a second base plan.
 - The public site stays free. Do not put the price in the description. The steps are in `play/README.md`.
 
 ## Content rating
@@ -95,7 +95,7 @@ App type: **not a game**. In the IARC questionnaire, choose the utility / all-ot
 | Controlled substances (alcohol, tobacco, drugs) | No |
 | Users interact or exchange content inside the app | No. See the note under the table. |
 | Shares the user's location with other users | No |
-| Users can purchase digital goods inside the app | Yes. One auto-renewing subscription, sold by Google Play, with a 7-day free trial. No other digital goods. |
+| Users can purchase digital goods inside the app | Yes. One auto-renewing subscription, sold by Google Play, with a 3-day free trial. No other digital goods. |
 | Web browser or search engine | No. The app opens one site. It is not a general browser. |
 | User-generated content that other people can browse or that is shared publicly | No |
 | Unrestricted internet, social, or chat | No |

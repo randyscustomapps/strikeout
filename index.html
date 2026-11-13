@@ -601,7 +601,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
 <div id="playGate" hidden>
   <div class="play-gate">
     <p class="play-kicker">Strikeout Harvest</p>
-    <h2 id="playTitle">7-day free trial</h2>
+    <h2 id="playTitle">3-day free trial</h2>
     <p class="play-price" id="playPrice">Then $24.99 CAD a year.</p>
     <p class="play-note" id="playNote">Renews automatically through Google Play until you cancel. Cancel in the Play Store before the trial ends and you are not charged. Google Play shows the trial and the price before you confirm.</p>
     <p class="play-status" id="playStatus" role="status">Checking…</p>
@@ -2920,10 +2920,10 @@ const PLAY={
   service:'https://play.google.com/billing',
   productId:'strikeout_yearly',
   basePlanId:'yearly',
-  offerId:'trial7',
+  offerId:'trial3',
   price:'$24.99',
   currency:'CAD',
-  trialDays:7
+  trialDays:3
 };
 let playSvc=null;
 let playUnlock=null;
