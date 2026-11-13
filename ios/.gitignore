@@ -1,0 +1,14 @@
+Strikeout/Web/*
+!Strikeout/Web/.gitkeep
+build/
+DerivedData/
+*.xcarchive
+*.ipa
+*.dSYM
+xcuserdata/
+*.xcuserstate
+signing/*.p12
+signing/*.mobileprovision
+signing/*.p8
+signing/*.cer
+signing/*.certSigningRequest
