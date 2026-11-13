@@ -58,7 +58,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 36
         versionCode 1
-        versionName "1.0.77"
+        versionName "1.0.80"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -213,5 +213,9 @@ dependencies {
         implementation 'com.google.androidbrowserhelper:locationdelegation:1.1.2'
     
         implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'
+    
+        implementation 'com.google.androidbrowserhelper:billing:1.2.0'
+    
+        implementation 'com.android.billingclient:billing:8.3.0'
     
 }
