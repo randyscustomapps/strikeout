@@ -155,7 +155,7 @@
                 <data android:scheme="https"
                     android:host="@string/hostName"
                 
-                    android:pathPrefix="/strikeout/"
+                    android:pathPrefix="/"
                 
                 />
             </intent-filter>

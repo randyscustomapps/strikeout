@@ -22,8 +22,8 @@ plugins {
 
 def twaManifest = [
     applicationId: 'com.randyscustomapps.strikeout',
-    hostName: 'randyscustomapps.github.io', // The domain being opened in the TWA.
-    launchUrl: '/strikeout/', // The start path for the TWA. Must be relative to the domain.
+    hostName: 'strikeout-harvest.vercel.app', // The domain being opened in the TWA.
+    launchUrl: '/', // The start path for the TWA. Must be relative to the domain.
     name: 'Strikeout Harvest', // The application name.
     launcherName: 'Strikeout', // The name shown on the Android Launcher.
     themeColor: '#2A1D0A', // The color used for the status bar.
@@ -78,12 +78,12 @@ android {
             // The URL the Web Manifest for the Progressive Web App that the TWA points to. This
             // is used by Chrome OS and Meta Quest to open the Web version of the PWA instead of
             // the TWA, as it will probably give a better user experience for non-mobile devices.
-            resValue "string", "webManifestUrl", 'https://randyscustomapps.github.io/strikeout/manifest.webmanifest'
+            resValue "string", "webManifestUrl", 'https://strikeout-harvest.vercel.app/manifest.webmanifest'
         
 
         
             // This is used by Meta Quest.
-            resValue "string", "fullScopeUrl", 'https://randyscustomapps.github.io/strikeout/'
+            resValue "string", "fullScopeUrl", 'https://strikeout-harvest.vercel.app/'
         
 
         

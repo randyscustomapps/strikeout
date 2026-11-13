@@ -1,6 +1,6 @@
 {
   "packageId": "com.randyscustomapps.strikeout",
-  "host": "randyscustomapps.github.io",
+  "host": "strikeout-harvest.vercel.app",
   "name": "Strikeout Harvest",
   "launcherName": "Strikeout",
   "display": "standalone",
@@ -12,9 +12,9 @@
   "navigationDividerColorDark": "#000000",
   "backgroundColor": "#F2DFA7",
   "enableNotifications": true,
-  "startUrl": "/strikeout/",
-  "iconUrl": "https://randyscustomapps.github.io/strikeout/icon-512.png",
-  "maskableIconUrl": "https://randyscustomapps.github.io/strikeout/icon-512.png",
+  "startUrl": "/",
+  "iconUrl": "https://strikeout-harvest.vercel.app/icon-512.png",
+  "maskableIconUrl": "https://strikeout-harvest.vercel.app/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./signing/upload-keystore.jks",
@@ -24,7 +24,7 @@
   "appVersionCode": 1,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://randyscustomapps.github.io/strikeout/manifest.webmanifest",
+  "webManifestUrl": "https://strikeout-harvest.vercel.app/manifest.webmanifest",
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": {
@@ -40,7 +40,7 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
-  "fullScopeUrl": "https://randyscustomapps.github.io/strikeout/",
+  "fullScopeUrl": "https://strikeout-harvest.vercel.app/",
   "minSdkVersion": 21,
   "orientation": "portrait",
   "fingerprints": [],

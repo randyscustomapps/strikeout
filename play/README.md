@@ -1,20 +1,20 @@
 # Strikeout Harvest on Google Play
 
-Draft launch assets for the Android app. The Play app is free to install and sells a yearly subscription through Google Play Billing. The website at `https://randyscustomapps.github.io/strikeout/` stays free, and so does a home-screen install that is not the Play app. The subscription gate lives in `index.html` and runs only inside this Trusted Web Activity.
+Draft launch assets for the Android app. The Play app is free to install and sells a yearly subscription through Google Play Billing. The public page at `https://randyscustomapps.github.io/strikeout/` becomes a Play store link on launch day. The calculator moves to its own origin, `https://strikeout-harvest.vercel.app/`. The subscription gate lives in `index.html` and runs only inside this Trusted Web Activity.
 
-The Android package is a Trusted Web Activity: a thin app that opens that URL in Chrome, fullscreen, once Digital Asset Links check out. Bubblewrap 1.25.0 generated `play/android/` from the live web manifest.
+The Android package is a Trusted Web Activity: a thin app that opens the app origin in Chrome, fullscreen, once Digital Asset Links check out. Bubblewrap 1.25.0 generated `play/android/` from the web manifest.
 
 ## Package name — change it before the first upload
 
 Suggested application id: **`com.randyscustomapps.strikeout`**
 
-It is only a suggestion. Play locks the id at the first upload, and it cannot be renamed later. If you want a different id, change `packageId` in `play/android/twa-manifest.json`, run `bubblewrap update --skipVersionUpgrade` inside `play/android/`, and use the same id in `play/.well-known/assetlinks.json`. Do that before anyone uploads an AAB.
+It is only a suggestion. Play locks the id at the first upload, and it cannot be renamed later. If you want a different id, change `packageId` in `play/android/twa-manifest.json`, run `bubblewrap update --skipVersionUpgrade` inside `play/android/`, and use the same id in `.well-known/assetlinks.json` and `play/.well-known/assetlinks.json`. Do that before anyone uploads an AAB.
 
 ## What the Android project is
 
 | | |
 | --- | --- |
-| Start URL | `https://randyscustomapps.github.io/strikeout/` |
+| Start URL | `https://strikeout-harvest.vercel.app/` |
 | Orientation | Portrait. The website manifest still allows any orientation. The Play app does not. |
 | Theme | Status and navigation `#2A1D0A` (day chrome) and `#0C0904` (night). Splash background `#F2DFA7`, from the web manifest. |
 | Icon | The live `icon-512.png`: flat-auger combine and the STRIKEOUT / HARVEST lockup. |
@@ -74,24 +74,15 @@ A signed AAB was built on the machine that prepared this branch, to prove the pr
 
 ## Digital Asset Links
 
-Chrome only treats the app as a Trusted Web Activity after it finds a statement for this package on the **host root**:
+Chrome only treats the app as a Trusted Web Activity after it finds a statement for this package on the **app origin root**:
 
-`https://randyscustomapps.github.io/.well-known/assetlinks.json`
+`https://strikeout-harvest.vercel.app/.well-known/assetlinks.json`
 
-Not under `/strikeout/`. A file in this repo at `play/.well-known/assetlinks.json` is the template. GitHub Pages for the `strikeout` project serves it at `https://randyscustomapps.github.io/strikeout/play/.well-known/assetlinks.json`, and Chrome will not look there.
+The file in this repo is `.well-known/assetlinks.json`. Vercel serves that path from the app branch. `Content-Type` must be `application/json`, over HTTPS, with no login and no redirect to HTML.
 
-The template is a JSON array. `Content-Type` must be `application/json`, over HTTPS, with no login and no redirect to HTML. GitHub Pages does that for a `.json` file.
+`play/.well-known/assetlinks.json` is the same template. The strikeout project site cannot serve the host root, so do not point the TWA at `randyscustomapps.github.io`.
 
-### Where it has to live
-
-**Option A — user site repo. This matches the current URL.**  
-Create a GitHub repo named exactly `randyscustomapps.github.io`, owned by the `randyscustomapps` account. Put the file at `.well-known/assetlinks.json` on the branch Pages serves. That becomes `https://randyscustomapps.github.io/.well-known/assetlinks.json`. The Strikeout site can stay in the `strikeout` repo. Only the asset links file has to be on the user site. The two repos do not share a folder.
-
-**Option B — a domain you control at the root.**  
-Point the TWA at that host instead (`host`, `startUrl`, and `fullScopeUrl` in `twa-manifest.json`), rebuild, and serve asset links at `https://that-domain/.well-known/assetlinks.json`. Use this if you do not want a user-site repo. It means a new origin, and phones that already cached `github.io/strikeout/` are a different site.
-
-**What does not work.**  
-Serving the file only from the `strikeout` project. `https://randyscustomapps.github.io/strikeout/.well-known/assetlinks.json` is the wrong URL.
+To use a different host, run `play/set-app-origin.sh new-host.example` and create that host before you build. The hostname currently written down is `play/app-origin.txt`.
 
 ### Which SHA-256
 
@@ -99,7 +90,7 @@ After the first upload, Play App Signing is on by default. Phones receive an APK
 
 1. Play Console → Test and release → App integrity → App signing.
 2. Copy the SHA-256 of the **App signing key certificate**.
-3. Put that string in `sha256_cert_fingerprints`, colons included, uppercase hex as Play shows it.
+3. Put that string in `sha256_cert_fingerprints` in `.well-known/assetlinks.json` and `play/.well-known/assetlinks.json`, colons included, uppercase hex as Play shows it.
 4. If you also want a sideload of your own signed APK to open fullscreen, add the upload certificate SHA-256 from `generate-upload-key.sh` as a second string in the same array. Play installs do not use the upload fingerprint.
 
 If you change the package id, change `package_name` in the same file. Update the file when Play rotates the app signing key (rare; Play shows the new fingerprint).
@@ -123,7 +114,7 @@ Those three ids are the only store strings in the web app. They sit in the `PLAY
 
 The page uses the Digital Goods API (`getDigitalGoodsService('https://play.google.com/billing')`) to read the product and `listPurchases()`, and the Payment Request API with method `https://play.google.com/billing` to start the purchase. The request sends `sku`, `offerId`, and `basePlanId`. Play's own sheet is the price the farmer confirms. The $24.99 line on our screen is the fallback until `getDetails` returns Play's price.
 
-The gate runs only when the page was opened as this Play app. Chrome sets `document.referrer` to `android-app://com.randyscustomapps.strikeout` on that launch. A reload in the same tab keeps a `sessionStorage` flag named `strikeout.playtwa` so the gate can come back after the referrer is gone. That flag is not the settings key `strikeout.v1`, and it is not written for a normal browser tab. The website, an iPhone home-screen icon, and an Android install from Chrome's menu never take this path.
+The gate runs only when the page was opened as this Play app. Chrome sets `document.referrer` to `android-app://com.randyscustomapps.strikeout` on that launch. A reload in the same tab keeps a `sessionStorage` flag named `strikeout.playtwa` so the gate can come back after the referrer is gone. That flag is not the settings key `strikeout.v1`, and it is not written for a normal browser tab. Opening the app origin in Chrome, or from an iPhone home-screen icon, does not take this path. That is how a browser test of the calculator works.
 
 Inside the Play app, with no active subscription, the farmer gets one full-screen page: 3-day free trial, then $24.99 CAD a year, a Subscribe button, and a Restore button. The buttons are tall, flat, and use the same day and night colors as the field.
 
@@ -143,18 +134,19 @@ On the first internal test, read the Play sheet before you confirm. It has to sa
 
 Play refunds a subscription that is still unacknowledged after three days. The current Digital Goods API has no `acknowledge()` method, and this app has no server. `PlaySubscriptionAck` in the Android wrapper acknowledges an unacknowledged subscription on the device, when the process starts and again when Play's payment activity closes. It does not store the purchase token. `build-release.sh` puts the `Application.onCreate` call back if `bubblewrap update` rewrites that file. Do not delete `PlaySubscriptionAck.java`.
 
-### The free website is a bypass
+### Public page, app origin, and the test copy
 
-Anyone who opens `https://randyscustomapps.github.io/strikeout/` in a browser, or who uses Add to Home Screen, gets the calculator with no subscription. The Play app loads that same URL. The gate can only appear after this version of `index.html` is what that URL serves. This branch does not publish the site.
+The public URL becomes a store page when the store-page pull request is merged to `main`. Do not merge this branch to `main`. This branch is the calculator. `main` becomes the store page.
 
-Ways to close the hole, for you to pick. None of them is built here.
+`strikeout.v1` is stored per origin. The app origin is not `github.io`, so header sizes and the current row on a phone that used the old site do not show up in the Play app. There is no copy step. The farmer sets the headers again.
 
-1. Leave it. The website is the demo. The Play app is the paid one. A person who already has the URL does not pay. This is the current behavior.
-2. Publish the gate on the website too, and point the planned iPhone build at a different check (App Store) later. The website would stop being a free tool the day that page ships.
-3. Move the Play app to its own origin (a domain you control) and keep GitHub Pages as the free demo. The gate stays on the Play origin only. Asset links and the TWA host have to move with it.
-4. Add a server that Play and the page both trust. That is the only way to make a copied APK or a browser tab fail closed. This app has no server today.
+The test copy is a Vercel preview of a branch that is not the production branch. Open that URL in Chrome. The gate stays off, because it is not the Play app. Bookmark it from the Vercel dashboard.
 
-Sideloading the APK is the same hole as the website, because the pages are the public site. Play Integrity and the old Licensing Verification Library are not wired up. Play Integrity wants a server. The Licensing library answers "did they pay to download," which is the wrong question for a free app with a subscription.
+An obscure URL is not security. The production host is in this public repo (`play/app-origin.txt` and `twa-manifest.json`), so anyone who reads the repo can open the calculator. The source is public too. GitHub's free plan cannot turn on Pages for a private repo, and this repo stays public. Vercel password protection is a paid feature, so the free preview has no password. `robots.txt` on this branch asks crawlers to skip the app origin. That does not stop a person with the link. Turn off Vercel's pull-request comments, or the preview URL is posted on a public pull request.
+
+Vercel Hobby is for non-commercial personal projects. This is a paid app. If that rules Hobby out, put the calculator on a host you control at the root and run `play/set-app-origin.sh` with that hostname. A path under `randyscustomapps.github.io` is the same origin as the store page, so settings would be shared and Chrome would look for asset links at `https://randyscustomapps.github.io/.well-known/assetlinks.json`, which the strikeout project cannot serve.
+
+Sideloading the APK still opens whatever URL is in the package. Play Integrity wants a server this app does not have.
 
 ## Create the subscription in Play Console
 
@@ -187,8 +179,20 @@ The developer account does not exist yet. Nothing here was uploaded.
 3. Create the app. Set it to **Free**. Decide the package id first (`com.randyscustomapps.strikeout` unless you change it). You cannot change it later. Do not set a download price.
 4. Payments profile and tax for the Canadian company, then the subscription in the section above: product `strikeout_yearly`, base plan `yearly`, offer `trial3`, **$24.99 CAD** a year, 3-day free trial.
 5. On your machine, run `generate-upload-key.sh`, back up the keystore and `passwords.env` in a password manager, then `build-release.sh`. Upload **that** AAB. Leave Play App Signing on.
-6. Copy the **App signing** SHA-256 into asset links and publish the file at `https://randyscustomapps.github.io/.well-known/assetlinks.json` from a `randyscustomapps.github.io` repo (option A above).
+6. Copy the **App signing** SHA-256 into `.well-known/assetlinks.json` on this branch and redeploy the app origin. Chrome reads `https://strikeout-harvest.vercel.app/.well-known/assetlinks.json`.
 7. Store listing from `play/listing.md`. Category Tools. Upload the icon, feature graphic, and screenshots in `play/graphics/`.
 8. Privacy policy URL: the hosted `play/privacy.html`. Contact email on that page is support@strikeoutharvest.com.
 9. App content: content rating (Everyone-level, not a game; yes, users can purchase a subscription), target audience 18 and over only, not designed for children, ads No, data safety No collection, location permission foreground and optional, not background.
 10. Ship to an internal test track first and open the app on a phone with Chrome. Confirm the Play sheet says 3 days free, then $24.99 a year. Confirm the browser bar is gone after asset links propagate, then promote the release.
+
+## Launch day
+
+Do this when the Play listing is ready. Until then, leave both pull requests unmerged. `main` keeps serving the calculator.
+
+1. In Vercel, import `randyscustomapps/strikeout`. Production branch: `cursor/play-app-origin-79ea`, not `main`. Framework: Other. The site URL should be `https://strikeout-harvest.vercel.app/`. If that name is taken, run `play/set-app-origin.sh` with the hostname Vercel gives you, commit, and push this branch.
+2. Turn off Vercel pull-request comments so preview URLs are not posted on public pull requests.
+3. Open the production URL in Chrome and confirm the calculator loads and the subscription gate does not. Bookmark a preview URL of any other branch for the next test build. That preview is the test copy.
+4. Build the AAB from this branch and upload it. The start URL is the Vercel origin.
+5. Merge the store-page pull request into `main`. That is the flip. `https://randyscustomapps.github.io/strikeout/` becomes the Play button. Do not merge this branch into `main`.
+6. Open an old home-screen icon once with signal. It should show the store page. After that, offline shows the store page too. A phone that never connects keeps the cached calculator.
+7. Open the Play app. It should show the calculator from the Vercel origin, then the trial screen when billing is live.
