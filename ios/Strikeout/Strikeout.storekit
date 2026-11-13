@@ -1,0 +1,121 @@
+{
+  "identifier" : "F4A1C0DE",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_developerTeamID" : "",
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_CA",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "CAN",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem"
+      }
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "1000000001",
+      "localizations" : [
+        {
+          "description" : "Yearly access to Strikeout Harvest.",
+          "displayName" : "Strikeout Harvest",
+          "locale" : "en_CA"
+        }
+      ],
+      "name" : "Strikeout Harvest",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "24.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "1000000002",
+          "introductoryOffer" : {
+            "internalID" : "1000000003",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "Yearly access, with a 3-day free trial.",
+              "displayName" : "Strikeout Harvest yearly",
+              "locale" : "en_CA"
+            }
+          ],
+          "productID" : "com.randyscustomapps.strikeout.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Strikeout Harvest yearly",
+          "subscriptionGroupID" : "1000000001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
