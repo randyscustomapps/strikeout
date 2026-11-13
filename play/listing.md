@@ -19,14 +19,14 @@ The in-app header is heavy STRIKEOUT with small gold HARVEST between thin gold r
 Store settings, not part of the description.
 
 - Developer name: **Randy's Custom Apps**
-- Contact / support email: **randyscustomapps@gmail.com**
+- Contact / support email: **support@strikeoutharvest.com**
 
 ## Short description
 
-80 characters maximum. This draft is 66.
+80 characters maximum. This draft is 77.
 
 ```
-Skip GPS lines and nudge so the crew's return pass finishes flush.
+Lines to skip and the nudge for the lead combine. Big buttons. Works offline.
 ```
 
 ## Full description
@@ -65,9 +65,10 @@ Screen
 Day, Night, or Auto. Auto follows sunrise and sunset from your location. It does not use the light sensor. Extra-dim night is for the cab after dark. Keep screen on holds the display awake while you are in the field.
 
 On the phone
-Open it once with signal. After that it runs with no cell service. Header sizes, crew counts, and the current row stay on this phone. They are not uploaded. There is no account, and there are no ads.
+The buttons are large and flat, for a combine cab. Open it once with signal. After that it runs with no cell service. Header sizes, crew counts, and the current row stay on this phone. They are not uploaded. There is no account, and there are no ads.
 
-The website is free to try in a browser. The Play Store app is free to install and is a yearly subscription of the same calculator, with a 3-day free trial, billed by Google Play.
+Subscription
+The Play app is free to install. A 3-day free trial, then $24.99 CAD a year. It renews automatically until you cancel. Cancel anytime in Google Play: Play Store, Payments & subscriptions.
 ```
 
 ## Category
@@ -81,7 +82,18 @@ Productivity is the other listing that fits a field calculator. Tools matches a 
 - App type: **Free** to install. Not a paid download.
 - One subscription. Product id `strikeout_yearly`. Base plan id `yearly`, auto-renewing, every year. Price **$24.99 CAD** in Canada. Set the Canada price explicitly. Let Play derive other countries, or turn off countries you do not want.
 - One offer. Offer id `trial3`, a 3-day free trial for a new customer, then the yearly price. Do not add a second base plan.
-- The public site stays free. Do not put the price in the description. The steps are in `play/README.md`.
+- The full description states the trial, the yearly price, and how to cancel. The steps to create the product are in `play/README.md`.
+
+## Subscription name and benefits
+
+Paste these into the subscription in Play Console. Benefit lines are kept to 40 characters.
+
+- Display name: **Strikeout Harvest yearly**
+- Benefits:
+  - 3-day trial, then $24.99 CAD a year
+  - Line and nudge for the lead combine
+  - Big buttons, works offline
+  - Cancel anytime in Google Play
 
 ## Content rating
 
@@ -146,7 +158,7 @@ Do not declare location as collected. Do declare the location **permission** in 
 
 Notifications: the package does not request the notification permission. Strikeout Harvest never posts a notification. See `play/README.md` for why the project file mentions that permission and then removes it.
 
-Privacy policy URL: host `play/privacy.html`. The contact email on that page is randyscustomapps@gmail.com. Until that page is on a public URL, Play will not accept a policy that nobody can open. The in-app page already live at `https://randyscustomapps.github.io/strikeout/privacy.html` is the same location and on-device wording, without the company contact line. Use this draft once it is published. A privacy policy URL is required because the app uses location.
+Privacy policy URL: host `play/privacy.html`. The contact email on that page is support@strikeoutharvest.com. Until that page is on a public URL, Play will not accept a policy that nobody can open. The in-app page `privacy.html` uses the same subscription, on-device, and contact wording. Host `play/privacy.html` for the Play policy URL once it is on a public address. A privacy policy URL is required because the app uses location.
 
 ## Store graphics
 

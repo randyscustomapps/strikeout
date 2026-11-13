@@ -909,7 +909,7 @@ dialog.csheet::backdrop{background:rgba(0,0,0,.42)}
         </section>
 
         <section class="panel">
-          <a class="chkbtn" id="supportMail" href="mailto:randyscustomapps@gmail.com">Contact support</a>
+          <a class="chkbtn" id="supportMail" href="mailto:support@strikeoutharvest.com">Contact support</a>
           <p class="note">Opens your email app with your app version filled in.</p>
         </section>
       </div>
@@ -2860,7 +2860,7 @@ else void resumeAuto();
 
 // offline support when hosted on its own site (ignored elsewhere)
 // ---- version + updates (only when hosted as the installable app)
-const APP_VERSION='1.0.80';
+const APP_VERSION='1.0.81';
 $('verNow').textContent='v'+APP_VERSION;
 function supportHref(){
   let installed=false;
@@ -2871,7 +2871,7 @@ function supportHref(){
   }catch(e){}
   const subject='Strikeout Harvest support (v'+APP_VERSION+')';
   const body='\n\n\n---\nApp version: '+APP_VERSION+'\nDevice: '+(navigator.userAgent||'')+'\nRunning: '+(installed?'installed (standalone)':'in the browser');
-  return 'mailto:randyscustomapps@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  return 'mailto:support@strikeoutharvest.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
 }
 function fillSupportMail(){const a=$('supportMail');if(a)a.href=supportHref();}
 fillSupportMail();

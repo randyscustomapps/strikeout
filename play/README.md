@@ -175,7 +175,7 @@ The developer account does not exist yet. Nothing was created in Play, and nothi
 ## Store listing and privacy
 
 - Listing copy, content rating, data safety, target age, and the graphic file list: `play/listing.md`
-- Privacy policy draft: `play/privacy.html`. Contact email is randyscustomapps@gmail.com. It follows the in-app privacy page and adds the company, the Play purchase, and a contact line.
+- Privacy policy draft: `play/privacy.html`. Contact email is support@strikeoutharvest.com. It follows the in-app privacy page and adds the company, the Play purchase, and a contact line.
 - Icon, feature graphic, and phone screenshots: `play/graphics/`
 
 ## Randy's checklist in Play Console
@@ -189,6 +189,6 @@ The developer account does not exist yet. Nothing here was uploaded.
 5. On your machine, run `generate-upload-key.sh`, back up the keystore and `passwords.env` in a password manager, then `build-release.sh`. Upload **that** AAB. Leave Play App Signing on.
 6. Copy the **App signing** SHA-256 into asset links and publish the file at `https://randyscustomapps.github.io/.well-known/assetlinks.json` from a `randyscustomapps.github.io` repo (option A above).
 7. Store listing from `play/listing.md`. Category Tools. Upload the icon, feature graphic, and screenshots in `play/graphics/`.
-8. Privacy policy URL: the hosted `play/privacy.html`. Contact email on that page is randyscustomapps@gmail.com.
+8. Privacy policy URL: the hosted `play/privacy.html`. Contact email on that page is support@strikeoutharvest.com.
 9. App content: content rating (Everyone-level, not a game; yes, users can purchase a subscription), target audience 18 and over only, not designed for children, ads No, data safety No collection, location permission foreground and optional, not background.
 10. Ship to an internal test track first and open the app on a phone with Chrome. Confirm the Play sheet says 3 days free, then $24.99 a year. Confirm the browser bar is gone after asset links propagate, then promote the release.
