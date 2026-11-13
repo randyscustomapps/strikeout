@@ -32,6 +32,7 @@ files = [
     "play/android/app/src/main/res/values/strings.xml",
     "play/android/app/src/main/res/raw/web_app_manifest.json",
     "play/README.md",
+    "CNAME",
 ]
 for name in files:
     path = pathlib.Path(name)

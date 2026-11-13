@@ -1,6 +1,6 @@
 # Strikeout Harvest on Google Play
 
-Draft launch assets for the Android app. The Play app is free to install and sells a yearly subscription through Google Play Billing. The public page at `https://randyscustomapps.github.io/strikeout/` becomes a Play store link on launch day. The calculator moves to its own origin, `https://strikeout-harvest.vercel.app/`. The subscription gate lives in `index.html` and runs only inside this Trusted Web Activity.
+Draft launch assets for the Android app. The Play app is free to install and sells a yearly subscription through Google Play Billing. The public page at `https://randyscustomapps.github.io/strikeout/` becomes a Play store link on launch day. The calculator moves to its own origin, `https://app.strikeoutharvest.com/`. The subscription gate lives in `index.html` and runs only inside this Trusted Web Activity.
 
 The Android package is a Trusted Web Activity: a thin app that opens the app origin in Chrome, fullscreen, once Digital Asset Links check out. Bubblewrap 1.25.0 generated `play/android/` from the web manifest.
 
@@ -14,7 +14,7 @@ It is only a suggestion. Play locks the id at the first upload, and it cannot be
 
 | | |
 | --- | --- |
-| Start URL | `https://strikeout-harvest.vercel.app/` |
+| Start URL | `https://app.strikeoutharvest.com/` |
 | Orientation | Portrait. The website manifest still allows any orientation. The Play app does not. |
 | Theme | Status and navigation `#2A1D0A` (day chrome) and `#0C0904` (night). Splash background `#F2DFA7`, from the web manifest. |
 | Icon | The live `icon-512.png`: flat-auger combine and the STRIKEOUT / HARVEST lockup. |
@@ -76,13 +76,13 @@ A signed AAB was built on the machine that prepared this branch, to prove the pr
 
 Chrome only treats the app as a Trusted Web Activity after it finds a statement for this package on the **app origin root**:
 
-`https://strikeout-harvest.vercel.app/.well-known/assetlinks.json`
+`https://app.strikeoutharvest.com/.well-known/assetlinks.json`
 
-The file in this repo is `.well-known/assetlinks.json`. Vercel serves that path from the app branch. `Content-Type` must be `application/json`, over HTTPS, with no login and no redirect to HTML.
+The file in this repo is `.well-known/assetlinks.json`. GitHub Pages serves it from the app repo root. `.nojekyll` is there so Pages does not hide the dot folder. `Content-Type` must be `application/json`, over HTTPS, with no login and no redirect to HTML.
 
-`play/.well-known/assetlinks.json` is the same template. The strikeout project site cannot serve the host root, so do not point the TWA at `randyscustomapps.github.io`.
+`play/.well-known/assetlinks.json` is the same template. One GitHub repo has one Pages site, so this file is published from `randyscustomapps/strikeout-app`, not from the strikeout project site. Do not point the TWA at `randyscustomapps.github.io`.
 
-To use a different host, run `play/set-app-origin.sh new-host.example` and create that host before you build. The hostname currently written down is `play/app-origin.txt`.
+`CNAME` in the app repo contains `app.strikeoutharvest.com`. To use a different host, run `play/set-app-origin.sh new-host.example` before you build. The hostname currently written down is `play/app-origin.txt`.
 
 ### Which SHA-256
 
@@ -140,11 +140,9 @@ The public URL becomes a store page when the store-page pull request is merged t
 
 `strikeout.v1` is stored per origin. The app origin is not `github.io`, so header sizes and the current row on a phone that used the old site do not show up in the Play app. There is no copy step. The farmer sets the headers again.
 
-The test copy is a Vercel preview of a branch that is not the production branch. Open that URL in Chrome. The gate stays off, because it is not the Play app. Bookmark it from the Vercel dashboard.
+Open `https://app.strikeoutharvest.com/` in Chrome to test the calculator. The gate stays off, because that visit is not the Play app. GitHub Pages publishes one branch, so there is no separate preview URL. Put a new build on `strikeout-app` only when it is the build the Play app should load.
 
-An obscure URL is not security. The production host is in this public repo (`play/app-origin.txt` and `twa-manifest.json`), so anyone who reads the repo can open the calculator. The source is public too. GitHub's free plan cannot turn on Pages for a private repo, and this repo stays public. Vercel password protection is a paid feature, so the free preview has no password. `robots.txt` on this branch asks crawlers to skip the app origin. That does not stop a person with the link. Turn off Vercel's pull-request comments, or the preview URL is posted on a public pull request.
-
-Vercel Hobby is for non-commercial personal projects. This is a paid app. If that rules Hobby out, put the calculator on a host you control at the root and run `play/set-app-origin.sh` with that hostname. A path under `randyscustomapps.github.io` is the same origin as the store page, so settings would be shared and Chrome would look for asset links at `https://randyscustomapps.github.io/.well-known/assetlinks.json`, which the strikeout project cannot serve.
+The source stays public either way. `strikeout-app` has to be a public repo, because GitHub's free plan does not serve Pages from a private repo. This repo stays public too. The host is in `play/app-origin.txt` and `twa-manifest.json`. Anyone who reads either repo can open the calculator. An obscure URL would not be security, and this URL is not obscure. `robots.txt` asks crawlers to skip the app pages and still allows `/.well-known/`. That does not stop a person.
 
 Sideloading the APK still opens whatever URL is in the package. Play Integrity wants a server this app does not have.
 
@@ -179,20 +177,49 @@ The developer account does not exist yet. Nothing here was uploaded.
 3. Create the app. Set it to **Free**. Decide the package id first (`com.randyscustomapps.strikeout` unless you change it). You cannot change it later. Do not set a download price.
 4. Payments profile and tax for the Canadian company, then the subscription in the section above: product `strikeout_yearly`, base plan `yearly`, offer `trial3`, **$24.99 CAD** a year, 3-day free trial.
 5. On your machine, run `generate-upload-key.sh`, back up the keystore and `passwords.env` in a password manager, then `build-release.sh`. Upload **that** AAB. Leave Play App Signing on.
-6. Copy the **App signing** SHA-256 into `.well-known/assetlinks.json` on this branch and redeploy the app origin. Chrome reads `https://strikeout-harvest.vercel.app/.well-known/assetlinks.json`.
+6. Copy the **App signing** SHA-256 into `.well-known/assetlinks.json` on this branch and redeploy the app origin. Chrome reads `https://app.strikeoutharvest.com/.well-known/assetlinks.json`.
 7. Store listing from `play/listing.md`. Category Tools. Upload the icon, feature graphic, and screenshots in `play/graphics/`.
 8. Privacy policy URL: the hosted `play/privacy.html`. Contact email on that page is support@strikeoutharvest.com.
 9. App content: content rating (Everyone-level, not a game; yes, users can purchase a subscription), target audience 18 and over only, not designed for children, ads No, data safety No collection, location permission foreground and optional, not background.
 10. Ship to an internal test track first and open the app on a phone with Chrome. Confirm the Play sheet says 3 days free, then $24.99 a year. Confirm the browser bar is gone after asset links propagate, then promote the release.
 
+## Where the app is published
+
+One GitHub repo has one Pages site. The strikeout repo's Pages site is the public store page (`https://randyscustomapps.github.io/strikeout/`). It cannot also be `https://app.strikeoutharvest.com/`.
+
+Create a second **public** repo, `randyscustomapps/strikeout-app`, on launch day. Publish this branch's files from the root of that repo (the calculator, `CNAME`, `.nojekyll`, and `.well-known/assetlinks.json`). Set that repo's Pages custom domain to `app.strikeoutharvest.com`. Leave the strikeout repo's Pages domain alone.
+
+The source is public in both repos. A private repo cannot serve Pages on the free plan.
+
+Later, the store page can also live at `https://strikeoutharvest.com/`. That is a different custom domain on the strikeout repo, with GitHub's apex A records at Porkbun. It is not part of this change. Leave the apex alone for now, and do not change the MX or SPF records.
+
+## Porkbun DNS
+
+Nameservers stay on Porkbun. Add one record. Do not edit the MX or SPF records that forward mail.
+
+| Type | Host | Answer |
+| --- | --- | --- |
+| CNAME | `app` | `randyscustomapps.github.io` |
+
+## GitHub domain check, then Pages
+
+Verify the domain on the GitHub account before anyone else can attach it to a Pages site. GitHub makes the TXT value when you add the domain. It is not in this repo.
+
+1. GitHub → Settings → Pages → Add a domain. Enter `strikeoutharvest.com` (the apex). Verifying the apex covers `app`.
+2. GitHub shows a TXT record. The host is `_github-pages-challenge-randyscustomapps`. The value is the string GitHub shows on that screen.
+3. At Porkbun, add that TXT record. Do not change MX or SPF. Click Verify on GitHub.
+4. Create the public repo `randyscustomapps/strikeout-app` and push this app tree to the branch Pages will publish. The root must include `CNAME`, `.nojekyll`, and `.well-known/assetlinks.json`.
+5. In that repo, Settings → Pages → Deploy from that branch. Custom domain: `app.strikeoutharvest.com`. Save.
+6. Wait until the certificate is issued. Then check **Enforce HTTPS**. Leave it unchecked until GitHub offers the box. DNS can take a while. The certificate often follows within an hour and can take longer.
+
 ## Launch day
 
 Do this when the Play listing is ready. Until then, leave both pull requests unmerged. `main` keeps serving the calculator.
 
-1. In Vercel, import `randyscustomapps/strikeout`. Production branch: `cursor/play-app-origin-79ea`, not `main`. Framework: Other. The site URL should be `https://strikeout-harvest.vercel.app/`. If that name is taken, run `play/set-app-origin.sh` with the hostname Vercel gives you, commit, and push this branch.
-2. Turn off Vercel pull-request comments so preview URLs are not posted on public pull requests.
-3. Open the production URL in Chrome and confirm the calculator loads and the subscription gate does not. Bookmark a preview URL of any other branch for the next test build. That preview is the test copy.
-4. Build the AAB from this branch and upload it. The start URL is the Vercel origin.
-5. Merge the store-page pull request into `main`. That is the flip. `https://randyscustomapps.github.io/strikeout/` becomes the Play button. Do not merge this branch into `main`.
+1. Add the Porkbun CNAME above, and the GitHub verification TXT. Do not touch MX or SPF.
+2. Create `randyscustomapps/strikeout-app`, push this app tree, and turn on Pages with the custom domain and Enforce HTTPS, as above.
+3. Open `https://app.strikeoutharvest.com/` in Chrome. The calculator should load and the subscription gate should stay off. `https://app.strikeoutharvest.com/.well-known/assetlinks.json` should be JSON, not a 404.
+4. Build the AAB from this branch and upload it. The start URL is `https://app.strikeoutharvest.com/`.
+5. Merge the store-page pull request (#73) into `main`. That is the flip. `https://randyscustomapps.github.io/strikeout/` becomes the Play button. Do not merge this branch into `main`.
 6. Open an old home-screen icon once with signal. It should show the store page. After that, offline shows the store page too. A phone that never connects keeps the cached calculator.
-7. Open the Play app. It should show the calculator from the Vercel origin, then the trial screen when billing is live.
+7. Open the Play app. It should show the calculator from `https://app.strikeoutharvest.com/`, then the trial screen when billing is live.

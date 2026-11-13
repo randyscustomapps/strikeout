@@ -1,6 +1,6 @@
 {
   "packageId": "com.randyscustomapps.strikeout",
-  "host": "strikeout-harvest.vercel.app",
+  "host": "app.strikeoutharvest.com",
   "name": "Strikeout Harvest",
   "launcherName": "Strikeout",
   "display": "standalone",
@@ -13,8 +13,8 @@
   "backgroundColor": "#F2DFA7",
   "enableNotifications": true,
   "startUrl": "/",
-  "iconUrl": "https://strikeout-harvest.vercel.app/icon-512.png",
-  "maskableIconUrl": "https://strikeout-harvest.vercel.app/icon-512.png",
+  "iconUrl": "https://app.strikeoutharvest.com/icon-512.png",
+  "maskableIconUrl": "https://app.strikeoutharvest.com/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./signing/upload-keystore.jks",
@@ -24,7 +24,7 @@
   "appVersionCode": 1,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://strikeout-harvest.vercel.app/manifest.webmanifest",
+  "webManifestUrl": "https://app.strikeoutharvest.com/manifest.webmanifest",
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": {
@@ -40,7 +40,7 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
-  "fullScopeUrl": "https://strikeout-harvest.vercel.app/",
+  "fullScopeUrl": "https://app.strikeoutharvest.com/",
   "minSdkVersion": 21,
   "orientation": "portrait",
   "fingerprints": [],

@@ -1,1 +1,1 @@
-strikeout-harvest.vercel.app
+app.strikeoutharvest.com
