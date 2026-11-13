@@ -67,7 +67,7 @@ Day, Night, or Auto. Auto follows sunrise and sunset from your location. It does
 On the phone
 Open it once with signal. After that it runs with no cell service. Header sizes, crew counts, and the current row stay on this phone. They are not uploaded. There is no account, and there are no ads.
 
-The website is free to try in a browser. The Play Store app is free to install and is a yearly subscription of the same calculator, with a 3-day free trial, billed by Google Play.
+The public page links to Google Play. The Play Store app is free to install and is a yearly subscription of the calculator, with a 3-day free trial, billed by Google Play.
 ```
 
 ## Category
