@@ -1,7 +1,7 @@
 {
   "name": "Strikeout Harvest",
   "short_name": "Strikeout",
-  "description": "Lines to skip and nudge for the lead combine's strikeout.",
+  "description": "Get Strikeout Harvest on Google Play.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
