@@ -2,7 +2,10 @@
 // When you publish an update: bump APP_VERSION in index.html AND "version" in version.json.
 // Bump VERSION to a new cache name that includes that app version so phones drop the old cache.
 // Never add version.json here — the update check must always hit the network.
-const VERSION = 'strikeout-cache-1.0.79';
+// This origin is the store page. A new cache name drops a previously cached
+// calculator after one online open. A phone that stays offline keeps the old
+// calculator until it next connects.
+const VERSION = 'strikeout-cache-1.0.80';
 const CORE = [
   './',
   './index.html',
